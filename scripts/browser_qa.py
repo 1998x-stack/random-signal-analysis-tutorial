@@ -26,6 +26,13 @@ def main():
                 uri=(ROOT/"chapters"/f"{num:02}.html").as_uri()
                 console_errors.clear()
                 page.goto(uri, wait_until="load")
+                # Lazy-loaded figures may not start loading until they enter the
+                # viewport. Trigger and await decoding before checking them.
+                page.evaluate("""async () => {
+                    const images=[...document.images];
+                    images.forEach(img=>img.loading='eager');
+                    await Promise.all(images.map(img=>img.decode().catch(()=>null)));
+                }""")
                 page.screenshot(path=str(dest/f"ch{num:02}-{width}.png"),full_page=True)
                 result=page.evaluate("""() => {
                     const q=(sel)=>document.querySelector(sel);
