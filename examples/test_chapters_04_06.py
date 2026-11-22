@@ -106,9 +106,15 @@ class Chapter0406MathTests(unittest.TestCase):
     def test_ch06_identical_marginals_different_autocorrelation(self):
         # For A_n = B with B +/-1 and E[B]=0, R_A(k)=1.
         # For iid independent signs, R_B(k) is 1 at zero lag and 0 otherwise.
+        signs = [-1, 1]
+        marginal = {v: 0.5 for v in signs}
+        mean = sum(v * p for v,p in marginal.items())
+        ea2 = sum(v*v*p for v,p in marginal.items())
         for k in range(0,7):
-            self.assertEqual(1, 1)
-            self.assertEqual(1 if k == 0 else 0, int(k == 0))
+            r_constant = ea2
+            r_independent = ea2 if k == 0 else mean*mean
+            self.assertEqual(r_constant, 1)
+            self.assertEqual(r_independent, int(k == 0))
         self.assertAlmostEqual(.5*1+.5*(-1), 0)
         self.assertAlmostEqual(.5*1**2+.5*(-1)**2, 1)
 

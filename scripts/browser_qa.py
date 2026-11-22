@@ -24,6 +24,7 @@ def main():
             page.on("pageerror",lambda e:console_errors.append(str(e)))
             for num in range(1,7):
                 uri=(ROOT/"chapters"/f"{num:02}.html").as_uri()
+                console_errors.clear()
                 page.goto(uri, wait_until="load")
                 page.screenshot(path=str(dest/f"ch{num:02}-{width}.png"),full_page=True)
                 result=page.evaluate("""() => {
@@ -51,12 +52,12 @@ def main():
                 if console_errors: issues.append(f"{key}: JS errors {console_errors}")
                 if num == 4:
                     slider=page.locator("#cheb-k")
-                    slider.fill("4")
+                    slider.evaluate("(e) => {e.value='4';e.dispatchEvent(new Event('input',{bubbles:true}))}")
                     val=page.locator("#cheb-value").inner_text()
                     if "93.75%" not in val: issues.append(f"{key}: Chebyshev demo {val}")
                 if num == 5:
                     slider=page.locator("#rayleigh-gamma")
-                    slider.fill("0")
+                    slider.evaluate("(e) => {e.value='0';e.dispatchEvent(new Event('input',{bubbles:true}))}")
                     val=page.locator("#rayleigh-tail").inner_text()
                     if "100.000%" not in val: issues.append(f"{key}: Rayleigh demo {val}")
                 if num == 6:
