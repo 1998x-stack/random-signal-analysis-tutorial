@@ -6,7 +6,7 @@ Build a rigorous, independently readable Chinese stochastic-signal textbook, not
 ## Repository contract
 - `index.html`: static semantic landing page, all chapter links in initial HTML (do not require JS/fetch to populate).
 - `courses.json`: canonical title, topics, destination, stage metadata. Keep 28 entries and align with the homepage.
-- `chapters/01.html` … `28.html`: canonical content paths. 01–03 are freshly audited; **04–28 remain legacy** pending review.
+- `chapters/01.html` … `28.html`: canonical content paths. 01–06 are rebuilt and reviewed at the chapter level; **07–28 remain legacy** pending review.
 - `assets/css/site.css`: shared styles for new pages; never introduce 28 divergent inline themes.
 - `assets/js/site.js`: unobtrusive enhancement; default content always visible without JS.
 - `assets/svg/NN-*.svg`: original, standalone diagrams with XML namespace, viewBox, title and desc. New images must have meaningful HTML alt and captions.
@@ -59,3 +59,9 @@ Use https://github.com/1998x-stack/Olah-style-posts/tree/main/skills/olah-style-
 - Preserve all existing chapter content or retain copies until migrated. Move legacy files with their exact blob bytes; avoid accidental technical rewrites during path changes.
 - Keep redirect shims and relative links. No destructive branch force-push.
 - Never claim the full 28 chapters are technically audited when only three are.
+
+## Wave 2 · chapters 04–06
+- Chapter 04: finite moments/variance caveat, power=second moment only with clearly stated units, Chebyshev vs normal coverage, nonlinear dependence, characteristic functions.
+- Chapter 05: squared Uniform transform branches, Rayleigh/Rice I/Q assumptions, exact bernoulli PMFs, iid finite variance LLN/CLT distinctions.
+- Chapter 06: sample paths vs ensemble, finite-dimensional distributions, correlated constant-sign vs iid sequence, R vs C, stationarity vs ergodicity.
+- Manuscript quality gate: no unqualified global claims; verify each figure's numbers against `examples/test_chapters_04_06.py` and browser check at 1440/390/360px.

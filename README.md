@@ -18,8 +18,11 @@
 - **[01 概率与贝叶斯检测](chapters/01.html)**：随机相位与样本路径、概率空间、条件概率、10,000 次观测的期望计数贝叶斯树、不相关但不独立的反例。
 - **[02 随机变量与分布](chapters/02.html)**：样本空间映射、离散 CDF 跳跃、连续 PDF 面积、含原子质量的混合分布。
 - **[03 高斯与多维分布](chapters/03.html)**：中心极限定理的条件、高斯覆盖率、联合/边缘/条件分布、协方差椭圆和联合高斯条件推断。
+- **[04 数字特征](chapters/04.html)**：条件期望、方差和切比雪夫、协方差、反例与特征函数（4 SVG）。
+- **[05 变量变换与极限定理](chapters/05.html)**：平方变换 Jacobian、Rayleigh/Rice、特征函数和 LLN/CLT（4 SVG）。
+- **[06 随机过程基本概念](chapters/06.html)**：样本路径、相同边缘不同相关、WSS 与各态历经（4 SVG）。
 
-这三篇采用统一的语义化 HTML、独立 SVG、原生 MathML、轻量交互与可复现校验。**04–28 章仅完成结构迁移，仍为原有正文，尚未经历同等技术审校。**
+这三篇采用统一的语义化 HTML、独立 SVG、原生 MathML、轻量交互与可复现校验。**04–06 章已完成第二批深度改写；07–28 章仍是原有正文，仅作结构迁移。**
 
 ## 本地预览
 
@@ -46,7 +49,7 @@ python3 -m http.server 8000
 ├── assets/
 │   ├── css/site.css           # 全站新设计系统
 │   ├── js/site.js             # 渐进增强交互
-│   └── svg/*.svg              # 9 张原创科学示意图
+│   └── svg/*.svg              # 21 张原创科学示意图
 ├── examples/test_intro_math.py
 ├── scripts/validate_site.py
 ├── .github/workflows/site.yml
@@ -55,7 +58,7 @@ python3 -m http.server 8000
 └── README.md
 ```
 
-历史链接 `/01.html` 至 `/28.html` 使用 HTML 跳转到 `/chapters/NN.html`。原始 04–28 章的相互链接仍然相对于 `chapters/` 解析，不修改其未经审校的正文语义。
+历史链接 `/01.html` 至 `/28.html` 使用 HTML 跳转到 `/chapters/NN.html`。原始 07–28 章的相互链接仍然相对于 `chapters/` 解析，不修改其未经审校的正文语义。
 
 ## 验收
 
@@ -64,7 +67,7 @@ python3 scripts/validate_site.py
 python3 -m unittest discover -s examples -p 'test_*.py' -v
 ```
 
-校验覆盖全部 28 章是否存在、旧 URL 跳转、首页静态课程链接、局部资源和站内锚点、图片替代文本、首次重写章节唯一 H1 与 MathML、SVG XML 结构和 9 张图解的标题/描述。另需按 `AGENTS.md` 在浏览器中人工检查 1440px / 390px / 360px、键盘焦点、MathML 与图形实际显示；**自动静态检查不等于浏览器截图验收**。
+校验覆盖全部 28 章是否存在、旧 URL 跳转、首页静态课程链接、局部资源和站内锚点、图片替代文本、首次重写章节唯一 H1 与 MathML、SVG XML 结构和 21 张图解的标题/描述。另需按 `AGENTS.md` 在浏览器中人工检查 1440px / 390px / 360px、键盘焦点、MathML 与图形实际显示；**自动静态检查不等于浏览器截图验收**。
 
 ## GitHub Pages
 

@@ -44,36 +44,36 @@
       "num": "04",
       "title": "随机变量的数字特征",
       "topics": [
-        "期望与方差",
-        "协方差与相关系数",
-        "矩与特征函数"
+        "期望、方差与功率",
+        "切比雪夫概率界",
+        "协方差、矩和特征函数"
       ],
       "file": "chapters/04.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "概率基础"
     },
     {
       "num": "05",
       "title": "随机变量函数与极限定理",
       "topics": [
-        "变量函数分布变换",
-        "瑞利分布与莱斯分布",
+        "CDF与Jacobian变换",
+        "瑞利与莱斯包络",
         "大数定律与中心极限定理"
       ],
       "file": "chapters/05.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "概率基础"
     },
     {
       "num": "06",
       "title": "随机信号的基本概念",
       "topics": [
-        "随机过程定义",
-        "有限维分布族",
-        "均值/自相关函数"
+        "随机过程与样本路径",
+        "有限维分布与时间相关",
+        "WSS、各态历经性"
       ],
       "file": "chapters/06.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "随机过程与谱"
     },
     {
