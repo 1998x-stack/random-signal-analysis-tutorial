@@ -1,208 +1,23 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第10章 白噪声与热噪声</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html" class="active">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>开篇：无处不在的"嘶嘶"声</h2>
-
-        <p>大家好，我是你们的讲师。请你想一个最常见的声音：把收音机调到没有信号的频道，或者把音响音量开到最大但不播放任何音乐——你听到的那个"嘶嘶"声。那就是噪声，而且是本章要重点讨论的噪声。</p>
-
-        <p>这个嘶嘶声几乎包含了所有频率成分，就像白光是所有可见光的混合一样——这就是"白噪声"这个名字的由来。但白噪声不仅仅是一个学术概念，它还有坚实的物理基础。1928 年，约翰逊（Johnson）在贝尔实验室发现了一个现象：即使没有任何外加电压，一个电阻的两端也存在微弱的电压波动。他的同事奈奎斯特（Nyquist）很快给出了理论解释——这个噪声来源于导体中电子的随机热运动。这就是<strong>热噪声</strong>，也是物理世界中"最白"的噪声之一。</p>
-
-        <p>从本章开始，我们将系统性地研究噪声——它既是信号处理中需要克服的障碍，也是许多物理现象的天然探针。</p>
-
-        <h2>白噪声：理想化的噪声模型</h2>
-
-        <h3>定义与数学表述</h3>
-
-        <p>白噪声（White Noise）是随机信号分析中最基本的噪声模型。一个均值为零的宽平稳随机过程 W(t) 被称为白噪声，如果它的功率谱密度在所有频率上为常数：</p>
-
-        <p><strong>S_W(ω) = N₀/2</strong>，对所有 ω 成立。</p>
-
-        <p>其中 N₀ 是常数，称为"单边噪声功率谱密度"，单位是 W/Hz。除以 2 是因为双边谱将功率对称地分配在正负频率上，但物理上我们通常只关心正频率。</p>
-
-        <p>由维纳-辛钦定理，白噪声的自相关函数为：</p>
-
-        <p><strong>R_W(τ) = (N₀/2) · δ(τ)</strong></p>
-
-        <p>这意味着什么呢？δ(τ) 函数告诉我们：白噪声在任意两个<strong>不同的</strong>时刻是不相关的（R_W(τ) = 0 当 τ ≠ 0）。换句话说，白噪声是一个"没有记忆"的信号——它在每个时刻的取值与任何其他时刻的取值都无关。</p>
-
-        <div class="highlight">
-            <strong>直觉类比：</strong>白噪声就像连续不断地抛掷一个公平的硬币——每次抛掷的结果完全独立于之前的所有结果。但白噪声的"抛掷"是无限密集的（连续时间），每次抛掷的幅度服从高斯分布，所以它比硬币抛掷更复杂一些。
-        </div>
-
-        <h3>白噪声的高斯性</h3>
-
-        <p>在工程中，我们通常还假设白噪声服从<strong>高斯分布</strong>——此时它被称为"高斯白噪声"（Additive White Gaussian Noise, AWGN）。高斯性意味着噪声的幅度分布服从正态分布，而不仅仅是不相关。为什么这个假设合理？因为根据中心极限定理（我们第 5 章讨论过），大量独立微小随机因素叠加的结果趋近于高斯分布——而电阻中的热噪声正是数十亿电子随机热运动的叠加。</p>
-
-        <h2>白噪声的物理不可实现性</h2>
-
-        <h3>理论困境</h3>
-
-        <p>如果我们真的存在一个理想白噪声，那么它的总平均功率将是：</p>
-
-        <pre><code>E[W²(t)] = R_W(0) = (N₀/2) · δ(0) → ∞</code></pre>
-
-        <p>总功率无穷大！这显然不物理——任何实际系统的功率都是有限的。正因为 PSD 在全频带积分发散，理想白噪声在物理上不可实现。它就像一个"完美真空"或"无摩擦平面"，是理论上的极限模型，但实际只能无限逼近而无法完全达到。</p>
-
-        <p>不过别因此轻视白噪声模型——就像物理学家用"质点"和"理想气体"一样，白噪声在理论上极其有用：它抓住了一个关键特征——"在关注的频率范围内，功率谱近似平坦"。</p>
-
-        <h3>带限白噪声</h3>
-
-        <p>现实世界中，我们只能处理<strong>带限白噪声</strong>（Band-Limited White Noise）：功率谱在某个有限带宽 B 内平坦，带宽外为零：</p>
-
-        <pre><code>S_W(ω) = { N₀/2,  |ω| ≤ 2πB
-          { 0,      |ω| > 2πB</code></pre>
-
-        <p>对应的自相关函数为：</p>
-
-        <p><strong>R_W(τ) = N₀ · B · sinc(2Bτ)</strong></p>
-
-        <p>注意这里的 sinc 函数（sin(x)/x）——不同于理想白噪声的 δ 函数，带限白噪声的自相关在不同时刻不再完全为零，而是随着时间间隔增大逐渐衰减到零。这就是"带限"的代价：频带受限 ⟹ 时域必须有一定的相关性。</p>
-
-        <div class="tip">
-            <strong>工程启示：</strong>在仿真中，带限白噪声通常这样生成：用均匀分布的随机数种子输入一个伪随机数生成器，产生高斯分布的序列，然后通过一个低通滤波器来限制带宽。关键是你要确保采样率远高于你关注的最高频率——否则会出现"混叠"问题。
-        </div>
-
-        <h2>热噪声（Johnson-Nyquist噪声）</h2>
-
-        <h3>物理起源</h3>
-
-        <p>1928 年，贝尔实验室的约翰逊（John B. Johnson）在做精密电阻测量实验时发现了一个令人困惑的现象：即使不使用电池，电阻两端也存在着微弱的电压波动。这个波动的幅度虽然很小（微伏量级），但它在高增益放大器中会产生可测量的噪声。</p>
-
-        <p>奈奎斯特（Harry Nyquist）很快从热力学角度给出了解释：导体中的自由电子处于不停的热运动中，温度越高，运动越剧烈。这些电子的随机运动会产生一个随机的电流/电压——这就是<strong>热噪声</strong>（Thermal Noise），也称为 Johnson-Nyquist 噪声。</p>
-
-        <h3>奈奎斯特公式</h3>
-
-        <p>奈奎斯特推导出的公式非常简洁优美：</p>
-
-        <p><strong>V² = 4k_B T R B</strong></p>
-
-        <p>其中：</p>
-        <ul>
-            <li>V² 是热噪声电压的均方值（单位：V²）</li>
-            <li>k_B = 1.38 × 10⁻²³ J/K 是玻尔兹曼常数</li>
-            <li>T 是电阻的绝对温度（单位：K）</li>
-            <li>R 是电阻值（单位：Ω）</li>
-            <li>B 是测量带宽（单位：Hz）</li>
-        </ul>
-
-        <p>这个公式告诉我们：热噪声的功率与温度成正比、与电阻值成正比、与带宽成正比。为什么与带宽成正比？因为热噪声的 PSD 是常数 ≈ 4k_B T R（单边），带宽越宽，累积的噪声功率越大。</p>
-
-        <p>在室温（T = 290 K）下，一个 1 kΩ 电阻的热噪声 PSD 大约为：</p>
-
-        <pre><code>PSD = 4k_B T R
-    = 4 × 1.38×10⁻²³ × 290 × 1000
-    ≈ 1.6 × 10⁻¹⁷  V²/Hz
-    = 4 nV/√Hz  （电压密度）</code></pre>
-
-        <p>这就是为什么精密放大器通常标注输入噪声密度为几个 nV/√Hz——这个值恰好就是热噪声的理论极限。</p>
-
-        <h3>噪声温度的概念</h3>
-
-        <p>在射频和通信系统中，工程师经常使用<strong>噪声温度</strong>（Noise Temperature）来量化噪声，而不是直接使用功率。定义如下：</p>
-
-        <p>对于一个实际器件（如放大器、混频器），它的噪声温度 T_e 是这样一个温度——在这个温度下，一个匹配电阻的热噪声功率等于该器件内部产生的噪声功率。</p>
-
-        <p>噪声温度的优点在于：它是<strong>线性</strong>的，可以方便地级联计算。级联系统的总噪声温度为：</p>
-
-        <p><strong>T_total = T₁ + T₂/G₁ + T₃/(G₁G₂) + ...</strong></p>
-
-        <p>其中 T_i 是第 i 级的噪声温度，G_i 是第 i 级的增益。这个公式（弗里斯公式，Friis Formula）告诉我们：系统第一级的噪声温度和增益对整体噪声性能起决定性作用——这就是为什么接收机的第一级通常是低噪声放大器（LNA）。</p>
-
-        <div class="highlight">
-            <strong>关键洞察：</strong>热噪声不是"缺陷"，而是物质的基本属性。只要温度高于绝对零度，就存在热噪声。在深空通信中，接收机的噪声温度可以低至几开尔文（通过将放大器冷却到极低温度），但永远无法消除。这就是信号检测的终极物理极限之一。
-        </div>
-
-        <h2>有色噪声</h2>
-
-        <h3>噪声的色彩</h3>
-
-        <p>与白噪声相对的是<strong>有色噪声</strong>（Colored Noise）——它的功率谱密度不是平坦的，而是在频率上有所变化。噪声的"颜色"这个命名类比来自光学：像不同颜色的光有不同频率成分一样，不同颜色的噪声有不同的频谱特性。</p>
-
-        <table>
-            <tr><th>噪声类型</th><th>PSD 形式</th><th>自相关函数</th><th>典型来源</th></tr>
-            <tr><td>白噪声</td><td>S(ω) = 常数</td><td>R(τ) ∝ δ(τ)</td><td>热噪声、散弹噪声</td></tr>
-            <tr><td>粉红噪声（1/f 噪声）</td><td>S(ω) ∝ 1/|ω|</td><td>无法显式积分为初等函数</td><td>电子器件闪烁噪声、自然现象</td></tr>
-            <tr><td>布朗噪声（1/f² 噪声）</td><td>S(ω) ∝ 1/ω²</td><td>R(τ) ∝ e^{-α|τ|}（存在截断时）</td><td>布朗运动、随机游走、相位噪声</td></tr>
-            <tr><td>蓝噪声</td><td>S(ω) ∝ |ω|</td><td>高频增强</td><td>某些声学处理过程</td></tr>
-            <tr><td>紫噪声</td><td>S(ω) ∝ ω²</td><td>高频更强</td><td>微分过程</td></tr>
-        </table>
-
-        <h3>噪声整形</h3>
-
-        <p>一个非常重要的概念是<strong>噪声整形</strong>（Noise Shaping）：通过滤波器将白噪声转换为具有特定频谱形状的有色噪声。这个概念在 Σ-Δ 模数转换器（Sigma-Delta ADC）中发挥着核心作用：Σ-Δ 调制器将量化噪声"推"到高频区域（噪声整形），然后用低通滤波器滤除高频噪声部分——这样在低频信号带内的有效信噪比可以大大提高。</p>
-
-        <div class="tip">
-            <strong>有趣的事实：</strong>粉红噪声（1/f 噪声）是自然界中极其普遍的现象——从电子器件的低频噪声到音乐的音高分布，从潮汐的波动到地磁场的涨落，无处不见 1/f 的影子。它被称为"无处不在的噪声"（ubiquitous noise），其物理起源至今没有完全统一的解释。
-        </div>
-
-        <h2>踩坑故事：仿真中白噪声的"无限功率"陷阱</h2>
-
-        <p>这是我亲身经历的一个教训。几年前我在仿真一个 OFDM（正交频分复用）通信系统，需要给接收信号添加高斯白噪声来测试误码率性能。代码很简单：在 Python 中用 <code>numpy.random.normal()</code> 生成一组噪声样本，加到信号上。我设置的噪声方差是 σ² = 1，仿真跑出来误码率曲线看起来完美——与理论曲线高度一致。</p>
-
-        <p>问题出在后面。我把这个 OFDM 系统的仿真扩展到多用户 MIMO 场景，采样率提高了 10 倍，但数据符号的周期不变。这时我发现：<strong>误码率曲线整体偏移了</strong>，信噪比（SNR）的绝对数值跟单用户情况对不上。我花了整整两天排查——检查功率归一化、检查信道矩阵、检查检测算法——都没有发现问题。</p>
-
-        <p>最终，我在对比一篇文章的实现细节时才恍然大悟：我生成噪声的方差是 σ² = 1，采样率增加到 10 倍后，噪声的<strong>总功率</strong>也增加了 10 倍（因为采样点多了，每个点的方差不变）！但实际上物理白噪声的功率谱密度是常数，采样率提高后每个样本的方差应该<strong>减小</strong>才对——因为更快的采样意味着每个样本代表的"等效带宽"更小，累积的噪声功率也就更小。</p>
-
-        <div class="warning">
-            <strong>教训：</strong>在离散时间仿真中，生成白噪声时一定要考虑采样率！正确的做法是：设定所需的单边 PSD 值 N₀，然后根据采样率 f_s 计算每个样本的方差 σ² = N₀ · f_s / 2。如果采样率改变，噪声样本的方差要相应调整。更规范的做法是：先定义"噪声功率谱密度"，再根据系统带宽换算为"噪声功率"，而不是直接拍脑袋定一个方差值。记住：<strong>物理世界中决定噪声量的是 PSD（功率谱密度），不是方差</strong>。
-        </div>
-
-        <h2>本章小结</h2>
-
-        <p>这一章我们深入学习了噪声的数学建模与物理基础。白噪声作为最理想化的噪声模型，其 PSD 平坦、自相关为 δ 函数，在理论上极其重要但物理上不可实现——现实中我们只能用带限白噪声近似。热噪声（Johnson-Nyquist 噪声）作为白噪声最重要的物理实例，揭示了温度、电阻和带宽如何共同决定噪声功率。我们还介绍了粉红噪声、布朗噪声等有色噪声以及噪声整形的概念。最后通过仿真实例警示了不考虑采样率与 PSD 关系而直接设定噪声方差的常见错误。</p>
-
-        <p>下一章我们将讨论一个与工程实践密切相关的概念——<strong>各态历经性</strong>（Ergodicity）。它回答了一个关键问题：我们只有一条样本函数（一次实验记录），怎么用它来估计信号的统计特性？各态历经性告诉你：在某些条件下，时间平均等于集合平均——这让你可以用"一条曲线"推断"全体的性质"。</p>
-
-        <div class="footer-nav">
-            <a href="09.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="11.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="白噪声与热噪声：双边与单边功率谱约定、不相关与独立的区别、Johnson-Nyquist公式与噪声温度、有色噪声与离散仿真方差，含原创SVG与可复现检查。"><title>第 10 章 · 白噪声与热噪声 | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header><div class="article-layout"><aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">白噪声模型</a><a href="#thermal">热噪声与噪声温度</a><a href="#colored">有色噪声与噪声整形</a><a href="#sampling">离散仿真中的方差</a><a href="#experiment">可复现核查</a><a href="#boundaries">边界与陷阱</a><a href="#sources">参考资料</a></nav></aside><main id="article-main" class="article-body"><article><div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 随机过程与谱 / 第 10 章</div><header class="article-header"><p class="chapter-kicker">CHAPTER 10 · 随机过程与谱</p><h1>白噪声与热噪声</h1><p class="dek">“白”只描述功率谱平坦，并不意味着取独立。把这一章讲清楚，需要区分双边与单边谱约定、不相关与独立、理想化模型与物理可实现的带限近似，并说明离散仿真中方差如何随采样率变化。</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>写出双边与单边白噪声谱并换算带宽内功率</li><li>用 Johnson-Nyquist 公式与噪声温度估算器件噪声</li><li>用 Johnson-Nyquist 公式与噪声温度估算器件噪声</li></ul></div></header>
+<section id="opening"><h2>“白”到底白在哪里？</h2><p>白噪声是均值为零的宽平稳过程，其<strong>双边</strong>功率谱在所有频率上为常数：</p><div class="eq" role="group" tabindex="0" aria-label="白噪声的双边功率谱"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="双边功率谱等于N零除以2，对所有角频率成立"><msub><mi>S</mi><mi>W</mi></msub><mo>(</mo><mi>ω</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>N</mi><mn>0</mn></msub><mn>2</mn></mfrac><mo>,</mo><mspace width="0.7em"/><mi>∀</mi><mi>ω</mi></math><span class="eq-label">(10.1) 双边白噪声谱</span></div><p>这里要小心两个容易混的约定：双边谱在正、负频率上都有值；若只画 ω≥0 的<strong>单边谱</strong>，则应为 S₁(ω)=N₀（ω≥0）。同一物理噪声在两套约定下的带宽内功率必须一致，这是检验换算是否正确的硬标准。N₀ 的单位是 V²/Hz（若以 f 为自变量），而 S<sub>W</sub>(ω) 的密度单位是 V²·s/rad。</p><p>由维纳-辛钦定理，自相关退化为一个冲激，于是不同时刻的取值不相关：</p><div class="eq" role="group" tabindex="0" aria-label="白噪声的自相关为冲激"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="自相关等于N零除以2乘单位冲激"><msub><mi>R</mi><mi>W</mi></msub><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>N</mi><mn>0</mn></msub><mn>2</mn></mfrac><mi>δ</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mo>,</mo><mspace width="0.7em"/><msub><mi>R</mi><mi>W</mi></msub><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mn>0</mn><mspace width="0.5em"/><mo>(</mo><mi>τ</mi><mo>≠</mo><mn>0</mn><mo>)</mo></math><span class="eq-label">(10.2) 白噪声自相关</span></div><div class="warning"><p><strong>不相关不等于独立：</strong>“无记忆”“每次抽样互相独立”这类说法只在白噪声同时是<strong>联合高斯</strong>（即 AWGN）时才成立。一般白噪声只保证不同时刻不相关；要得到独立，必须额外假设高斯性。这与第 07 章的结论完全一致。</p></div><p>工程中常写 AWGN（Additive White Gaussian Noise），即在白噪声之上附加高斯性。用中心极限定理为高斯性做辩护时要带上条件：需要大量相互独立、方差有限且贡献均匀的微小成分叠加。热噪声在多数实用条件下接近高斯，但这是近似，不是恒等式。</p><div class="note"><p><strong>理想化的代价：</strong>把 (10.1) 代入总功率公式得到 E[W²]=(1/2π)∫S<sub>W</sub>dω→∞。因此理想白噪声是无限功率的极限模型，只能作为“在关注频带内近似平坦”的近似使用，不能当作某个真实信号。</p></div></section>
+<section id="thermal"><h2>热噪声：电阻两端为什么总有微小电压？</h2><p>导体中的自由电子持续做随机热运动，宏观上表现为电阻两端无法消除的电压波动。Johnson 在 1928 年报告了这一测量，Nyquist 同年给出热力学解释，因此又称 Johnson–Nyquist 噪声。在经典近似 hf≪k<sub>B</sub>T 下，一个电阻 R 在带宽 B 内的<strong>开路</strong>均方噪声电压为：</p><div class="eq" role="group" tabindex="0" aria-label="奈奎斯特热噪声公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="开路均方噪声电压等于4kBT乘R乘B"><mover><msup><mi>V</mi><mn>2</mn></msup><mo>‾</mo></mover><mo>=</mo><mn>4</mn><msub><mi>k</mi><mi>B</mi></msub><mi>T</mi><mi>R</mi><mi>B</mi></math><span class="eq-label">(10.3) 热噪声均方电压（单边）</span></div><p>与之对应，匹配负载上可提取的<strong>可用噪声功率</strong>是 k<sub>B</sub>TB，与 R 无关——这也是“为什么放大器噪声用温度而不是电阻描述”的原因。取 k<sub>B</sub>=1.380649×10⁻²³ J/K（SI 定义值），T=290 K、R=1 kΩ 时：</p><div class="eq" role="group" tabindex="0" aria-label="室温和千欧电阻的噪声密度"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="4倍玻尔兹曼常数乘290乘1000约等于1.60乘10的负17次方伏方每赫兹"><mn>4</mn><msub><mi>k</mi><mi>B</mi></msub><mo>·</mo><mn>290</mn><mo>·</mo><mn>1000</mn><mo>≈</mo><mn>1.60</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>17</mn></mrow></msup><mspace width="0.4em"/><msup><mi>V</mi><mn>2</mn></msup><mo>/</mo><mtext>Hz</mtext></math><span class="eq-label">(10.4) 电压密度数值</span></div><p>对其开方得约 4 nV/√Hz，即精密放大器常标注的噪声底线量级——它正是热噪声的理论下限，而不是某个工艺参数。注意 (10.3)、(10.4) 的数值均按上述假设精确计算，非工程实测。</p><figure><img src="../assets/svg/10-thermal-noise.svg" alt="电阻串联等效噪声电压源的电路图，右侧给出奈奎斯特公式、4nV每根号赫兹的数值和级联噪声温度公式" width="1000" height="400" loading="lazy"><figcaption>图 10.1　电阻可用“无噪声电阻 + 等效噪声电压源”建模；级联系统的噪声温度由弗里斯公式描述，第一级影响最大。</figcaption></figure><div class="note"><p><strong>噪声温度与级联：</strong>把器件内部噪声折算为等效输入温度 T<sub>e</sub>，其优点是可线性相加。级联后 T<sub>total</sub>=T₁+T₂/G₁+T₃/(G₁G₂)+…，因此接收机第一级通常采用低噪声放大器（LNA）。式子在 hf≪k<sub>B</sub>T 的经典近似下成立；极低温或极高频需要量子修正。</p></div></section>
+<section id="colored"><h2>有色噪声与噪声整形</h2><p>谱不平坦的噪声统称有色噪声，按幂次习惯命名。需要强调：这些名称只是对功率谱随频率变化趋势的描述，并不能反推出样本路径的分布或物理机制。</p><div class="table-wrap"><table><thead><tr><th>类型</th><th>PSD 形式</th><th>典型来源</th></tr></thead><tbody><tr><td>白噪声</td><td>S(ω)=常数</td><td>理想化模型；带限热噪声近似</td></tr><tr><td>粉红噪声（1/f）</td><td>S(ω)∝1/|ω|</td><td>电子器件闪烁噪声；无统一物理机制</td></tr><tr><td>布朗噪声（1/f²）</td><td>S(ω)∝1/ω²</td><td>随机游走、积分后的白噪声</td></tr><tr><td>蓝噪声</td><td>S(ω)∝|ω|</td><td>微分白噪声、部分音频处理</td></tr></tbody></table></div><figure><img src="../assets/svg/10-noise-colors.svg" alt="双对数坐标下白噪声谱平坦，粉红噪声负一次方下降，布朗噪声负二次方下降，蓝噪声随频率上升" width="1000" height="400" loading="lazy"><figcaption>图 10.2　噪声“颜色”就是 PSD 幂次的直观标注。斜率仅为教学示意，不代表特定器件的实测谱。</figcaption></figure><p><strong>噪声整形</strong>是把白噪声通过滤波器变成指定谱形的过程。Σ-Δ 调制器把量化噪声推向高频，再用低通滤波去掉带外噪声，从而提高信号带内的有效信噪比。注意：整形不减少总噪声功率，只是改变了它在频率上的分布——这一点与“提高总功率”必须区分开。</p></section>
+<section id="sampling"><h2>离散仿真中方差随采样率怎么变？</h2><p>仿真时直接把“噪声样本的方差”设为 1，这在改变采样率时会静默地改变物理噪声的强度。设关注的连续噪声在带内具有单边密度 N₀，采样率为 f<sub>s</sub>。奈奎斯特带宽是 f<sub>s</sub>/2，因此每个样本承担的噪声功率为：</p><div class="eq" role="group" tabindex="0" aria-label="离散白噪声样本方差与采样率的关系"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="样本方差等于N零乘采样率除以2"><msup><mi>σ</mi><mn>2</mn></msup><mo>=</mo><msub><mi>N</mi><mn>0</mn></msub><mo>·</mo><mfrac><msub><mi>f</mi><mi>s</mi></msub><mn>2</mn></mfrac></math><span class="eq-label">(10.5) 离散样本方差</span></div><p>所以保持 N₀ 不变、把采样率加倍时，样本方差也应加倍；反之，若把方差固定为 1 而拉高采样率，就相当于把隐含的 N₀ 减半。自洽的做法是：先根据物理模型确定 N₀，再按 (10.5) 换算方差。</p><figure><img src="../assets/svg/10-sampling-psd.svg" alt="左侧连续单边功率谱为常数，右侧条形图显示采样率加倍时离散样本方差也加倍" width="1000" height="400" loading="lazy"><figcaption>图 10.3　同一 N₀ 下，离散样本方差与采样率成正比。条形高度为教学示意，比例关系 (10.5) 为精确结果。</figcaption></figure><div class="warning"><p><strong>采样与混叠：</strong>若采样率低于两倍最高关注频率，高频噪声会混叠到带内，使离散样本不再近似白噪声。(10.5) 的前提是采样前已经限制了带宽（抗混叠滤波），不能用它来弥补混叠带来的偏差。</p></div></section>
+<section id="experiment"><h2>把三处数值关系算准</h2><pre class="code-block"><code>from math import pi, sqrt, isclose
+# 1) Nyquist: 290 K, 1 kOhm -> voltage density near 4 nV/sqrt(Hz)
+kB, T, R = 1.380649e-23, 290.0, 1000.0
+density = 4*kB*T*R                 # V^2/Hz, single sided
+assert isclose(density, 1.6019e-17, rel_tol=2e-3)
+assert isclose(sqrt(density), 4.008e-9, rel_tol=2e-3)   # ~4 nV/sqrt(Hz)
+# 2) Two- and one-sided conventions agree over bandwidth B
+N0, B = 2.0, 50.0
+band_power = (1/(2*pi))*(N0/2)*(2*(2*pi*B))   # integrate two-sided over |w|<=2 pi B
+assert isclose(band_power, N0*B, abs_tol=1e-12)
+# 3) Discrete variance scales with the sample rate
+fs = 8000.0
+var1 = N0*fs/2
+assert isclose(N0*(2*fs)/2, 2*var1, abs_tol=1e-9)
+</code></pre><details><summary>自检：把 σ² 固定为 1 并提高采样率，等效地改变了什么？</summary><p>改变了隐含的单边噪声密度：由 σ²=N₀f<sub>s</sub>/2 可知 N₀=2σ²/f<sub>s</sub>。采样率越高，隐含的 N₀ 越小，相当于把物理噪声变得更弱。</p></details></section>
+<section id="boundaries"><h2>边界：哪些说法不能外推</h2><ul><li><strong>理想白噪声不可实现</strong>：它的总功率发散。任何声称“产生了理想白噪声”的仿真实际上都是带限的。</li><li><strong>白≠独立</strong>：白噪声只保证不同时刻不相关；只有联合高斯（AWGN）时才是独立。不能把白噪声当成“每次抽样完全独立”的普适事实。</li><li><strong>热噪声靠近高斯是近似</strong>：它来自大量独立微小贡献的叠加，但“大量”与“独立”都是理想化条件，精确分布仍需由具体统计模型确定。</li><li><strong>同 PSD 不等于同分布</strong>：两个过程的功率谱可以完全相同而分布不同（参见第 09 章），因此谱平坦并不排除任何特定过程。</li><li><strong>整形不减少总噪声</strong>：噪声整形重新分配功率在频率上的位置，不降低总功率，带内信噪比的提高以带外噪声增加为代价。</li></ul><p>这些边界共同说明：白噪声与热噪声是分析噪声的<strong>起点模型</strong>，而不是对任何具体器件噪声的完整描述。</p></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li><a href="https://www.probabilitycourse.com/chapter10/10_1_4_stationary_processes.php">ProbabilityCourse · Stationary Processes</a>：宽平稳白噪声的均值、自相关与谱约定。</li><li><a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/pages/part-iii-random-processes/">MIT OpenCourseWare · Random Processes</a>：白噪声作为宽平稳过程的定义与相关结构。</li><li><a href="https://www.probabilitycourse.com/chapter10/10_2_1_power_spectral_density.php">ProbabilityCourse · Autocorrelation and PSD</a>：自相关与功率谱的变换关系，用于推导 (10.2)。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="09.html">← 第 09 章</a><a href="../index.html#content">全部章节</a><a href="11.html">第 11 章 →</a></nav></article></main></div><footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>
