@@ -1,186 +1,28 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第8章 平稳随机信号</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html" class="active">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>开篇：信号的时间平移不变性</h2>
-
-        <p>大家好，我是你们的讲师。在上一章中，我们学习了随机信号的相关函数与微积分运算。那时候我们注意到一个有趣的问题：随机信号的自相关函数 <code>R(t₁, t₂)</code> 依赖于两个时间点，这让分析变得相当复杂——如果信号有 1000 个采样点，理论上我们需要计算 1000×1000 个相关值。有没有什么简化方法？</p>
-
-        <p>答案就是<strong>平稳性</strong>（stationarity）。如果一个随机信号的统计特性不随时间原点的平移而改变，那么它的均值就是一个常数，自相关函数只依赖于两个时间点之间的差 τ = t₂ - t₁。这样一来，信号分析的复杂度从 O(N²) 降到了 O(N)，而且频域分析（下一章的功率谱密度）才有了坚实的数学基础。平稳性看似是一个很强的假设，但它在工程中却是最常用的出发点——就像物理学中先假设无摩擦再引入摩擦力一样合理。</p>
-
-        <h2>平稳性：时间的平移不变性</h2>
-
-        <h3>直觉理解</h3>
-
-        <p>考虑这样一个场景：你在一台稳定的机器旁边测量振动信号。如果你今天测量一小时和明天同一时间测量一小时，数据的统计特性（均值、方差、相关性结构）应该是相似的，这就是平稳性的直觉——<strong>信号的统计特性不随时间原点改变</strong>。换句话说，系统已经进入了"稳态"，没有了启动瞬态或趋势变化。</p>
-
-        <p>用数学语言来说：对于任意的时间偏移 τ₀，如果随机信号 X(t) 的统计特性与 X(t + τ₀) 完全相同，那么 X(t) 就是平稳的。注意，这里说的是"统计特性"相同，而不是样本函数相同——单个样本当然在随时间变化，但它的"统计规律"是不变的。</p>
-
-        <p>为了让你更直观地理解，想象你在海边观察海浪。虽然每一个波浪的高度、形状都不同，但你观察一小时和观察下一小时的波高分布应该是基本一致的——这就是海浪的平稳性。相反，如果你从早上八点到九点观察海面（涨潮），波高的均值从 1 米逐渐升到 2 米，这就不是平稳的。</p>
-
-        <div class="highlight">
-            <strong>关键区分：</strong>"平稳"不等于"没有波动"。平稳信号可以有剧烈的波动，只要这种波动的统计规律不变。白噪声是平稳的（均值 0、方差 σ² 恒定），但它仍然在剧烈振荡。另一角度：非平稳信号的统计特性是时间 t 的函数，而平稳信号的统计特性只依赖于时间差 τ。
-        </div>
-
-        <h2>严平稳（SSS）</h2>
-
-        <h3>定义与数学表述</h3>
-
-        <p>严格平稳（Strict-Sense Stationary, SSS）的定义非常直接：对于任意正整数 n、任意时间点 t₁, t₂, ..., tₙ 以及任意时间偏移 τ₀，随机信号 X(t) 的 n 维联合分布满足：</p>
-
-        <pre><code>F_X(x₁,...,xₙ; t₁,...,tₙ) = F_X(x₁,...,xₙ; t₁+τ₀,...,tₙ+τ₀)</code></pre>
-
-        <p>也就是说：信号的<strong>任意有限维分布</strong>在时间平移下不变。这意味着什么呢？一阶分布不依赖于 t（均值恒定），二阶分布只依赖于时间差 τ（自相关只依赖于 τ），三阶、四阶……所有阶的分布都有同样的平移不变性。</p>
-
-        <p>严平稳是一个极其完整的平稳概念——它要求信号的所有统计特性都是时不变的。但正因为这个定义太过完美，在工程实践中几乎无法验证。你能想象自己需要验证一个信号的所有有限维分布在时间平移下都不变吗？这就像要检查一座房子的每一块砖头——理论上是这样，实际上你只能抽样检查。</p>
-
-        <div class="tip">
-            <strong>理解要点：</strong>SSS 是理论家喜爱的定义，因为它给出了一个干净的数学框架。但对工程师来说，SSS 的主要价值在于——它告诉我们在什么意义上"信号可以无限观测"：如果你有一个 SSS 信号，你可以在任何一个时间段观测它，得到的统计结论都可以推广到其他时间段。不过在实践中，我们几乎从不检查 SSS，而是使用更方便的 WSS。
-        </div>
-
-        <h2>宽平稳（WSS）</h2>
-
-        <h3>定义与工程意义</h3>
-
-        <p>宽平稳（Wide-Sense Stationary, WSS）是工程中最常用的平稳定义。它的条件比 SSS 弱得多，只涉及前两阶矩：</p>
-
-        <ul>
-            <li><strong>均值恒定</strong>：E[X(t)] = μ_X，是一个与时间 t 无关的常数。</li>
-            <li><strong>方差有限</strong>：E[|X(t)|²] &lt; ∞，信号的总功率有限。</li>
-            <li><strong>自相关只依赖于时延</strong>：R_X(t₁, t₂) = R_X(t₂ - t₁) = R_X(τ)，其中 τ = t₂ - t₁。</li>
-        </ul>
-
-        <p>这三个条件就是 WSS 的全部要求。注意它不要求高阶矩的平稳性，也不要求分布的具体形式——这使得 WSS 几乎成了所有实际信号处理算法的基础假设。</p>
-
-        <p>为什么 WSS 如此重要？因为这三个条件恰好是<strong>功率谱密度</strong>存在所需要的。我们下一章将要学习的维纳-辛钦定理（Wiener-Khinchin Theorem）告诉我们：WSS 信号的自相关函数与功率谱密度构成一对傅里叶变换对。如果信号不满足 WSS，这个关系就不成立，频域分析就失去了根基。</p>
-
-        <h3>高斯情况：SSS ⇔ WSS</h3>
-
-        <p>有一个非常重要的特例：如果 X(t) 是<strong>高斯随机过程</strong>，那么 WSS 等价于 SSS。为什么？因为高斯过程的任意有限维分布完全由均值向量和协方差矩阵决定。如果一阶矩和二阶矩是时不变的，那么所有高阶矩（它们都由前两阶矩确定）也一定是时不变的。换句话说，对高斯信号而言，"宽平稳"自动意味着"严平稳"。</p>
-
-        <p>这个性质在实际工作中非常有用：你只需要确认一个高斯信号的均值和自相关满足 WSS 条件，就可以放心地把它当作严平稳信号来处理，不需要担心高阶矩的问题。</p>
-
-        <div class="warning">
-            <strong>注意：</strong>这个等价关系<strong>只对高斯过程成立</strong>。对于非高斯信号，WSS 完全不保证 SSS。例如一个 WSS 的二元信号（取值 ±1），它的三阶矩可能随时间变化，但二阶矩却不変。不要因为方便就默认非高斯信号的 WSS 等价于 SSS！
-        </div>
-
-        <h2>联合平稳与循环平稳</h2>
-
-        <h3>联合平稳（Jointly WSS）</h3>
-
-        <p>在实际工程中，我们经常同时处理多个随机信号——例如一个通信系统同时有发送信号和接收信号，一个控制系统同时有参考信号和误差信号。这时候除了各自的平稳性，还需要考虑两个信号之间的互相关特性。</p>
-
-        <p>两个随机信号 X(t) 和 Y(t) 被称为<strong>联合宽平稳</strong>，如果它们各自都是 WSS 的，并且它们的互相关函数只依赖于时间差 τ：</p>
-
-        <p><strong>R_{XY}(t₁, t₂) = E[X(t₁) Y(t₂)] = R_{XY}(τ)</strong>，其中 τ = t₂ - t₁。</p>
-
-        <p>联合平稳性在系统分析中至关重要。回想一下第 12 章将要讲的内容：当一个随机信号通过线性系统时，输入输出之间的互相关函数反映了系统对信号的影响。如果输入是 WSS 的且系统是线性时不变的（LTI），那么输入输出就是联合平稳的——这个性质让我们可以用简单的卷积运算来分析系统。</p>
-
-        <h3>循环平稳（Cyclostationary）</h3>
-
-        <p>现实世界中，很多随机信号的统计特性并不是恒定的，而是呈现周期性变化。最典型的例子就是<strong>数字通信中的调制信号</strong>。想象一下 BPSK 调制：信号的符号以固定的符号周期 T_s 切换，每个符号的幅度可以建模为一个随机变量。这时信号的统计特性不是时不变的，而是以 T_s 为周期变化的——这就叫做循环平稳。</p>
-
-        <p>循环平稳信号的数学定义：均值 m_X(t) 和自相关 R_X(t₁, t₂) 对时间偏移具有周期性，即存在 T &gt; 0 使得：</p>
-
-        <p><strong>m_X(t + T) = m_X(t)</strong> 且 <strong>R_X(t₁ + T, t₂ + T) = R_X(t₁, t₂)</strong></p>
-
-        <p>循环平稳分析在工程中有重要的应用：在认知无线电（Cognitive Radio）中，可以利用信号的循环平稳特性来检测是否存在主用户信号——因为噪声通常不是循环平稳的，而通信信号是。这种"循环平稳检测"比传统的能量检测在低信噪比下表现更好。</p>
-
-        <div class="highlight">
-            <strong>实用技巧：</strong>处理循环平稳信号的一个常用技巧是"循环平均"——在每个周期内的相同相位位置做平均，就可以把循环平稳信号转换为平稳信号。这本质上就是接收机中"符号同步"和"匹配滤波"的数学基础。
-        </div>
-
-        <h2>SSS vs WSS 对比表</h2>
-
-        <table>
-            <tr><th>特性</th><th>严平稳（SSS）</th><th>宽平稳（WSS）</th></tr>
-            <tr><td>涉及矩的阶数</td><td>所有阶（全部有限维分布）</td><td>仅前两阶（均值+自相关）</td></tr>
-            <tr><td>验证难度</td><td>工程上几乎不可验证</td><td>易于验证和假设</td></tr>
-            <tr><td>高斯过程</td><td>SSS 自动满足 WSS 条件</td><td>WSS 等价于 SSS</td></tr>
-            <tr><td>频域分析支持</td><td>支持（但估计困难）</td><td>直接支持维纳-辛钦定理</td></tr>
-            <tr><td>工程常用性</td><td>主要用于理论分析</td><td>几乎所有实用算法的假设</td></tr>
-            <tr><td>高阶矩要求</td><td>全部时不变</td><td>无要求</td></tr>
-            <tr><td>典型应用</td><td>信息论、遍历理论证明</td><td>功率谱估计、滤波、检测</td></tr>
-        </table>
-
-        <h3>如何判断信号是否平稳？</h3>
-
-        <p>在工程实践中，判断平稳性通常不是通过严格的统计检验，而是通过领域知识和对信号产生机制的理解：</p>
-
-        <ul>
-            <li><strong>物理系统</strong>：如果系统已经处于稳态（没有启动瞬态、没有时变参数），通常可以假设 WSS。</li>
-            <li><strong>趋势检验</strong>：检查信号是否有明显的趋势项（如线性增长或衰减）。有趋势项 → 非平稳。</li>
-            <li><strong>分段统计</strong>：将信号分成多段，比较每段的均值和方差。如果变化显著 → 怀疑非平稳。</li>
-            <li><strong>时间-频率分析</strong>：用短时傅里叶变换（STFT）观察频谱随时间的变化。稳定 → 可近似为 WSS。</li>
-        </ul>
-
-        <h2>踩坑故事：为非平稳信号穿上"平稳的外衣"</h2>
-
-        <p>讲一个我在研究生阶段参与的课题组项目。师兄毕业论文的核心内容是用<strong>功率谱估计</strong>来分析某种脑电信号（EEG）的频域特征，进而推断不同认知任务下的大脑活跃区域。EEG 信号被分成 10 秒的片段，每一段都被假定为 WSS，然后直接用周期图法估计功率谱。</p>
-
-        <p>实验结果在组会上展示时看起来很不错——不同任务下的 α 波（8-12 Hz）和 β 波（13-30 Hz）的功率比例出现了明显的差异，似乎验证了实验假设。然而一位审稿人提出了尖锐的问题：<strong>"你们的 EEG 数据做过平稳性检验吗？"</strong></p>
-
-        <p>师兄当时就懵了——没人做过这个检验。在审稿人的要求下，我们重新审视了数据。用分段方差检验发现，很多 10 秒片段内的 EEG 信号并非平稳：受试者在实验过程中可能出现眨眼、肌肉紧张、注意力波动等非平稳因素，这些都会显著改变信号的能量分布。更有意思的是，之前观察到的"显著差异"中，有一部分根本不是认知任务导致的，而是受试者在不同任务阶段的疲劳程度不同造成的——也就是说，我们一直在把非平稳信号的功率谱变化错误地归因于实验变量。</p>
-
-        <div class="warning">
-            <strong>教训：</strong>把非平稳信号当作平稳信号做功率谱估计，得到的结果可能完全不可靠。功率谱密度的数学定义依赖于平稳性假设，如果不验证这个假设就直接用 FFT 做谱分析，相当于在流沙上盖房子。在工程实践中，遇到未知信号时请首先问三个问题：(1) 信号的产生机制是否支持平稳性？(2) 是否有趋势项或周期性成分？(3) 分段时间窗是否足够短以保证近似平稳？记住：<strong>平稳性不是一个可以"默认"的假设，而是一个需要你主动验证的前提条件</strong>。
-        </div>
-
-        <h2>本章小结</h2>
-
-        <p>这一章我们学习了随机信号分析中最重要的概念之一——平稳性。严平稳（SSS）要求所有有限维分布在时间平移下不变，是理论上的黄金标准；宽平稳（WSS）只要求均值和自相关满足时不变条件，是工程实践中最实用的假设。我们还讨论了高斯过程中 SSS 与 WSS 的等价性、联合平稳的处理方法以及循环平稳这个更贴近工程实际的概念。最后通过一个 EEG 信号分析的真实案例，警示了忽视平稳性假设可能带来的严重后果。</p>
-
-        <p>下一章我们将进入随机信号频域分析的核心——<strong>功率谱密度与维纳-辛钦定理</strong>。你会发现，WSS 假设的价值在频域中得到了最充分的体现：正是由于自相关只依赖于 τ，它才能与功率谱密度构成傅里叶变换对。请记住：平稳性是"桥"，而维纳-辛钦定理是那座桥上最重要的通行证。</p>
-
-        <div class="footer-nav">
-            <a href="07.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="09.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="平稳随机信号：严平稳与宽平稳的精确定义、二者与高斯过程的关系、联合平稳与循环平稳，含原创 SVG 与可复现检查。"><title>第 08 章 · 平稳随机信号 | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header><div class="article-layout"><aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">宽平稳的定义</a><a href="#strict">严平稳与两者的关系</a><a href="#gaussian">高斯过程的等价性</a><a href="#notsss">宽平稳但不严平稳</a><a href="#joint">联合平稳与循环平稳</a><a href="#experiment">可复现核查</a><a href="#sources">参考资料</a></nav></aside><main id="article-main" class="article-body"><article><div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 随机过程与谱 / 第 08 章</div><header class="article-header"><p class="chapter-kicker">CHAPTER 08 · 随机过程与谱</p><h1>平稳随机信号</h1><p class="dek">为什么今天测到的均值可以代表明天的信号？把“统计规律不随时间原点改变”写成可检验的条件，需要区分严平稳与宽平稳、自相关与自协方差，并说清高斯过程为何是唯一的等价特例。</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>写出严平稳与宽平稳的定义并指出各自的验证对象</li><li>判断“严平稳 ⇒ 宽平稳”需要什么前提，以及高斯反向等价的原因</li><li>给出一个宽平稳但不严平稳的显式反例，并说明联合平稳与循环平稳</li></ul></div></header>
+<section id="opening"><h2>凭什么把不同时刻的观测当成同一个分布？</h2><p>把同一台接收机在上午和下午各录一分钟噪声，如果要用上午的均值和方差去预测下午的行为，你实际上假定了“统计规律不随时间原点改变”。把这句话写成可检验的条件，就是<strong>宽平稳</strong>（wide-sense stationary, WSS）。</p><p>定义之前先约定时差方向：本章统一取 τ=t₂−t₁，即后者减前者。复值信号的归一化、离散序列的索引约定将在第 09、第 14 章重申。宽平稳要求同时满足三条：</p><div class="eq" role="group" tabindex="0" aria-label="宽平稳的三条定义"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="均值恒定，均方有限，自相关只依赖时差τ"><msub><mi>μ</mi><mi>X</mi></msub><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><msub><mi>μ</mi><mi>X</mi></msub><mo>,</mo><mspace width="0.7em"/><mi>E</mi><mo>[</mo><msup><mrow><mo>|</mo><mi>X</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>|</mo></mrow><mn>2</mn></msup><mo>]</mo><mo>&lt;</mo><mi>∞</mi><mo>,</mo><mspace width="0.7em"/><msub><mi>R</mi><mi>X</mi></msub><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>,</mo><msub><mi>t</mi><mn>2</mn></msub><mo>)</mo><mo>=</mo><msub><mi>R</mi><mi>X</mi></msub><mo>(</mo><mi>τ</mi><mo>)</mo></math><span class="eq-label">(8.1) 宽平稳的三条要求</span></div><p>注意第二条是<strong>均方有限</strong>。由柯西-施瓦茨不等式，E[|X|]≤√E[X²]，所以均方有限已隐含均值有限；在第一条均值恒定的前提下，均方有限与方差有限等价。把它写成均方有限只是因为这更贴近定义本身，不必先假设均值存在。第三条只约束<strong>自相关</strong>；自协方差随之满足 C<sub>X</sub>(τ)=R<sub>X</sub>(τ)−|μ<sub>X</sub>|²，两者只在 μ<sub>X</sub>=0 时重合。</p><figure><img src="../assets/svg/08-wss-conditions.svg" alt="两段不同绝对时刻的观测均值和方差带相同，自相关只由时差决定" width="1000" height="420" loading="lazy"><figcaption>图 8.1　宽平稳只要求一阶矩恒定、均方有限、自相关只依赖时差 τ；不要求样本波形相同，也不要求高阶矩的平移不变性。</figcaption></figure><div class="note"><p><strong>平稳不等于无波动：</strong>白噪声均值恒为 0、方差恒定，是宽平稳的，但它每一刻都在剧烈振荡。平稳描述的是<strong>波动的规律</strong>不变，而不是波形不变。</p></div></section>
+<section id="strict"><h2>严平稳比宽平稳强在哪里？</h2><p><strong>严平稳</strong>（strict-sense stationary, SSS）要求：对任意正整数 n、任意时刻 t₁,…,t<sub>n</sub> 与任意平移 τ₀，有限维分布完全不变。</p><div class="eq" role="group" tabindex="0" aria-label="严平稳的有限维分布平移不变性"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="任意维联合分布函数在时间平移后不变"><msub><mi>F</mi><mrow><mi>X</mi><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>)</mo><mo>,</mo><mi>…</mi><mo>,</mo><mi>X</mi><mo>(</mo><msub><mi>t</mi><mi>n</mi></msub><mo>)</mo></mrow></msub><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo><mo>=</mo><msub><mi>F</mi><mrow><mi>X</mi><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>+</mo><msub><mi>τ</mi><mn>0</mn></msub><mo>)</mo><mo>,</mo><mi>…</mi><mo>,</mo><mi>X</mi><mo>(</mo><msub><mi>t</mi><mi>n</mi></msub><mo>+</mo><msub><mi>τ</mi><mn>0</mn></msub><mo>)</mo></mrow></msub><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>x</mi><mi>n</mi></msub><mo>)</mo></math><span class="eq-label">(8.2) 严平稳的定义</span></div><p>两者之间有一个方向是<strong>无条件成立</strong>的，这一点常被写错：只要二阶矩存在，严平稳就一定是宽平稳。取 n=1 得到均值恒定，取 n=2 得到联合分布只依赖时差，因而 R<sub>X</sub> 也只依赖 τ。反过来则不然。</p><div class="table-wrap"><table><thead><tr><th>比较项</th><th>严平稳 SSS</th><th>宽平稳 WSS</th></tr></thead><tbody><tr><td>约束对象</td><td>全有限维联合分布</td><td>均值、自相关（前二阶）</td></tr><tr><td>前提</td><td>无（无需矩）</td><td>二阶矩存在</td></tr><tr><td>推导方向</td><td>SSS + 二阶矩 ⇒ WSS</td><td>WSS ⇒ SSS 一般不成立</td></tr><tr><td>验证难度</td><td>工程上不可逐项验证</td><td>可用分段统计近似检查</td></tr><tr><td>频域用途</td><td>需附加二阶矩条件才可用</td><td>直接支持维纳-辛钦定理</td></tr></tbody></table></div><div class="warning"><p><strong>常见误写：</strong>“严平稳是高斯过程才有的概念”或“严平稳自动是宽平稳且反之”。正确表述是：严平稳加二阶矩存在⇒宽平稳；反向需要额外条件，而高斯过程恰好提供了这个条件（见下节）。</p></div></section>
+<section id="gaussian"><h2>为什么只有高斯过程能让两个定义重合？</h2><p>称 X(t) 为<strong>高斯过程</strong>，如果对任意有限个时刻，向量 (X(t₁),…,X(t<sub>n</sub>)) 服从<strong>联合</strong>多维高斯分布。这个“联合”很关键：只要每个时刻的边缘都是高斯、但联合分布不是高斯（例如两向量的依赖是非线性的），就不能用下面的等价性。</p><p>高斯向量的分布完全由均值向量与协方差矩阵决定。在宽平稳前提下，均值恒定；而协方差矩阵的元素 Cov(X(t<sub>i</sub>),X(t<sub>j</sub>)) 只依赖时差 t<sub>j</sub>−t<sub>i</sub>。把整个时间轴平移 τ₀ 后，任意有限维协方差矩阵的每个元素不变，而均值向量也不变，所以平移前后是<strong>同一个</strong>多维高斯分布。由此得到：</p><div class="eq" role="group" tabindex="0" aria-label="高斯过程下宽平稳与严平稳等价"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="对高斯过程，宽平稳当且仅当严平稳"><mtext>X 是高斯过程</mtext><mspace width="0.6em"/><mo>⟹</mo><mspace width="0.6em"/><mrow><mo>(</mo><mtext>WSS</mtext><mo>⟺</mo><mtext>SSS</mtext><mo>)</mo></mrow></math><span class="eq-label">(8.3) 高斯过程的等价性</span></div><p>这给出一个非常实用的判据：只要确认一个高斯信号的均值恒定、自相关只依赖时差，就可以把它当作严平稳处理，不必再检查高阶矩——因为它们都由前两阶矩完全决定。</p><div class="warning"><p><strong>不要外推：</strong>非高斯过程完全没有这个便利。下一节会给出一个宽平稳但不严平稳的显式反例，它的边缘分布随时间改变。把“不相关即独立”或“宽平平即严平稳”当作普适规则，都会在非高斯环境中出错。</p></div></section>
+<section id="notsss"><h2>反例：宽平稳但连边缘分布都不恒定</h2><p>取两个独立、等概率取 ±1 的随机变量 A 与 B，令 θ=π/3，定义离散时间过程 X<sub>n</sub>=A·cos(nθ)+B·sin(nθ)，n 为整数。</p><p>先看二阶量。因为 E[A]=E[B]=0、E[A²]=E[B²]=1、E[AB]=0，展开乘积期望后发现交叉项消失：</p><div class="eq" role="group" tabindex="0" aria-label="该过程的自相关只依赖时差"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="自相关等于余弦的n减m倍θ"><msub><mi>R</mi><mi>X</mi></msub><mo>(</mo><mi>n</mi><mo>,</mo><mi>m</mi><mo>)</mo><mo>=</mo><mi>cos</mi><mo>(</mo><mo>(</mo><mi>n</mi><mo>−</mo><mi>m</mi><mo>)</mo><mi>θ</mi><mo>)</mo><mo>,</mo><mspace width="0.7em"/><mi>E</mi><mo>[</mo><msubsup><mi>X</mi><mi>n</mi><mn>2</mn></msubsup><mo>]</mo><mo>=</mo><mn>1</mn></math><span class="eq-label">(8.4) 自相关只依赖时差</span></div><p>均值恒为 0、均方恒为 1、自相关只依赖 n−m，所以它是<strong>宽平稳</strong>的。但把 n=0 与 n=1 的边缘分布都写出来，差别立刻显现：X<sub>0</sub>=A 只在 ±1 取值（各 1/2）；而 X<sub>1</sub>=A/2+B(√3/2) 在四个不同值 ±(1+√3)/2、±(1−√3)/2 上各取 1/4。两者均值为 0、方差为 1，但分布不同，因此<strong>不严平稳</strong>。</p><figure><img src="../assets/svg/08-wss-not-sss.svg" alt="时刻n=0时X为正负一的二点分布，时刻n=1时X为四个值的分布，均值方差相同但形状不同" width="1000" height="400" loading="lazy"><figcaption>图 8.2　宽平稳但不严平稳的显式反例。两列概率质量分布形状不同，却共享相同的均值 0 与方差 1，因此 R 只依赖时差。</figcaption></figure><div class="note"><p><strong>为什么选 θ=π/3？</strong>若改取 θ=π/2，旋转 90° 会把支持集的四个角点 {(±1,±1)} 映回自身，使 (X₀,X₁) 与 (X₁,X₂) 同分布，反而成为严平稳。π/3 的旋转不保持该四点分布，边缘分布才会随 n 真正改变。</p></div></section>
+<section id="joint"><h2>多路信号与周期性统计：联合平稳、循环平稳</h2><p>当系统里同时有多个信号时，各自的平稳性还不够，还需要它们之间的互相关也只依赖时差。称 X(t) 与 Y(t) <strong>联合宽平稳</strong>，若两者各自宽平稳，且 R<sub>XY</sub>(t₁,t₂) 只依赖 t₂−t₁。这为第 12 章分析线性系统输入-输出关系提供了前提：输入宽平稳且系统线性时不变时，输入与输出是联合平稳的。</p><p>很多真实信号的统计特性不是恒定，而是<strong>周期变化</strong>：通信信号的符号速率、周期性采样时钟都会在统计量上留下周期性。若存在 T&gt;0 使均值与自相关相对时间偏移 T 不变，则称过程是<strong>循环平稳</strong>（宽意义下）：</p><div class="eq" role="group" tabindex="0" aria-label="循环平稳的定义"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="均值与自相关相对时间平移T不变"><msub><mi>μ</mi><mi>X</mi></msub><mo>(</mo><mi>t</mi><mo>+</mo><mi>T</mi><mo>)</mo><mo>=</mo><msub><mi>μ</mi><mi>X</mi></msub><mo>(</mo><mi>t</mi><mo>)</mo><mo>,</mo><mspace width="0.7em"/><msub><mi>R</mi><mi>X</mi></msub><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>+</mo><mi>T</mi><mo>,</mo><msub><mi>t</mi><mn>2</mn></msub><mo>+</mo><mi>T</mi><mo>)</mo><mo>=</mo><msub><mi>R</mi><mi>X</mi></msub><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>,</mo><msub><mi>t</mi><mn>2</mn></msub><mo>)</mo></math><span class="eq-label">(8.5) 循环平稳（宽意义）</span></div><figure><img src="../assets/svg/08-cyclostationary.svg" alt="一段统计结构以周期T重复的信号，下方把相邻T长片段对齐后统计规律一致" width="1000" height="400" loading="lazy"><figcaption>图 8.3　循环平稳信号的统计结构以 T 为周期重复；把时间轴按 T 分帧并对齐，可得到片段内一致的“平稳化”表示，这正是接收机符号同步的数学背景。</figcaption></figure><div class="warning"><p><strong>交叉陷阱：</strong>一个循环平稳信号既不是宽平稳的，也不能简单地用普通功率谱描述——它的时变统计量会产生不能忽略的离散谱线。直接套用平稳公式会遗漏这些谱成分，即使它看起来“差不多”是平稳的。</p></div></section>
+<section id="experiment"><h2>把反例的每个数都算出来</h2><p>用四个等概率结果 ((1,0),(0,1),(−1,0),(0,−1)) 代替 (A,B) 的分布，直接做集合平均。</p><pre class="code-block"><code>from math import pi, cos, sin, isclose
+pts = [(1, 0), (0, 1), (-1, 0), (0, -1)]  # (A, B), each with prob 1/4
+th = pi/3
+def X(n, A, B):
+    return A*cos(n*th) + B*sin(n*th)
+def R(n, m):
+    return sum(X(n, a, b)*X(m, a, b) for a, b in pts)/4
+def Xn(n):
+    return sorted({round(X(n, a, b), 6) for a, b in pts})
+# 1) WSS: R depends only on the lag n-m
+assert all(isclose(R(n, m), cos((n-m)*th), abs_tol=1e-12)
+           for n in range(-3, 4) for m in range(-3, 4))
+# 2) constant mean and unit variance for every n
+for n in range(-3, 4):
+    vals = [X(n, a, b) for a, b in pts]
+    assert isclose(sum(vals)/4, 0, abs_tol=1e-12)
+    assert isclose(sum(v*v for v in vals)/4, 1, abs_tol=1e-12)
+# 3) but marginals differ: 2 atoms at n=0, 4 atoms at n=1
+assert len(Xn(0)) == 2 and len(Xn(1)) == 4
+</code></pre><details><summary>自检：为什么“宽平稳”不能写成“自协方差只依赖时差”？</summary><p>可以，但前提是均值恒定。恒等式 C<sub>X</sub>(τ)=R<sub>X</sub>(τ)−|μ|² 说明在均值恒定的前提下两者等价；若均值随时间变化，自相关不会被“只依赖时差”的单个条件固定。</p></details><details><summary>自检：把上述反例的 (A,B) 换成独立标准高斯，得到的过程严平稳吗？</summary><p>严平稳。此时它是高斯过程，宽平稳已成立，由 (8.3) 自动升格为严平稳，边缘分布也不再随时间改变。</p></details></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li><a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/pages/part-iii-random-processes/">MIT OpenCourseWare · Random Processes</a>：平稳、宽平稳与奇平稳的定义，以及高斯过程阶矩特征。</li><li><a href="https://www.probabilitycourse.com/chapter10/10_1_4_stationary_processes.php">ProbabilityCourse · Stationary Processes</a>：严平稳与宽平稳的对比及自相关性质。</li><li><a href="https://www.probabilitycourse.com/chapter10/10_2_1_power_spectral_density.php">ProbabilityCourse · Autocorrelation and PSD</a>：宽平稳前提与维纳-辛钦定理的衔接。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="07.html">← 第 07 章</a><a href="../index.html#content">全部章节</a><a href="09.html">第 09 章 →</a></nav></article></main></div><footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>
