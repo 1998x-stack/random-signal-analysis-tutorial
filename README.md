@@ -25,16 +25,16 @@
 
 无需打包工具，也不依赖在线字体或数学排版 CDN：
 
-\`\`\`bash
+```bash
 python3 -m http.server 8000
 # 浏览 http://localhost:8000/
-\`\`\`
+```
 
 首页和阅读页面的基本内容在关闭 JavaScript 时仍然存在。JS 仅增强目录检索与三个数值交互。
 
 ## 仓库布局
 
-\`\`\`text
+```text
 .
 ├── index.html                 # GitHub Pages 静态课程首页
 ├── courses.json               # 全课程元数据（路径/精修状态）
@@ -53,22 +53,22 @@ python3 -m http.server 8000
 ├── AGENTS.md
 ├── 01.html … 28.html          # 旧地址的轻量跳转页
 └── README.md
-\`\`\`
+```
 
-历史链接 \`/01.html\` 至 \`/28.html\` 使用 HTML 跳转到 \`/chapters/NN.html\`。原始 04–28 章的相互链接仍然相对于 \`chapters/\` 解析，不修改其未经审校的正文语义。
+历史链接 `/01.html` 至 `/28.html` 使用 HTML 跳转到 `/chapters/NN.html`。原始 04–28 章的相互链接仍然相对于 `chapters/` 解析，不修改其未经审校的正文语义。
 
 ## 验收
 
-\`\`\`bash
+```bash
 python3 scripts/validate_site.py
 python3 -m unittest discover -s examples -p 'test_*.py' -v
-\`\`\`
+```
 
-校验覆盖全部 28 章是否存在、旧 URL 跳转、首页静态课程链接、局部资源和站内锚点、图片替代文本、首次重写章节唯一 H1 与 MathML、SVG XML 结构和 9 张图解的标题/描述。另需按 \`AGENTS.md\` 在浏览器中人工检查 1440px / 390px / 360px、键盘焦点、MathML 与图形实际显示；**自动静态检查不等于浏览器截图验收**。
+校验覆盖全部 28 章是否存在、旧 URL 跳转、首页静态课程链接、局部资源和站内锚点、图片替代文本、首次重写章节唯一 H1 与 MathML、SVG XML 结构和 9 张图解的标题/描述。另需按 `AGENTS.md` 在浏览器中人工检查 1440px / 390px / 360px、键盘焦点、MathML 与图形实际显示；**自动静态检查不等于浏览器截图验收**。
 
 ## GitHub Pages
 
-静态网站的入口是**仓库根目录的** \`index.html\`，所有 URL 使用适用于项目子路径的相对路径。GitHub 仓库中选择 **Settings → Pages → Deploy from a branch → main / (root)**（如果当前配置尚未启用）。代码合并并不等于 Pages 已成功部署，必须检查 Pages 构建状态与在线链接。
+静态网站的入口是**仓库根目录的** `index.html`，所有 URL 使用适用于项目子路径的相对路径。GitHub 仓库中选择 **Settings → Pages → Deploy from a branch → main / (root)**（如果当前配置尚未启用）。代码合并并不等于 Pages 已成功部署，必须检查 Pages 构建状态与在线链接。
 
 ## 参考资料
 

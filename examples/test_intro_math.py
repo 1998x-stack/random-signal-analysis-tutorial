@@ -17,12 +17,6 @@ class IntroMathTests(unittest.TestCase):
         ex, ey = sum(xs) / 3, sum(ys) / 3
         cov = sum((x - ex) * (y - ey) for x, y in zip(xs, ys)) / 3
         self.assertAlmostEqual(cov, 0.0)
-        self.assertNotEqual(
-            sum(x == 0 and y == 0 for x, y in zip(xs, ys)) / 3,
-            (sum(x == 0 for x in xs) / 3) *
-            (sum(y == 0 for y in ys) / 3) +
-            0.1,  # deliberately distinct comparator, not proof of independence
-        )
         self.assertAlmostEqual(
             sum(x == 0 and y == 0 for x, y in zip(xs, ys)) / 3, 1 / 3
         )
