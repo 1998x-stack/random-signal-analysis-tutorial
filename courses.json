@@ -133,7 +133,7 @@
         "蒙特卡罗与随机模拟"
       ],
       "file": "chapters/11.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "随机过程与谱"
     },
     {
