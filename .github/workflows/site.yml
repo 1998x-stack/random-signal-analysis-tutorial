@@ -1,0 +1,23 @@
+name: Validate static textbook
+
+on:
+  push:
+    branches: [main, "refactor/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  site-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate files, routes, MathML and SVG
+        run: python scripts/validate_site.py
+      - name: Verify probability and Gaussian examples
+        run: python -m unittest discover -s examples -p 'test_*.py' -v
