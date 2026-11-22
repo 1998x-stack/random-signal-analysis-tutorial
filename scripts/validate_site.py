@@ -83,10 +83,11 @@ def main():
         if chapter.get("file") != expected:
             report(f"courses.json: expected {expected}")
         page = Path(expected)
-        if i <= 3:
+        if i <= 6:
             scan = parse(page)
             if scan.h1 != 1: report(f"{page}: require one H1")
-            if scan.math < 3: report(f"{page}: need multiple native MathML formulas")
+            if scan.math < 5: report(f"{page}: need multiple native MathML formulas")
+            if i >= 4 and len(scan.img_alt) < 4: report(f"{page}: expected at least 4 explanatory images")
             if any(not alt.strip() for alt in scan.img_alt):
                 report(f"{page}: image missing alt text")
         else:
@@ -100,7 +101,7 @@ def main():
     if home.cards != 28: report(f"index has {home.cards} static chapter cards, expected 28")
     parse(Path("chapters/index.html"))
     svgs = list((ROOT/"assets/svg").glob("*.svg"))
-    if len(svgs) < 9: report("expected 9 original figures")
+    if len(svgs) < 21: report("expected 21 original figures")
     for path in svgs:
         try:
             tree = ET.parse(path)
