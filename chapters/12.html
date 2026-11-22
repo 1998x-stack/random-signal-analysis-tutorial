@@ -1,212 +1,23 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第12章 随机信号通过线性系统（上）</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html" class="active">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>开篇：随机信号穿越"黑箱"</h2>
-
-        <p>大家好，我是你们的讲师。一个随机信号 X(t) 进入一个线性时不变系统（LTI 系统），出来变成 Y(t)。已知 X(t) 的统计特性，如何求出 Y(t) 的统计特性？这个问题在工程中无处不在：电子噪声通过放大器、无线信号通过多径信道、股票价格通过移动平均滤波器……本质上都是同一个数学结构。</p>
-
-        <p>好消息是，如果你已经掌握了确定性信号通过 LTI 系统的分析方法，那么随机版本并不困难——我们只需要把经典卷积运算与统计期望结合起来。本章和下一章将完整推导这套理论，本章专注于<strong>时域分析</strong>，下一章进入<strong>频域</strong>。</p>
-
-        <h2>问题的提出</h2>
-
-        <h3>系统模型</h3>
-
-        <p>考虑一个线性时不变系统，其冲激响应为 h(t)，频率响应为 H(ω)。输入是随机信号 X(t)，输出为：</p>
-
-        <p><strong>Y(t) = ∫_{-∞}^{∞} h(τ) X(t - τ) dτ = h(t) ∗ X(t)</strong></p>
-
-        <p>问题：已知输入随机信号 X(t) 的统计特性（均值 μ_X(t)、自相关 R_X(t₁, t₂)），以及系统的冲激响应 h(t)，求输出 Y(t) 的统计特性（均值 μ_Y(t)、自相关 R_Y(t₁, t₂)）以及输入-输出的互相关 R_{XY}(t₁, t₂)。</p>
-
-        <p>注意，这里一开始<strong>不假设输入是平稳的</strong>——公式推导对一般的随机信号都成立，然后再看平稳情况下的简化。</p>
-
-        <div class="highlight">
-            <strong>核心思想：</strong>卷积是线性运算，而期望也是线性运算——两者可以交换顺序。这个"期望与卷积可交换"的性质，是整个随机信号通过 LTI 系统分析的基石。正是因为这两个线性算子的可交换性，我们才能从输入的统计特性推导出输出的统计特性。
-        </div>
-
-        <h2>输出均值</h2>
-
-        <h3>一般公式</h3>
-
-        <p>输出 Y(t) 的均值为：</p>
-
-        <pre><code>μ_Y(t) = E[Y(t)] = E[∫ h(τ) X(t-τ) dτ]
-        = ∫ h(τ) E[X(t-τ)] dτ        （交换期望与积分）
-        = ∫ h(τ) μ_X(t-τ) dτ
-        = μ_X(t) ∗ h(t)</code></pre>
-
-        <p>漂亮！输出均值 = 输入均值与冲激响应的卷积。这完全类似于确定性信号分析的输入-输出关系——只不过这里的"输入"是统计均值函数。</p>
-
-        <h3>平稳输入的特殊情况</h3>
-
-        <p>如果 X(t) 是 WSS 的，那么 μ_X(t) = μ_X 是常数：</p>
-
-        <p><strong>μ_Y(t) = μ_X · ∫_{-∞}^{∞} h(τ) dτ = μ_X · H(0)</strong></p>
-
-        <p>其中 H(0) = ∫ h(τ) dτ 是系统的<strong>直流增益</strong>——频率响应在 ω = 0 处的值。这个结果非常直观：平稳信号的直流分量经过系统后，被系统的直流增益缩放。如果 H(0) = 0（例如交流耦合放大器），输出均值为零，不管输入均值是多少。</p>
-
-        <p>更重要的是：平稳输入 ⟹ 输出均值也是常数，所以输出至少是"均值平稳"的。后面我们会看到，输出自相关也只依赖于 τ，因此 WSS 输入通过 LTI 系统的输出也是 WSS 的——这个性质非常关键。</p>
-
-        <h2>输入输出互相关</h2>
-
-        <h3>定义与推导</h3>
-
-        <p>输入与输出之间的互相关函数 R_{XY}(t₁, t₂) 定义为：</p>
-
-        <pre><code>R_{XY}(t₁, t₂) = E[X(t₁) Y(t₂)]
-                = E[X(t₁) · ∫ h(τ) X(t₂-τ) dτ]
-                = ∫ h(τ) E[X(t₁) X(t₂-τ)] dτ
-                = ∫ h(τ) R_X(t₁, t₂-τ) dτ
-                = R_X(t₁, t₂) ∗_{t₂} h(t₂)</code></pre>
-
-        <p>注意这里的卷积是关于 t₂ 变量的（第二个时间参数）。直观含义：<strong>互相关 = 输入自相关与系统冲激响应的卷积</strong>。</p>
-
-        <h3>平稳情况下的简化</h3>
-
-        <p>如果 X(t) 是 WSS 的，R_X(t₁, t₂) = R_X(t₂ - t₁) = R_X(τ)，其中 τ = t₂ - t₁：</p>
-
-        <pre><code>R_{XY}(τ) = ∫ h(u) R_X(τ - u) du = R_X(τ) ∗ h(τ)</code></pre>
-
-        <p>所以输入输出互相关也只依赖于时延 τ！这意味着 X(t) 和 Y(t) 是联合 WSS 的。这是一个重要的性质：<strong>WSS 输入通过 LTI 系统 ⟹ 输入输出联合 WSS</strong>。</p>
-
-        <p>这个结果在系统辨识中有重要应用：如果我们能在系统输入端注入一个已知统计特性的测试信号（如白噪声），然后测量输入输出互相关，就可以估计出系统的冲激响应——因为当输入为白噪声时，R_X(τ) = (N₀/2)δ(τ)，于是 R_{XY}(τ) ∝ h(τ)。这就是相关法系统辨识的基本原理。</p>
-
-        <div class="tip">
-            <strong>系统辨识的简单思路：</strong>给待测系统输入一个宽带宽的白噪声信号，同时记录输入和输出。计算输入输出的互相关函数——理论上它正比于系统的冲激响应 h(τ)。这个方法的优点：(1) 不需要断开系统；(2) 白噪声不影响系统的正常工作；(3) 可以平均多次来提高估计精度。这是工程中测量未知系统冲激响应的首选方法之一。
-        </div>
-
-        <h2>输出自相关（时域）</h2>
-
-        <h3>双重卷积公式</h3>
-
-        <p>现在来到最重要的部分——输出自相关 R_Y(t₁, t₂)：</p>
-
-        <pre><code>R_Y(t₁, t₂) = E[Y(t₁) Y(t₂)]
-             = E[∫ h(α) X(t₁-α) dα · ∫ h(β) X(t₂-β) dβ]
-             = ∫∫ h(α) h(β) E[X(t₁-α) X(t₂-β)] dα dβ
-             = ∫∫ h(α) h(β) R_X(t₁-α, t₂-β) dα dβ
-             = R_X(t₁, t₂) ∗_{t₁} h(t₁) ∗_{t₂} h(t₂)</code></pre>
-
-        <p>这就是输出自相关的<strong>双重卷积公式</strong>——输入自相关分别对两个时间参数与系统冲激响应做卷积。</p>
-
-        <h3>平稳情况的关键简化</h3>
-
-        <p>当 X(t) 是 WSS 时，令 τ = t₂ - t₁：</p>
-
-        <pre><code>R_Y(τ) = ∫∫ h(α) h(β) R_X(τ + α - β) dα dβ</code></pre>
-
-        <p>进一步可以简化为更方便的形式。先对 β 进行变量替换 u = β - α：</p>
-
-        <pre><code>R_Y(τ) = ∫ h(α) ∫ h(β) R_X(τ + α - β) dβ dα
-        = ∫ h(α) [R_X(τ) ∗ h(-τ)] 在 (τ+α) 处取值  dα</code></pre>
-
-        <p>最常用的形式是引入"冲激响应的自相关" ϕ_h(τ) = ∫ h(t) h(t+τ) dt = h(τ) ∗ h(-τ)，于是：</p>
-
-        <p><strong>R_Y(τ) = R_X(τ) ∗ ϕ_h(τ) = R_X(τ) ∗ h(τ) ∗ h(-τ)</strong></p>
-
-        <p>也就是说：输出自相关 = 输入自相关与系统冲激响应自相关的卷积。这个公式优雅而强大——它将系统的影响完全封装在 ϕ_h(τ) 中。</p>
-
-        <div class="highlight">
-            <strong>直观理解：</strong>ϕ_h(τ) = h(τ) ∗ h(-τ) 是系统冲激响应的自相关函数，它反映了系统的"记忆特性"——好的滤波器（窄带）有很长的 ϕ_h(τ)，意味着输出信号在不同时刻之间有很强的相关性；而宽带系统（短冲激响应）的 ϕ_h(τ) 衰减很快，意味着输出信号的相关性弱。
-        </div>
-
-        <h2>输入→输出统计特性映射表</h2>
-
-        <table>
-            <tr><th>输出统计量</th><th>一般时变公式</th><th>WSS 输入时简化</th><th>记忆口诀</th></tr>
-            <tr><td>均值 μ_Y(t)</td><td>μ_X(t) ∗ h(t)</td><td>μ_X · H(0)</td><td>μ 过系统，乘以直流增益</td></tr>
-            <tr><td>互相关 R_{XY}</td><td>R_X(t₁, t₂) ∗_{t₂} h(t₂)</td><td>R_X(τ) ∗ h(τ)</td><td>互相关 = 自相关 ∗ h</td></tr>
-            <tr><td>输出自相关 R_Y</td><td>R_X(t₁,t₂) ∗_{t₁} h(t₁) ∗_{t₂} h(t₂)</td><td>R_X(τ) ∗ h(τ) ∗ h(-τ)</td><td>自相关过两次系统</td></tr>
-            <tr><td>输出方差 σ²_Y</td><td>R_Y(t, t) - |μ_Y(t)|²</td><td>R_Y(0) - μ²_X · H²(0)</td><td>τ=0 处取值减均值平方</td></tr>
-            <tr><td>输出 PSD S_Y(ω)</td><td>（见下章）</td><td>|H(ω)|² · S_X(ω)</td><td>频域乘法更简单</td></tr>
-        </table>
-
-        <p>观察上表你会发现一个模式：时域的公式涉及卷积，比较繁琐；但频域的公式（见下一章）是简单的乘法。这就是为什么在实际工程中，大多数随机信号通过 LTI 系统的分析都是在频域中完成的。</p>
-
-        <h3>计算示例：RC低通滤波器的输出自相关</h3>
-
-        <p>考虑一个一阶 RC 低通滤波器，其冲激响应 h(t) = (1/RC) · e^{-t/RC} · u(t)。输入是 PSD 为 N₀/2 的白噪声。求输出自相关。</p>
-
-        <p>由 ϕ_h(τ) = h(τ) ∗ h(-τ)：</p>
-
-        <pre><code>ϕ_h(τ) = (1/(2RC)) · e^{-|τ|/RC}
-
-R_Y(τ) = (N₀/2) · ϕ_h(τ)
-       = (N₀/4RC) · e^{-|τ|/RC}</code></pre>
-
-        <p>输出平均功率：σ²_Y = R_Y(0) = N₀/(4RC)。有趣的是，时间常数 RC 越大（滤波器越窄），输出平均功率越小——因为更多的噪声功率被滤波器滤除了。这正是直觉的数学表达。</p>
-
-        <h2>踩坑故事：忘记双重卷积的代价</h2>
-
-        <p>我的一个同事在做 MEMS（微机电系统）加速度计的噪声建模时，遇到了一个经典错误。加速度计可以建模为一个二阶线性系统（质量-弹簧-阻尼系统），输入是外部加速度，输出是检测到的位移。系统中的电子噪声可以建模为输入端的白噪声。</p>
-
-        <p>他需要计算输出噪声的功率（即位移检测的噪声方差），以便评估加速度计的灵敏度极限。他正确地计算了白噪声通过系统的 PSD 传递（这个我们下章会讲），然后积分得到了噪声功率——结果与实验测量值差了 2 倍。</p>
-
-        <p>排查了两天后，他发现——在计算输出信号的<strong>总功率</strong>时，他使用了公式：</p>
-
-        <pre><code>σ²_Y = ∫ S_X(ω) · |H(ω)|² dω     ← 正确</code></pre>
-
-        <p>但在检查时域结果时，他直接用了 R_Y(0) = R_X(0) ∗ h(0) ∗ h(0)，即只做了一次而不是双重卷积。这个错误相当于只对输入自相关在一个时间轴上做了滤波，忘记了对另一个时间轴的处理——结果少了一个数量级的噪声功率。</p>
-
-        <div class="warning">
-            <strong>教训：</strong>输出自相关的双重卷积公式 R_Y = R_X ∗ h ∗ h 不是打字打重复了，而是<strong>两次卷积缺一不可</strong>。第一次卷积对应输出信号的时间索引 t₁，第二次对应 t₂。如果你只做一次卷积，你得到的是 R_{XY}（互相关），而不是 R_Y（输出自相关）。一个简单的记忆方法："输入自相关要过两次系统，一次给 t₁，一次给 t₂；互相关只过一次，因为另一个时间点在输入侧"。别把互相关当自相关！
-        </div>
-
-        <h2>本章小结</h2>
-
-        <p>这一章我们从时域角度完整分析了随机信号通过 LTI 系统的统计特性传递。我们推导了三个核心公式：输出均值（μ_Y = μ_X ∗ h）、输入输出互相关（R_{XY} = R_X ∗ h）、输出自相关（R_Y = R_X ∗ h ∗ h）。对于 WSS 输入，输出也是 WSS 的，且输入输出联合平稳——这个性质是所有频域分析的基础。我们还展示了一个 RC 低通滤波器的完整计算例子，并通过 MEMS 噪声建模的踩坑故事警示了忘记双重卷积的常见错误。</p>
-
-        <p>下一章我们将进入频域视角——你会发现，同样的关系在频域中变得异常简洁：<strong>S_Y(ω) = |H(ω)|² · S_X(ω)</strong>。频域分析不仅公式更干净，还引入了等效噪声带宽等重要概念。准备好迎接"乘法时代"吧。</p>
-
-        <div class="footer-nav">
-            <a href="11.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="13.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="随机信号通过线性系统（上）：输出均值、输入输出互相关与输出自相关的时域卷积公式、平稳输入下的简化与系统辨识，含原创SVG与可复现检查。"><title>第 12 章 · 随机信号通过线性系统（上） | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header><div class="article-layout"><aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">问题与系统模型</a><a href="#mean">输出均值</a><a href="#cross">输入输出互相关</a><a href="#autocorr">输出自相关</a><a href="#example">可算例子：RC 低通</a><a href="#experiment">可复现核查</a><a href="#sources">参考资料</a></nav></aside><main id="article-main" class="article-body"><article><div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 系统与模型 / 第 12 章</div><header class="article-header"><p class="chapter-kicker">CHAPTER 12 · 系统与模型</p><h1>随机信号通过线性系统（上）</h1><p class="dek">随机信号进入一个线性时不变系统后，均值、互相关和输出自相关怎样传递？为什么互相关只过一次系统，而输出自相关要过两次？把“期望与卷积可交换”写成可检验的公式，需要哪些稳定性前提？</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>推导输出均值、互相关与输出自相关的时域卷积公式</li><li>说明期望与卷积交换的合法性条件，以及 WSS 输入下的简化</li><li>用 RC 低通例子验证输出功率，并识别“只做一次卷积”的错误</li></ul></div></header>
+<section id="opening"><h2>随机信号进入“黑箱”后，统计量怎样变化？</h2><p>设线性时不变系统的冲激响应为 h(t)、频率响应为 H(ω)，输入随机信号 X(t) 产生输出</p><div class="eq" role="group" tabindex="0" aria-label="线性时不变系统的输入输出卷积关系"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出等于冲激响应与输入的卷积"><mi>Y</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mi>X</mi><mo>(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo>)</mo><mi>d</mi><mi>τ</mi><mo>=</mo><mo>(</mo><mi>h</mi><mo>∗</mo><mi>X</mi><mo>)</mo><mo>(</mo><mi>t</mi><mo>)</mo></math><span class="eq-label">(12.1) LTI 系统输出</span></div><p>整个推导的基石是一个交换：<strong>卷积是线性运算，期望也是线性运算</strong>，所以在适当条件下 E 与 ∫h(τ)(·)dτ 可以交换次序。</p><div class="warning"><p><strong>交换不是无条件的：</strong>需要系统<strong>稳定</strong>，即 ∫|h(t)|dt&lt;∞（BIBO 稳定），且输入的二阶矩有限。有了这个前提，才能用 Fubini/控制收敛把期望移进积分，否则交换可能给出错误结果。本章所有公式均在“稳定 LTI + 有限二阶矩输入”下成立。</p></div><figure><img src="../assets/svg/12-lti-mapping.svg" alt="随机信号X经过冲激响应h的线性时不变系统得到Y，下方列出均值、互相关与输出自相关的卷积公式" width="1000" height="400" loading="lazy"><figcaption>图 12.1　时域映射关系：均值与互相关各过一次系统，输出自相关要过两次。一般（非平稳）公式与平稳简化形式并列。</figcaption></figure></section>
+<section id="mean"><h2>输出均值：与冲激响应卷积</h2><p>把期望移入卷积积分（依赖稳定前提），得到一般公式：</p><div class="eq" role="group" tabindex="0" aria-label="输出均值的一般公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出均值等于冲激响应与输入均值的卷积"><msub><mi>μ</mi><mi>Y</mi></msub><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>τ</mi><mo>)</mo><msub><mi>μ</mi><mi>X</mi></msub><mo>(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo>)</mo><mi>d</mi><mi>τ</mi><mo>=</mo><mo>(</mo><msub><mi>μ</mi><mi>X</mi></msub><mo>∗</mo><mi>h</mi><mo>)</mo><mo>(</mo><mi>t</mi><mo>)</mo></math><span class="eq-label">(12.2) 输出均值</span></div><p>若输入宽平稳，μ<sub>X</sub> 为常数，从积分中提出来，剩下的恰好是系统的直流增益 H(0)=∫h(τ)dτ：</p><div class="eq" role="group" tabindex="0" aria-label="平稳输入下的输出均值"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出均值等于输入均值乘直流增益H零"><msub><mi>μ</mi><mi>Y</mi></msub><mo>=</mo><msub><mi>μ</mi><mi>X</mi></msub><mi>H</mi><mo>(</mo><mn>0</mn><mo>)</mo><mo>,</mo><mspace width="0.7em"/><mi>H</mi><mo>(</mo><mn>0</mn><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mi>d</mi><mi>τ</mi></math><span class="eq-label">(12.3) 平稳输入：直流增益缩放</span></div><p>直观含义：直流（均值）分量被系统的直流增益缩放。若 H(0)=0（如隔直电容、微分器），则输出均值为零，与输入均值无关。注意这里只说明了输出的<strong>一阶矩</strong>是常数；要得到输出宽平稳，还需要自相关也只依赖时差，这将在下一节完成。</p></section>
+<section id="cross"><h2>输入输出互相关：只过一次系统</h2><p>互相关 R<sub>XY</sub>(t₁,t₂)=E[X(t₁)Y(t₂)]，把 Y(t₂) 展开并把期望移入积分（只涉及一次 h）：</p><div class="eq" role="group" tabindex="0" aria-label="输入输出互相关的一般公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="互相关等于输入自相关对第二个时间参数与h的卷积"><msub><mi>R</mi><mrow><mi>X</mi><mi>Y</mi></mrow></msub><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>,</mo><msub><mi>t</mi><mn>2</mn></msub><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>τ</mi><mo>)</mo><msub><mi>R</mi><mi>X</mi></msub><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>,</mo><msub><mi>t</mi><mn>2</mn></msub><mo>−</mo><mi>τ</mi><mo>)</mo><mi>d</mi><mi>τ</mi></math><span class="eq-label">(12.4) 互相关的单重卷积</span></div><p>当 X 宽平稳、取 τ=t₂−t₁ 时，右式化简为关于 τ 的单变量卷积：</p><div class="eq" role="group" tabindex="0" aria-label="平稳输入下的互相关"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="互相关等于输入自相关与冲激响应的卷积"><msub><mi>R</mi><mrow><mi>X</mi><mi>Y</mi></mrow></msub><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mo>(</mo><msub><mi>R</mi><mi>X</mi></msub><mo>∗</mo><mi>h</mi><mo>)</mo><mo>(</mo><mi>τ</mi><mo>)</mo></math><span class="eq-label">(12.5) 平稳输入：互相关只依赖时差</span></div><p>注意 R<sub>XY</sub> 与 R<sub>YX</sub> 不同：R<sub>YX</sub>(τ) 相当于把脉冲响应的时间方向反转。若输入是白噪声（单边密度 N₀），R<sub>X</sub>(τ)=(N₀/2)δ(τ)，则由 (12.5) 得到 R<sub>XY</sub>(τ)=(N₀/2)h(τ)：<strong>测得输入输出互相关就得到了冲激响应</strong>。</p><div class="note"><p><strong>约定与因果性：</strong>这里取 R<sub>XY</sub>(τ)=E[X(t)Y(t+τ)]。若换成 E[Y(t)X(t+τ)]，会得到 (N₀/2)h(−τ)。因果系统 h(τ)=0（τ&lt;0），因此相关法得到的是因果冲激响应；测量时需先确认延迟方向与参考零点。</p></div></section>
+<section id="autocorr"><h2>输出自相关：双重卷积</h2><p>输出自相关 R<sub>Y</sub>(t₁,t₂)=E[Y(t₁)Y(t₂)] 需要把两个输出都展开，因而产生两次 h，它们是相互独立的两个积分变量：</p><div class="eq" role="group" tabindex="0" aria-label="输出自相关的双重卷积"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出自相关等于双重积分hαhβ乘输入自相关"><msub><mi>R</mi><mi>Y</mi></msub><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>,</mo><msub><mi>t</mi><mn>2</mn></msub><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>α</mi><mo>)</mo><mi>h</mi><mo>(</mo><mi>β</mi><mo>)</mo><msub><mi>R</mi><mi>X</mi></msub><mo>(</mo><msub><mi>t</mi><mn>1</mn></msub><mo>−</mo><mi>α</mi><mo>,</mo><msub><mi>t</mi><mn>2</mn></msub><mo>−</mo><mi>β</mi><mo>)</mo><mi>d</mi><mi>α</mi><mi>d</mi><mi>β</mi></math><span class="eq-label">(12.6) 输出自相关的双重卷积</span></div><p>当 X 宽平稳时，把 t₂−t₁ 记为 τ，并引入冲激响应的自相关 ψ<sub>h</sub>(τ)=(h∗h(−τ))(τ)，就得到最常用的形式：</p><div class="eq" role="group" tabindex="0" aria-label="输出自相关与冲激响应自相关的卷积"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出自相关等于输入自相关与ψh的卷积，ψh是h与h负τ的卷积"><msub><mi>R</mi><mi>Y</mi></msub><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mo>(</mo><msub><mi>R</mi><mi>X</mi></msub><mo>∗</mo><msub><mi>ψ</mi><mi>h</mi></msub><mo>)</mo><mo>(</mo><mi>τ</mi><mo>)</mo><mo>,</mo><mspace width="0.7em"/><msub><mi>ψ</mi><mi>h</mi></msub><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>h</mi><mo>(</mo><mi>t</mi><mo>+</mo><mi>τ</mi><mo>)</mo><mi>d</mi><mi>t</mi></math><span class="eq-label">(12.7) 平稳输入：输出自相关</span></div><p>ψ<sub>h</sub> 是偶函数，它把系统的影响封装成一个“生效系统”。若输入 WSS、系统稳定且二阶矩有限，则 (12.6) 的定义量只依赖时差，输出 WSS，并且与输入联合 WSS。输出方差由均值修正得到：</p><div class="eq" role="group" tabindex="0" aria-label="输出方差等于输出自相关在零处减均值平方"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出方差等于RY零减μY绝对值的平方"><msubsup><mi>σ</mi><mi>Y</mi><mn>2</mn></msubsup><mo>=</mo><msub><mi>R</mi><mi>Y</mi></msub><mo>(</mo><mn>0</mn><mo>)</mo><mo>−</mo><msup><mrow><mo>|</mo><msub><mi>μ</mi><mi>Y</mi></msub><mo>|</mo></mrow><mn>2</mn></msup></math><span class="eq-label">(12.8) 输出方差</span></div><figure><img src="../assets/svg/12-double-convolution.svg" alt="上行自相关过一次h得到互相关，下行自相关依次过h与h负τ得到输出自相关" width="1000" height="400" loading="lazy"><figcaption>图 12.2　互相关过一次系统，输出自相关过两次。漏掉第二次卷积得到的是互相关，不是输出功率。</figcaption></figure></section>
+<section id="example"><h2>可算例子：RC 低通的输出自相关</h2><p>一阶 RC 低通的冲激响应与频率响应为</p><div class="eq" role="group" tabindex="0" aria-label="RC低通的冲激响应与频率响应"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="冲激响应为1除以RC乘指数衰减u t，频率响应为1除以1加jωRC"><mi>h</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mi>R</mi><mi>C</mi></mrow></mfrac><msup><mi>e</mi><mrow><mo>−</mo><mi>t</mi><mo>/</mo><mi>R</mi><mi>C</mi></mrow></msup><mi>u</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>,</mo><mspace width="0.7em"/><mi>H</mi><mo>(</mo><mi>ω</mi><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>1</mn><mo>+</mo><mi>j</mi><mi>ω</mi><mi>R</mi><mi>C</mi></mrow></mfrac></math><span class="eq-label">(12.9) RC 低通的 h 与 H</span></div><p>输入是双边谱为 N₀/2 的白噪声。先算生效系统的冲激响应自相关（对 τ≥0 积分后由偶性延拓）：</p><div class="eq" role="group" tabindex="0" aria-label="RC低通的冲激响应自相关"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="ψh等于2RC分之一乘e的负τ绝对值除以RC"><msub><mi>ψ</mi><mi>h</mi></msub><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>R</mi><mi>C</mi></mrow></mfrac><msup><mi>e</mi><mrow><mo>−</mo><mo>|</mo><mi>τ</mi><mo>|</mo><mo>/</mo><mi>R</mi><mi>C</mi></mrow></msup></math><span class="eq-label">(12.10) 生效系统的自相关</span></div><p>因 R<sub>X</sub>(τ)=(N₀/2)δ(τ)，与 ψ<sub>h</sub> 卷积只是把它乘上系数，得到输出自相关与输出平均功率：</p><div class="eq" role="group" tabindex="0" aria-label="RC低通白噪声输入的输出自相关与功率"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出自相关等于N零除以4RC乘指数衰减，零时差处等于N零除以4RC"><msub><mi>R</mi><mi>Y</mi></msub><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>N</mi><mn>0</mn></msub><mrow><mn>4</mn><mi>R</mi><mi>C</mi></mrow></mfrac><msup><mi>e</mi><mrow><mo>−</mo><mo>|</mo><mi>τ</mi><mo>|</mo><mo>/</mo><mi>R</mi><mi>C</mi></mrow></msup><mo>,</mo><mspace width="0.7em"/><msub><mi>R</mi><mi>Y</mi></msub><mo>(</mo><mn>0</mn><mo>)</mo><mo>=</mo><mfrac><msub><mi>N</mi><mn>0</mn></msub><mrow><mn>4</mn><mi>R</mi><mi>C</mi></mrow></mfrac></math><span class="eq-label">(12.11) 输出自相关与平均功率</span></div><p>时间常数 RC 越大（带宽越窄），输出平均功率越小，因为更多噪声被滤掉。这个结果可用频域公式 S<sub>Y</sub>(ω)=|H(ω)|²S<sub>X</sub>(ω) 与 (1/2π)∫S<sub>Y</sub>dω 独立验证（第 13 章），两者必须一致。</p><figure><img src="../assets/svg/12-rc-example.svg" alt="左侧因果指数衰减冲激响应，右侧关于零时差对称的双边指数输出自相关，零时差处等于输出平均功率" width="1000" height="400" loading="lazy"><figcaption>图 12.3　RC 低通在白噪声输入下的冲激响应与输出自相关。曲线由公式直接作图；输出功率 N₀/(4RC) 为精确结果。</figcaption></figure></section>
+<section id="experiment"><h2>用两种方法验证 RC 输出功率</h2><p>先用数值积分验证 (12.10)，再用频域公式独立地验证同一个输出功率。</p><pre class="code-block"><code>from math import pi, exp, atan, isclose
+RC, N0 = 1.0, 2.0
+h = lambda t: (1/RC)*exp(-t/RC) if t >= 0 else 0.0
+def psi(tau, n=20000, T=40.0):
+    dt = T/n
+    return sum(h((i+0.5)*dt)*h((i+0.5)*dt+tau)*dt for i in range(n))
+for tau in (0.0, 0.5, 1.5):
+    assert isclose(psi(tau), (1/(2*RC))*exp(-tau/RC), rel_tol=2e-4)
+# time-domain output power: R_Y(0) = (N0/2)*psi(0) = N0/(4 RC)
+assert isclose((N0/2)*(1/(2*RC)), N0/(4*RC), rel_tol=1e-12)
+# frequency domain: (1/2 pi) int (N0/2)/(1+(w RC)^2) dw
+W = 1.0e7
+I = (N0/2)*(1/RC)*(atan(W*RC) - atan(-W*RC))
+assert isclose(I/(2*pi), N0/(4*RC), rel_tol=1e-4)
+</code></pre><details><summary>自检：若误把 R_XY(0) 当作输出功率，会得到什么？</summary><p>R<sub>XY</sub>(0)=(N₀/2)h(0)=N₀/(2RC)，是真实值 N₀/(4RC) 的两倍。根源正是漏掉了第二次卷积。</p></details></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li><a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/pages/part-iii-random-processes/">MIT OpenCourseWare · Random Processes</a>：随机过程通过线性系统的均值与相关变换。</li><li><a href="https://www.probabilitycourse.com/chapter10/10_2_1_power_spectral_density.php">ProbabilityCourse · Autocorrelation and PSD</a>：输出功率与自相关、谱之间的一致性依据。</li><li><a href="https://www.probabilitycourse.com/chapter10/10_1_4_stationary_processes.php">ProbabilityCourse · Stationary Processes</a>：宽平稳与联合平稳的定义。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="11.html">← 第 11 章</a><a href="../index.html#content">全部章节</a><a href="13.html">第 13 章 →</a></nav></article></main></div><footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>
