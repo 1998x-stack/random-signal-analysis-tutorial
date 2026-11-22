@@ -109,7 +109,7 @@
         "互功率谱密度"
       ],
       "file": "chapters/09.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "随机过程与谱"
     },
     {
