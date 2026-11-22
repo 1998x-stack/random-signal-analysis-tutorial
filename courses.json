@@ -85,7 +85,7 @@
         "均方微积分"
       ],
       "file": "chapters/07.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "随机过程与谱"
     },
     {
