@@ -169,7 +169,7 @@
         "AR/MA/ARMA模型入门"
       ],
       "file": "chapters/14.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "系统与模型"
     },
     {
