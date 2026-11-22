@@ -157,7 +157,7 @@
         "白化滤波器"
       ],
       "file": "chapters/13.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "系统与模型"
     },
     {
