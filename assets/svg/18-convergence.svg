@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig18c-title fig18c-desc">
+<title id="fig18c-title">不同初始状态下的分布都收敛到同一平稳分布</title>
+<desc id="fig18c-desc">以示例三状态链中落在雨状态的概率为纵轴，初始为晴阴雨三条曲线在若干步后都收敛到同一个平稳值约零点四七二。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">极限分布：初始条件被遗忘，各行收敛到 π</text>
+<line x1="90" y1="320" x2="900" y2="320" stroke="#dce7e6"/>
+<line x1="90" y1="60" x2="90" y2="330" stroke="#dce7e6"/>
+<line x1="90" y1="202" x2="880" y2="202" stroke="#137f83" stroke-width="1.6" stroke-dasharray="6 5"/>
+<text x="885" y="206" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#137f83">π_雨≈0.472</text>
+<polyline points="90,320 155,195 220,202 285,202 350,202 415,202 480,202 545,202 610,202 675,202 740,202 805,202" fill="none" stroke="#137f83" stroke-width="2.6"/>
+<polyline points="90,320 155,220 220,205 285,202 350,202 415,202 480,202 545,202 610,202 675,202 740,202 805,202" fill="none" stroke="#7564ad" stroke-width="2.6"/>
+<polyline points="90,70 155,195 220,200 285,202 350,202 415,202 480,202 545,202 610,202 675,202 740,202 805,202" fill="none" stroke="#ce704f" stroke-width="2.6"/>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">
+<text x="90" y="340" text-anchor="middle">0</text><text x="415" y="340" text-anchor="middle">5</text><text x="740" y="340" text-anchor="middle">10</text>
+<text x="850" y="340" text-anchor="middle">n</text>
+<text x="80" y="75" text-anchor="end">1.0</text><text x="80" y="207" text-anchor="end">0.5</text><text x="80" y="324" text-anchor="end">0</text>
+</g>
+<text x="470" y="120" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">纵轴：P(Xₙ=雨)</text>
+<text x="90" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">三条曲线对应初始状态晴/阴/雨；数值由正文示例矩阵实际迭代得到。</text>
+</svg>

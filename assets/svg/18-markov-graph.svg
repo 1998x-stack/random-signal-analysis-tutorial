@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig18a-title fig18a-desc">
+<title id="fig18a-title">三状态马尔可夫链的转移图</title>
+<desc id="fig18a-desc">晴、阴、雨三个状态以带箭头的边相连，边上的数字为一步转移概率；每个状态还有指向自身的自环，表示保持原状态的概率。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">状态转移图：节点为状态，边权为一步转移概率</text>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15">
+<circle cx="290" cy="150" r="52" fill="#e5f4f0" stroke="#137f83" stroke-width="2.4"/>
+<text x="290" y="156" text-anchor="middle" fill="#0b585e" font-weight="700">晴</text>
+<circle cx="710" cy="150" r="52" fill="#f4f1fa" stroke="#7564ad" stroke-width="2.4"/>
+<text x="710" y="156" text-anchor="middle" fill="#524a86" font-weight="700">阴</text>
+<circle cx="500" cy="300" r="52" fill="#fff3ed" stroke="#ce704f" stroke-width="2.4"/>
+<text x="500" y="306" text-anchor="middle" fill="#a04a2e" font-weight="700">雨</text>
+</g>
+<g stroke="#5d7078" fill="none" stroke-width="2">
+<path d="M342 150 H658" marker-end="url(#arw)"/>
+<path d="M650 158 H350" marker-end="url(#arw)"/>
+<path d="M325 192 L470 268" marker-end="url(#arw)"/>
+<path d="M468 274 L322 198" marker-end="url(#arw)"/>
+<path d="M675 192 L540 268" marker-end="url(#arw)"/>
+<path d="M548 274 L682 198" marker-end="url(#arw)"/>
+</g>
+<defs><marker id="arw" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#5d7078"/></marker></defs>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#20343d">
+<text x="500" y="140" text-anchor="middle">0.3</text>
+<text x="500" y="182" text-anchor="middle">0.2</text>
+<text x="388" y="245">0.5</text>
+<text x="600" y="245">0.4</text>
+<text x="388" y="292">0.3</text>
+<text x="600" y="292">0.2</text>
+</g>
+<text x="290" y="90" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">自环 0.2</text>
+<text x="710" y="90" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">自环 0.4</text>
+<text x="500" y="382" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">自环 0.5</text>
+<text x="28" y="360" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">见正文：每行自环与出边之和为 1，矩阵为随机矩阵。数值为教学示例。</text>
+</svg>

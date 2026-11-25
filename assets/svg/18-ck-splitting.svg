@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig18b-title fig18b-desc">
+<title id="fig18b-title">切普曼科尔莫戈罗夫方程把多步转移按中间状态拆分</title>
+<desc id="fig18b-desc">从左端状态i经m步到某个中间状态k，再从k经n步到右端状态j，对所有中间状态k求和即得m加n步转移概率。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">P^(m+n) = P^m · P^n：先走 m 步，再走 n 步</text>
+<circle cx="150" cy="210" r="46" fill="#e5f4f0" stroke="#137f83" stroke-width="2.4"/>
+<text x="150" y="216" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e" font-weight="700">i</text>
+<circle cx="500" cy="110" r="40" fill="#f4f1fa" stroke="#7564ad" stroke-width="2.2"/>
+<text x="500" y="116" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#524a86">k₁</text>
+<circle cx="500" cy="210" r="40" fill="#f4f1fa" stroke="#7564ad" stroke-width="2.2"/>
+<text x="500" y="216" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#524a86">k₂</text>
+<circle cx="500" cy="310" r="40" fill="#f4f1fa" stroke="#7564ad" stroke-width="2.2"/>
+<text x="500" y="316" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#524a86">k₃</text>
+<circle cx="850" cy="210" r="46" fill="#fff3ed" stroke="#ce704f" stroke-width="2.4"/>
+<text x="850" y="216" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#a04a2e" font-weight="700">j</text>
+<g stroke="#137f83" fill="none" stroke-width="2" opacity="0.85">
+<path d="M188 190 Q340 110 458 112" marker-end="url(#a2)"/>
+<path d="M196 210 H456" marker-end="url(#a2)"/>
+<path d="M188 230 Q340 310 458 308" marker-end="url(#a2)"/>
+</g>
+<g stroke="#ce704f" fill="none" stroke-width="2" opacity="0.85">
+<path d="M540 112 Q660 112 808 192" marker-end="url(#a3)"/>
+<path d="M540 210 H800" marker-end="url(#a3)"/>
+<path d="M540 308 Q660 308 808 228" marker-end="url(#a3)"/>
+</g>
+<defs>
+<marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#137f83"/></marker>
+<marker id="a3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#ce704f"/></marker>
+</defs>
+<text x="320" y="70" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#137f83">m 步：P^(m)_ik</text>
+<text x="680" y="70" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#ce704f">n 步：P^(n)_kj</text>
+<text x="500" y="372" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#5d7078">对全部中间状态 k 求和：P^(m+n)_ij = Σ_k P^(m)_ik · P^(n)_kj</text>
+</svg>

@@ -212,12 +212,12 @@
       "num": "18",
       "title": "马尔可夫链",
       "topics": [
-        "C-K方程与转移概率",
-        "状态分类",
+        "马尔可夫性质与C-K方程",
+        "状态分类与遍历性",
         "平稳分布与PageRank"
       ],
       "file": "chapters/18.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "系统与模型"
     },
     {

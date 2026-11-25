@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig18d-title fig18d-desc">
+<title id="fig18d-title">PageRank 用随机跳转让网页图变成遍历链</title>
+<desc id="fig18d-desc">左侧网页超链接图含一个没有出链的悬挂节点，右侧加上以概率一减α随机跳到任意页面的虚线边后，链不可约且非周期，平稳分布唯一。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">随机跳转（teleportation）修复悬挂点与不可约性</text>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14">
+<circle cx="150" cy="120" r="34" fill="#e5f4f0" stroke="#137f83" stroke-width="2.2"/>
+<text x="150" y="125" text-anchor="middle" fill="#0b585e">A</text>
+<circle cx="150" cy="280" r="34" fill="#e5f4f0" stroke="#137f83" stroke-width="2.2"/>
+<text x="150" y="285" text-anchor="middle" fill="#0b585e">B</text>
+<circle cx="330" cy="200" r="34" fill="#f4f1fa" stroke="#7564ad" stroke-width="2.2"/>
+<text x="330" y="205" text-anchor="middle" fill="#524a86">C</text>
+<circle cx="520" cy="120" r="34" fill="#f4f1fa" stroke="#7564ad" stroke-width="2.2"/>
+<text x="520" y="125" text-anchor="middle" fill="#524a86">D</text>
+<circle cx="520" cy="280" r="34" fill="#fff3ed" stroke="#ce704f" stroke-width="2.4"/>
+<text x="520" y="285" text-anchor="middle" fill="#a04a2e">E</text>
+</g>
+<g stroke="#5d7078" fill="none" stroke-width="2" marker-end="url(#a4)">
+<path d="M184 128 L296 188"/>
+<path d="M170 246 L306 216"/>
+<path d="M364 192 L486 132"/>
+<path d="M356 214 L488 268"/>
+<path d="M170 152 L170 246"/>
+</g>
+<g stroke="#ce704f" fill="none" stroke-width="2" stroke-dasharray="6 5" opacity="0.8" marker-end="url(#a5)">
+<path d="M554 288 Q720 300 730 200 Q740 90 560 118"/>
+<path d="M720 200 Q600 210 360 210"/>
+<path d="M730 200 Q440 60 180 110"/>
+</g>
+<defs>
+<marker id="a4" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#5d7078"/></marker>
+<marker id="a5" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#ce704f"/></marker>
+</defs>
+<text x="540" y="330" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">E 为悬挂点：无出链</text>
+<text x="700" y="360" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">虚线：以概率 1−α 随机跳到任意页面</text>
+<text x="28" y="380" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">例：α=0.85。对悬挂点可规定其随机均匀跳到全图；教学示图，非真实网页图。</text>
+</svg>
