@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig15c-title fig15c-desc">
+<title id="fig15c-title">高斯过程回归：观测把先验带宽收缩为后验窄带</title>
+<desc id="fig15c-desc">横轴为输入x，先验均值附近的置信带用浅青色表示且较宽；加入四个观测点后，后验均值穿过观测附近，后验带宽显著变窄，远离数据处带宽再次增大。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">条件分布只依赖协方差：数据把不确定性压窄</text>
+<line x1="70" y1="330" x2="950" y2="330" stroke="#dce7e6"/>
+<line x1="70" y1="70" x2="70" y2="340" stroke="#dce7e6"/>
+<text x="955" y="335" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">x</text>
+<path d="M70 210 L950 190 L950 250 L70 270 Z" fill="#e5f4f0" opacity="0.85"/>
+<path d="M70 190 Q300 175 520 205 Q740 235 950 205" fill="none" stroke="#9dc9c4" stroke-width="1.6" stroke-dasharray="6 5"/>
+<text x="120" y="182" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">先验均值 ± 先验标准差</text>
+<path d="M70 214 Q160 200 250 214 Q330 227 410 218 Q500 209 600 214 Q700 222 790 216 Q870 209 950 213" fill="none" stroke="#7564ad" stroke-width="2.8"/>
+<path d="M70 200 Q160 190 250 205 Q340 222 430 212 Q520 199 610 206 Q710 219 800 210 Q880 201 950 207 L950 219 Q880 213 800 222 Q710 231 610 218 Q520 211 430 224 Q340 234 250 217 Q160 202 70 226 Z" fill="#7564ad" opacity="0.28"/>
+<g fill="#ce704f" stroke="#a04a2e" stroke-width="1.6">
+<circle cx="250" cy="212" r="6"/><circle cx="410" cy="216" r="6"/>
+<circle cx="610" cy="212" r="6"/><circle cx="790" cy="215" r="6"/>
+</g>
+<text x="705" y="352" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">后验均值与后验±2σ带宽</text>
+<text x="410" y="120" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#7564ad">后验标准差 = √(k(x*,x*) − k*ᵀ(K+σ²I)⁻¹k*)</text>
+<g fill="#ce704f"><circle cx="120" cy="118" r="5"/></g>
+<text x="140" y="123" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#ce704f">观测点（含噪声）</text>
+</svg>

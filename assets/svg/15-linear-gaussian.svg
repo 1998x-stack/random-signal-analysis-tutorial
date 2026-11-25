@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig15b-title fig15b-desc">
+<title id="fig15b-title">线性时不变系统把高斯输入映射为高斯输出</title>
+<desc id="fig15b-desc">上行高斯输入经脉冲响应h后输出仍为高斯，均值与协方差按卷积变换；下行非高斯输入经同一线性系统后一般不再是高斯，用珊瑚色标出。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">高斯性沿线性系统保持不变，非高斯性则不被保持</text>
+<text x="40" y="104" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#137f83" font-weight="700">高斯输入</text>
+<path d="M110 130 Q150 108 190 128 Q230 150 270 130 Q310 110 350 132" fill="none" stroke="#137f83" stroke-width="2.6"/>
+<rect x="410" y="108" width="130" height="48" rx="10" fill="#e5f4f0" stroke="#137f83"/>
+<text x="475" y="138" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e">h(t)</text>
+<path d="M600 130 Q640 100 680 122 Q720 146 760 124 Q800 104 840 128" fill="none" stroke="#137f83" stroke-width="2.6"/>
+<text x="880" y="134" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#137f83" font-weight="700">高斯</text>
+<text x="40" y="300" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#ce704f" font-weight="700">非高斯输入</text>
+<path d="M110 300 L130 258 L150 318 L170 262 L190 308 L210 270 L230 320 L250 268 L270 306 L290 280 L310 314 L330 272 L350 300" fill="none" stroke="#ce704f" stroke-width="2.2"/>
+<rect x="410" y="276" width="130" height="48" rx="10" fill="#fff3ed" stroke="#ce704f"/>
+<text x="475" y="306" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#a04a2e">h(t)</text>
+<path d="M600 300 L620 264 L640 314 L660 282 L680 312 L700 268 L720 308 L740 288 L760 310 L780 286 L800 306 L820 296 L840 302" fill="none" stroke="#ce704f" stroke-width="2.2" opacity="0.85"/>
+<text x="880" y="304" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#ce704f" font-weight="700">一般非高斯</text>
+<text x="28" y="380" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">均值 μ_Y=h∗μ_X；协方差 C_Y=h∗h∗C_X（下标省略卷积分量），线性组合的极限仍为高斯。</text>
+</svg>

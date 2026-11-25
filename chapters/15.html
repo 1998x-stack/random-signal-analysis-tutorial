@@ -1,197 +1,42 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第15章 高斯过程</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html" class="active">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="高斯过程：任意有限维分布为高斯、线性系统保持高斯性、均值与协方差完全刻画过程，以及多维高斯条件分布与高斯过程回归，含原创SVG与可复现检查。"><title>第 15 章 · 高斯过程 | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">为什么是高斯</a><a href="#definition">定义与刻画</a><a href="#linear">线性系统保持高斯</a><a href="#conditional">条件分布</a><a href="#gpr">高斯过程回归</a><a href="#experiment">可复现核查</a><a href="#boundaries">边界与陷阱</a><a href="#sources">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 系统与模型 / 第 15 章</div>
+<header class="article-header"><p class="chapter-kicker">CHAPTER 15 · 系统与模型</p><h1>高斯过程</h1><p class="dek">当一族随机变量在任意有限个时刻上的联合分布都是多维高斯，过程就被两个函数——均值与协方差——完全锁死。这让积分、微分、条件化都能写成闭式，也让“不相关 = 独立”第一次真正成立。</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>用有限维联合分布定义高斯过程，并写出均值、协方差函数与合法性的非负定条件</li><li>说明为什么线性时不变系统保持高斯性，并写出输出均值与协方差</li><li>写出多维高斯的条件均值/条件协方差，并解释它与高斯过程回归的关系</li></ul></div></header>
+<section id="opening"><h2>为什么高斯过程值得单独一章</h2><p>取一个 1 kΩ 的金属膜电阻，保持在 300 K，把两端电压放大后以 10 kHz 采样。你会得到一列看起来毫无规律的数。可实际测量告诉你一件事：无论抽取哪几个采样时刻，这些电压的联合分布几乎总能被一个<strong>多维高斯密度</strong>很好地描述，而且只要定下均值和协方差，就能算出条件概率、预测值与误差带。</p><p>这不是巧合，而是三个性质叠加的结果。</p><ul><li><strong>中心极限定理（CLT）。</strong>热噪声电压是数量极多的、近似独立的小扰动之和，其归一化和在很弱的条件下趋近高斯（第 5 章）。因此高斯性常是“许多小效应叠加”的极限近似，而不是精确恒等式。</li><li><strong>线性运算保持高斯性。</strong>高斯随机变量经过线性组合仍然联合高斯；积分、卷积是线性组合的极限，因此高斯信号通过线性时不变（LTI）系统后仍是高斯信号。</li><li><strong>均值与协方差即可完全描述。</strong>一般过程需要全部有限维分布才能刻画，而高斯过程只要两个函数 <em>m</em>(t) 与 <em>C</em>(t,s)。</li></ul><div class="note"><p><strong>本段的简化说明：</strong>上面把热噪声当作精确高斯只是为了先建立直觉；真实电阻噪声只是“近似高斯”，且在极高频、极短时间尺度上会偏离（第 10 章）。</p></div></section>
+<section id="definition"><h2>定义与刻画：有限维分布与非负定协方差</h2><p><strong>定义。</strong>随机过程 {X(t), t∈T} 是<strong>高斯过程</strong>，当且仅当对任意正整数 n 与任意 t₁,…,tₙ∈T，随机向量 (X(t₁),…,X(tₙ)) 服从多维高斯分布。只需检查所有有限维子集（fidis），过程的概率结构就完全确定。</p><p>刻画它只需要两个函数：均值函数 m(t)=E[X(t)] 与协方差函数 C(t,s)。零均值时，C(t,s) 就等于自相关 R(t,s)。</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="协方差函数定义"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="协方差函数等于两个中心化随机变量乘积的期望"><mi>C</mi><mo>(</mo><mi>t</mi><mo>,</mo><mi>s</mi><mo>)</mo><mo>=</mo><mi>E</mi><mo>[</mo><mo>(</mo><mi>X</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>−</mo><mi>m</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>)</mo><mo>(</mo><mi>X</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>−</mo><mi>m</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>)</mo><mo>]</mo><mo>=</mo><mi>R</mi><mo>(</mo><mi>t</mi><mo>,</mo><mi>s</mi><mo>)</mo><mo>−</mo><mi>m</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>m</mi><mo>(</mo><mi>s</mi><mo>)</mo></math><span class="eq-label">(15.1) 协方差函数</span></div><p>不是任意两个函数都能当均值与协方差。对任意 n、任意 t₁,…,tₙ 与任意实系数 a₁,…,aₙ，协方差矩阵必须<strong>对称非负定</strong>：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="协方差函数非负定条件"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="任意系数的二次型非负"><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msub><mi>a</mi><mi>i</mi></msub><msub><mi>a</mi><mi>j</mi></msub><mi>C</mi><mo>(</mo><msub><mi>t</mi><mi>i</mi></msub><mo>,</mo><msub><mi>t</mi><mi>j</mi></msub><mo>)</mo><mo>≥</mo><mn>0</mn></math><span class="eq-label">(15.2) 非负定（正半定）条件</span></div><p>这条要求其实很自然：左边正是线性组合 <em>ΣaᵢX(tᵢ)</em> 的方差，方差不能为负。当协方差矩阵<strong>正定</strong>时，联合密度存在：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="多维高斯密度函数"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="多维高斯密度，含逆协方差矩阵与行列式"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><msup><mrow><mo>(</mo><mn>2</mn><mi>π</mi><mo>)</mo></mrow><mrow><mi>n</mi><mo>/</mo><mn>2</mn></mrow></msup><msup><mrow><mo>|</mo><mi>Σ</mi><mo>|</mo></mrow><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow></msup></mrow></mfrac><mi>exp</mi><mrow><mo>(</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo>(</mo><mi>x</mi><mo>−</mo><mi>μ</mi><mo>)</mo></mrow><mi>T</mi></msup><msup><mi>Σ</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>(</mo><mi>x</mi><mo>−</mo><mi>μ</mi><mo>)</mo></mrow><mo>)</mo></math><span class="eq-label">(15.3) 多维高斯密度（Σ 正定）</span></div><figure><img src="../assets/svg/15-fidis-to-process.svg" alt="左侧时间轴上是同一高斯过程的三条样本路径与四个采样时刻，右侧是两个时刻的联合密度椭圆等高线" width="1000" height="400" loading="lazy"><figcaption>图 15.1　一个高斯过程 = 一族彼此相容的有限维高斯分布。曲线为教学示意。</figcaption></figure><div class="warning"><p><strong>“边缘高斯”不等于“联合高斯”：</strong>每个 X(tᵢ) 单独看是高斯的，并不能保证整个向量联合高斯；非负定条件也可能被破坏。只有<strong>联合</strong>高斯时，“不相关”才等价于“独立”（本章后文给出反例）。</p></div></section>
+<section id="linear"><h2>线性时不变系统保持高斯性</h2><p>设输入 X(t) 是高斯过程，单位冲激响应 h(t) 描述一个 LTI 系统，输出为 Y(t)=∫h(τ)X(t−τ)dτ。若 ∫|h(τ)|dτ&lt;∞（稳定），积分在均方意义下收敛，且<strong>输出仍然是高斯过程</strong>。</p><p>理由很短：对任意有限时刻，向量 (Y(t₁),…,Y(tₙ)) 的每个分量都是 (X(t)) 的线性泛函，因而它是联合高斯向量 (X(t₁),…,X(tₙ)) 经过一个线性变换（矩阵）得到的。线性变换把高斯向量映射为高斯向量，因此 Y 的所有有限维分布仍为高斯。</p><p>均值与协方差沿卷积传递：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="输出均值函数"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出均值等于冲激响应与输入均值的卷积"><msub><mi>m</mi><mi>Y</mi></msub><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>τ</mi><mo>)</mo><msub><mi>m</mi><mi>X</mi></msub><mo>(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo>)</mo><mi>d</mi><mi>τ</mi></math><span class="eq-label">(15.4) 输出均值</span></div><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="输出协方差函数"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="输出协方差是两个变量的双重卷积"><msub><mi>C</mi><mi>Y</mi></msub><mo>(</mo><mi>t</mi><mo>,</mo><mi>s</mi><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mi>h</mi><mo>(</mo><mi>η</mi><mo>)</mo><msub><mi>C</mi><mi>X</mi></msub><mo>(</mo><mi>t</mi><mo>−</mo><mi>τ</mi><mo>,</mo><mi>s</mi><mo>−</mo><mi>η</mi><mo>)</mo><mi>d</mi><mi>τ</mi><mi>d</mi><mi>η</mi></math><span class="eq-label">(15.5) 输出协方差</span></div><p>当输入是宽平稳（WSS）时，输出也 WSS，且频域关系回到第 12–13 章的结论：μ<sub>Y</sub>=μ<sub>X</sub>H(0)，S<sub>Y</sub>(ω)=|H(ω)|²S<sub>X</sub>(ω)。<strong>高斯性使得这两个统计量足以描述全部分布</strong>，而在非高斯输入下它们只给出二阶信息。</p><figure><img src="../assets/svg/15-linear-gaussian.svg" alt="上行高斯输入经h后仍为高斯，下行非高斯输入经同一线性系统后一般不是高斯" width="1000" height="400" loading="lazy"><figcaption>图 15.2　线性系统只保证“高斯进、高斯出”；换成非高斯输入，输出一般也不再是高斯。曲线为教学示意。</figcaption></figure><div class="warning"><p><strong>反例：非线性会破坏高斯性。</strong>设 X~N(0,1)，令 Y=X²。X 是高斯的，但 Y 服从自由度 1 的卡方分布，密度在 0 附近发散，早已不是高斯。只要系统含平方、限幅、取绝对值等非线性环节，“线性保持高斯”就不再适用。</p></div></section>
+<section id="conditional"><h2>多维高斯的条件分布：线性且解析</h2><p>把联合高斯向量分块为 X=(X₁,X₂)，对应地 μ=(μ₁,μ₂)，Σ=[Σ₁₁ Σ₁₂; Σ₂₁ Σ₂₂]，并假设 Σ₂₂ 可逆。给定 X₂=x₂ 时，条件分布仍然是高斯：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="条件均值公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="条件均值等于先验均值加上增益乘以残差"><msub><mi>μ</mi><mrow><mn>1</mn><mo>|</mo><mn>2</mn></mrow></msub><mo>=</mo><msub><mi>μ</mi><mn>1</mn></msub><mo>+</mo><msub><mi>Σ</mi><mn>12</mn></msub><msubsup><mi>Σ</mi><mn>22</mn><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><mo>(</mo><msub><mi>x</mi><mn>2</mn></msub><mo>−</mo><msub><mi>μ</mi><mn>2</mn></msub><mo>)</mo></math><span class="eq-label">(15.6) 条件均值</span></div><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="条件协方差公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="条件协方差等于先验协方差减去增益乘以互协方差"><msub><mi>Σ</mi><mrow><mn>1</mn><mo>|</mo><mn>2</mn></mrow></msub><mo>=</mo><msub><mi>Σ</mi><mn>11</mn></msub><mo>−</mo><msub><mi>Σ</mi><mn>12</mn></msub><msubsup><mi>Σ</mi><mn>22</mn><mrow><mo>−</mo><mn>1</mn></mrow></msubsup><msub><mi>Σ</mi><mn>21</mn></msub></math><span class="eq-label">(15.7) 条件协方差</span></div><p>两个结论很关键：</p><ul><li><strong>条件协方差不依赖观测值 x₂。</strong>不论测到的 X₂ 是大是小，X₁ 的不确定性减少量都一样，完全由协方差结构决定。</li><li><strong>条件均值是 x₂ 的线性函数。</strong>矩阵 Σ₁₂Σ₂₂⁻¹ 就是“从 X₂ 预测 X₁”的最优线性增益。在联合高斯下，最小均方误差（MMSE）估计器就是线性的，非线性估计无法再改善（第 20–22 章的滤波由此展开）。</li></ul><div class="note"><p><strong>与正交性原理的联系：</strong>在高斯下，“误差与观测正交”与“误差与观测独立”是同一件事，因此线性 MMSE 也是全局 MMSE。这个便利性仅对联合高斯成立。</p></div></section>
+<section id="gpr"><h2>从条件分布到高斯过程回归</h2><p>把“(15.6)(15.7)”从有限维搬到函数空间，就得到<strong>高斯过程回归</strong>（GPR）：直接给函数 f 一个高斯过程先验 f~GP(m(x), k(x,x'))，把核函数 k 当作协方差函数。给定带噪观测 yᵢ=f(xᵢ)+εᵢ，εᵢ~N(0,σ²)，在测试点 x* 处：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="后验预测均值"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="预测均值等于先验均值加核向量乘以增益矩阵再乘残差"><msup><mi>μ</mi><mo>∗</mo></msup><mo>=</mo><mi>m</mi><mo>(</mo><msup><mi>x</mi><mo>∗</mo></msup><mo>)</mo><mo>+</mo><msubsup><mi>k</mi><mo>∗</mo><mi>T</mi></msubsup><msup><mrow><mo>(</mo><mi>K</mi><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi>I</mi><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>(</mo><mi>y</mi><mo>−</mo><mi>m</mi><mo>(</mo><mi>X</mi><mo>)</mo><mo>)</mo></math><span class="eq-label">(15.8) 后验预测均值</span></div><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="后验预测方差"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="预测方差等于先验方差减去核向量乘增益矩阵再乘核向量"><msubsup><mi>σ</mi><mo>∗</mo><mn>2</mn></msubsup><mo>=</mo><mi>k</mi><mo>(</mo><msup><mi>x</mi><mo>∗</mo></msup><mo>,</mo><msup><mi>x</mi><mo>∗</mo></msup><mo>)</mo><mo>−</mo><msubsup><mi>k</mi><mo>∗</mo><mi>T</mi></msubsup><msup><mrow><mo>(</mo><mi>K</mi><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi>I</mi><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup><msub><mi>k</mi><mo>∗</mo></msub></math><span class="eq-label">(15.9) 后验预测方差</span></div><p>对比 (15.6)(15.7)：K 就是训练点之间的协方差矩阵，k* 是测试点与训练点的互协方差，增益 (K+σ²I)⁻¹ 扮演了 Σ₂₂⁻¹ 的角色。<strong>GPR 就是在函数空间上做条件化</strong>，预测方差越小，说明该处被数据“钉”得越紧。</p><figure><img src="../assets/svg/15-gp-regression.svg" alt="先验均值周围的宽置信带与加入四个观测点后变窄的后验带宽" width="1000" height="400" loading="lazy"><figcaption>图 15.3　观测把先验带宽压窄；远离数据处带宽重新变宽。曲线为教学示意，形状由核函数决定。</figcaption></figure><div class="table-wrap"><table><thead><tr><th>核函数（协方差）</th><th>表达式</th><th>典型性质</th></tr></thead><tbody><tr><td>RBF / 平方指数</td><td>σ²exp(−‖x−x'‖²/(2ℓ²))</td><td>无穷可微，极平滑</td></tr><tr><td>Matérn(ν)</td><td>ν=3/2: σ²(1+√3r/ℓ)e<sup>−√3r/ℓ</sup></td><td>有限可微，平滑度可控</td></tr><tr><td>周期核</td><td>σ²exp(−2sin²(π|x−x'|/p)/ℓ²)</td><td>周期性重复</td></tr><tr><td>线性核</td><td>σ²·xᵀx'</td><td>等价于贝叶斯线性回归</td></tr><tr><td>有理二次（RQ）</td><td>σ²(1+‖x−x'‖²/(2αℓ²))<sup>−α</sup></td><td>多尺度平滑</td></tr></tbody></table></div><p>核函数与噪声方差等超参数通常通过<strong>最大化边缘似然</strong>（而非拟合残差）学习；核的选择直接决定了过程平滑性与不确定性形状。</p></section>
+<section id="experiment"><h2>可复现核查</h2><p>下面用固定随机种子检验三件事：用 Cholesky 分解采样得到的向量是否具有预期的协方差；条件方差公式是否与蒙特卡罗一致；非负定条件是否能真的被破坏。依赖 NumPy。</p><pre class="code-block"><code>import numpy as np
+rng = np.random.default_rng(15)
 
-        <h2>为什么高斯过程是"随机过程中的VIP"</h2>
+# 1) GP 采样：零均值，RBF 核 k(t,s)=exp(-(t-s)^2/2)
+t = np.linspace(0, 4, 6)
+K = np.exp(-(t[:, None] - t[None, :]) ** 2 / 2)
+L = np.linalg.cholesky(K + 1e-12 * np.eye(6))
+samples = (L @ rng.standard_normal((6, 20000)))
+assert np.allclose(samples @ samples.T / 20000, K, atol=0.06)
 
-        <p>大家好，我是你们的讲师。在之前的学习中，我们已经接触了平稳随机信号、功率谱密度、白噪声以及随机信号通过线性系统等概念。如果你细心的话会发现，有一个"身影"不断在各个章节中出现——那就是高斯分布（也叫正态分布）。到了通信和信号处理领域，高斯分布几乎无处不在，以至于有种说法："世界上有两种随机信号，一种是高斯信号，另一种是尚待解决的问题。"</p>
+# 2) 条件分布：X1 与 X2 为标准正态，相关系数 rho
+rho = 0.6
+Sig = np.array([[1, rho], [rho, 1]])
+x2 = 0.8
+mean_cond = Sig[0, 1] / Sig[1, 1] * x2
+var_cond = Sig[0, 0] - Sig[0, 1] ** 2 / Sig[1, 1]
+z = rng.multivariate_normal([0, 0], Sig, 50000)
+near = z[np.abs(z[:, 1] - x2) < 0.05]
+assert abs(near[:, 0].var() - var_cond) < 0.02
+assert abs(near[:, 0].mean() - mean_cond) < 0.05
 
-        <p>为什么高斯过程如此特殊？我认为有三个核心原因值得你在入门阶段就牢牢记住。</p>
-
-        <p><strong>第一，中心极限定理。</strong>大量独立随机因素叠加在一起，无论每个因素服从什么分布，它们的总和在极限条件下都会趋近高斯分布。热噪声是数十亿个电子无规则运动的叠加结果，所以它是高斯的。接收机前端噪声来自各级放大器噪声的累积，所以它也是高斯的。自然界和工程系统中，凡是"很多小东西加在一起"的地方，几乎都会出现高斯性。</p>
-
-        <p><strong>第二，线性系统保持高斯性。</strong>这是一个极其优美的性质：如果输入到线性时不变（LTI）系统的是一个高斯随机过程，那么输出仍然是高斯随机过程。这意味着，一旦我们在高斯框架下建模，整个系统的"输入-输出"分析都可以用简洁的数学完成——均值被系统函数变换，协方差通过双线性变换。没有别的分布能提供如此干净的分析结果。</p>
-
-        <p><strong>第三，仅需均值和协方差就能完全描述。</strong>对于一般的随机过程，你需要知道所有有限维分布才能完整刻画它。但对于高斯过程，全部统计信息都浓缩在均值和协方差两个函数里。这意味着，只要确定了均值函数 <code>m(t)</code> 和协方差函数 <code>C(t,s)</code>，整个过程的概率结构就完全确定了。这在理论分析和实际计算中都带来了极大的便利。</p>
-
-        <div class="highlight">
-            <strong>核心洞见：</strong>高斯过程是"数学上最友善"的随机过程之一。它的可解析性让我们能在复杂的工程问题中获得闭式解——这在维纳滤波、卡尔曼滤波、信道容量分析等经典问题中体现得淋漓尽致。但也要记住，这种友善是有代价的：如果我们错误地假设非高斯过程为高斯，分析结果可能严重偏离实际。
-        </div>
-
-        <h2>高斯过程的定义与性质</h2>
-
-        <h3>严格定义</h3>
-
-        <p>一个随机过程 <code>{X(t), t ∈ T}</code> 被称为<strong>高斯过程</strong>（Gaussian process），当且仅当它的任意有限维联合分布都是高斯分布。换句话说：对任意正整数 <code>n</code> 和任意时间点 <code>t₁, t₂, ..., tₙ ∈ T</code>，随机向量 <code>(X(t₁), X(t₂), ..., X(tₙ))</code> 服从多维高斯分布。</p>
-
-        <p>这个定义看起来平淡无奇，但它的力量在于：你不必检查无穷多个时间点的联合分布——只需要检查所有的有限维子集。这在数学上是可行的，因为有限维分布族（finite-dimensional distributions, fidis）已经完全确定了随机过程的概率结构。</p>
-
-        <h3>均值函数与协方差函数</h3>
-
-        <p>高斯过程由其<strong>均值函数</strong>和<strong>协方差函数</strong>完全确定：</p>
-
-        <pre><code>均值函数：     m(t) = E[X(t)]
-协方差函数：   C(t,s) = E[(X(t)-m(t))(X(s)-m(s))]
-             = R(t,s) - m(t)m(s)   (其中 R 是自相关函数)
-
-对于零均值高斯过程：m(t) ≡ 0，过程完全由协方差 C(t,s) 决定</code></pre>
-
-        <p>协方差函数必须满足<strong>非负定性</strong>（positive semidefiniteness）：对任意正整数 n、任意时间点 t₁,...,tₙ 和实系数 a₁,...,aₙ，有 ∑ᵢ∑ⱼ aᵢaⱼC(tᵢ,tⱼ) ≥ 0。这个性质保证了协方差矩阵总是非负定的——否则它就不是一个合法的协方差矩阵。</p>
-
-        <h3>高斯过程通过LTI系统</h3>
-
-        <p>这是高斯过程最优雅的性质之一。设 <code>X(t)</code> 是高斯过程，<code>h(t)</code> 是LTI系统的冲激响应，那么输出：</p>
-
-        <p><strong>Y(t) = ∫ h(τ)X(t-τ) dτ</strong></p>
-
-        <p>仍然是高斯过程。输出过程的均值和协方差为：</p>
-
-        <pre><code>m_Y(t) = ∫ h(τ) m_X(t-τ) dτ
-C_Y(t,s) = ∫∫ h(τ) h(η) C_X(t-τ, s-η) dτ dη</code></pre>
-
-        <p>这意味着，只要我们能写出输入过程的均值和协方差，输出过程的均值和协方差就可以通过积分解析得到。为什么积分后的过程仍然是高斯的？因为积分是线性运算的极限，而高斯随机变量的线性组合仍然服从高斯分布——这个性质对无穷线性组合（即积分）也成立。</p>
-
-        <div class="tip">
-            <strong>实用技巧：</strong>当你在仿真中需要产生一个高斯随机过程时，不需要真的生成无穷多个时间点。只需要：① 在离散时间网格上定义协方差矩阵 K；② 对 K 做 Cholesky 分解 K = LLᵀ；③ 生成独立标准高斯向量 z，然后令 x = Lz + m。这样得到的 x 就精确服从 N(m, K)。
-        </div>
-
-        <h2>多维高斯分布的回顾与拓展</h2>
-
-        <h3>均值向量与协方差矩阵</h3>
-
-        <p>多维高斯分布是理解高斯过程的基础。一个 n 维随机向量 <code>X = (X₁, X₂, ..., Xₙ)ᵀ</code> 服从多维高斯分布，记作 <code>X ~ N(μ, Σ)</code>，其中：</p>
-
-        <ul>
-            <li><strong>μ</strong> = E[X] 是 n×1 均值向量</li>
-            <li><strong>Σ</strong> = E[(X-μ)(X-μ)ᵀ] 是 n×n 协方差矩阵（对称且非负定）</li>
-        </ul>
-
-        <p>当 Σ 正定时，联合概率密度函数为：</p>
-
-        <pre><code>f(x) = (1/(2π)^{n/2} |Σ|^{1/2}) · exp(-½ (x-μ)ᵀ Σ^{-1} (x-μ))</code></pre>
-
-        <p>指数中的 <code>(x-μ)ᵀ Σ^{-1} (x-μ)</code> 称为<strong>马氏距离</strong>（Mahalanobis distance）的平方。马氏距离不是简单的欧氏距离——它通过逆协方差矩阵对各个维度进行"去相关"和"归一化"。两个点之间的马氏距离相同，意味着它们在分布中的"概率密度等高线"上处于同一位置。</p>
-
-        <h3>条件分布：解析可计算</h3>
-
-        <p>高斯分布最神奇的性质之一：条件分布仍然是高斯的，并且可以解析计算。将向量分块为 <code>X = (X₁, X₂)ᵀ</code>，对应地：</p>
-
-        <pre><code>μ = (μ₁, μ₂)ᵀ,    Σ = [Σ₁₁  Σ₁₂;  Σ₂₁  Σ₂₂]
-
-给定 X₂ = x₂，条件分布 X₁|X₂=x₂ 为：
-条件均值：    μ₁|₂ = μ₁ + Σ₁₂ Σ₂₂^{-1} (x₂ - μ₂)
-条件协方差：  Σ₁|₂ = Σ₁₁ - Σ₁₂ Σ₂₂^{-1} Σ₂₁</code></pre>
-
-        <p>注意一个关键事实：条件协方差 <strong>不依赖于</strong>观测值 x₂！这意味着，无论你观测到 X₂ 的值是大是小，在给定 X₂ 后 X₁ 的不确定性减少量是相同的。这个性质在信号处理中极其重要——它意味着在高斯假设下，观测数据带来的信息增益完全由协方差结构决定，而不是由观测值本身的大小决定。</p>
-
-        <div class="highlight">
-            <strong>数学之美：</strong>Σ₁₂ Σ₂₂^{-1} 这个矩阵可以理解为"从 X₂ 到 X₁ 的最优线性预测系数"。在高斯框架下，最优线性预测器同时也是最优非线性预测器——因为条件均值恰好是线性函数。这正是高斯过程如此高效的核心原因：最小均方误差估计器退化为一个简单的线性运算。
-        </div>
-
-        <h2>高斯过程在机器学习中的应用</h2>
-
-        <h3>高斯过程回归（GPR）</h3>
-
-        <p>高斯过程回归（Gaussian Process Regression, GPR）是高斯过程在机器学习中最经典的应用。它的核心思想非常优雅：<strong>把函数的先验分布直接定义在函数空间上</strong>。</p>
-
-        <p>在传统的回归方法中，我们假设函数有一个参数化的形式（比如线性函数 y = ax + b），然后估计参数。GPR的做法完全不同：它用高斯过程作为函数 f(x) 的先验分布，意味着在观测任何数据之前，我们就假设 f(x) 是一个高斯过程，具有某个均值函数 m(x) 和协方差函数（即核函数）k(x, x')。</p>
-
-        <pre><code>先验：f(x) ~ GP(m(x), k(x, x'))
-
-给定观测数据 {(xᵢ, yᵢ)}，其中 yᵢ = f(xᵢ) + εᵢ，εᵢ ~ N(0, σ²)，
-
-预测点 x* 的后验分布为：
-预测均值：    μ* = k(x*, X) [K + σ²I]^{-1} y
-预测方差：    σ*² = k(x*, x*) - k(x*, X) [K + σ²I]^{-1} k(X, x*)</code></pre>
-
-        <p>看到这个形式了吗？它和上面多维高斯条件分布的公式完全一致！GPR本质上就是在函数空间上做"条件概率"——用观测数据去更新对函数形状的认知。</p>
-
-        <h3>核函数 = 协方差函数</h3>
-
-        <p>在GPR中，核函数 k(x, x') 扮演的就是协方差函数的角色。它编码了我们关于函数性质（平滑性、周期性、各向同性等）的先验知识。常用的核函数如下。</p>
-
-        <table>
-            <tr><th>核函数名称</th><th>数学表达式</th><th>特性</th><th>适用场景</th></tr>
-            <tr><td>径向基函数（RBF/SE）</td><td>k(x,x') = σ²·exp(-‖x-x'‖²/(2ℓ²))</td><td>无穷可微，极度平滑</td><td>默认首选，光滑函数建模</td></tr>
-            <tr><td>马顿核（Matérn）</td><td>k(x,x') = σ²·(2^{1-ν}/Γ(ν))·(√2ν r/ℓ)^ν·K_ν(√2ν r/ℓ)</td><td>有限可微，控制平滑度</td><td>有噪声的实际数据</td></tr>
-            <tr><td>周期核（Periodic）</td><td>k(x,x') = σ²·exp(-2sin²(π|x-x'|/p)/ℓ²)</td><td>周期性重复</td><td>季节数据、波动信号</td></tr>
-            <tr><td>线性核（Linear）</td><td>k(x,x') = σ²·xᵀx'</td><td>等价于贝叶斯线性回归</td><td>线性趋势</td></tr>
-            <tr><td>有理二次核（RQ）</td><td>k(x,x') = σ²·(1+‖x-x'‖²/(2αℓ²))^{-α}</td><td>多尺度平滑</td><td>数据包含不同长度尺度</td></tr>
-        </table>
-
-        <p>核函数的超参数（如长度尺度 ℓ、信号方差 σ²）通常通过<strong>最大化边缘似然</strong>（maximum marginal likelihood）来自动学习——这也是GPR的自适应能力所在。</p>
-
-        <h3>GPR提供预测不确定性量化</h3>
-
-        <p>GPR最吸引人的能力在于：它不只是给出一个点预测（prediction），还给出了预测的<strong>置信区间</strong>（uncertainty quantification）。在贝叶斯优化、主动学习、安全关键系统等场景中，知道"模型在某个点预测的把握有多大"往往比预测值本身更重要。</p>
-
-        <p>举个例子：在化学实验的贝叶斯优化中，GPR不仅预测某个化合物配比的产率，还会给出预测的不确定性。优化算法据此在"探索"（去不确定性高的区域）和"利用"（去预测产率高的区域）之间做出权衡。如果没有不确定性量化，这就是普通的梯度优化——但有了不确定性，它就变成了智能的材料搜索。</p>
-
-        <div class="warning">
-            <strong>踩坑故事 — 高斯假设在非线性系统中的失效</strong>
-            <br><br>
-            某自动驾驶团队使用高斯过程回归建模车辆发动机的扭矩-油门映射关系。他们在台架测试中采集了大量数据，GPR模型的预测均方根误差非常小，团队信心满满地把模型部署到了实际车辆上。
-            <br><br>
-            结果在实车路试中，模型在急加速工况下给出了完全离谱的预测——置信区间窄得让人放心，但实际输出却远远偏离。排查后发现原因：发动机在急加速时存在明显的非线性迟滞效应（由于燃油喷射系统的动态响应），而GPR使用的RBF核假设了函数平滑且各向同性。真实系统的局部非线性远强于核函数的建模能力，导致模型在未充分采样的区域给出了过于自信的错误预测。
-            <br><br>
-            <strong>教训：</strong>高斯过程回归中的"不确定性量化"的可靠性完全取决于模型假设是否正确。如果你的核函数不能捕获数据的真实结构（如急剧的非线性、不连续性、多模态），那么预测方差也会严重失真。永远不要盲目相信置信区间——要先问自己：我的先验假设合理吗？
-        </div>
-
-        <h2>本章小结与衔接</h2>
-
-        <p>本章我们深入探讨了高斯过程——随机信号分析中最重要的"VIP"过程。你了解了它的定义（任意有限维分布为高斯）、核心性质（线性系统保持高斯性、两个函数完全描述）、多维高斯分布的条件分布公式，以及高斯过程在机器学习中的前沿应用（GPR提供预测不确定性）。最重要的是，我们通过一个踩坑故事提醒你：高斯框架是一把锋利但有限制的刀——它不能处理非高斯和非线性问题。</p>
-
-        <p>下一章，我们将进入一个非常实用的专题——<strong>窄带随机信号分析</strong>。无线通信中的大多数信号都是窄带的，我们会学到希尔伯特变换、解析信号和复包络这些通信工程师的"日用工具"。准备好了吗？我们下章见。</p>
-
-        <div class="footer-nav">
-            <a href="14.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="16.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+# 3) 合法与非负定：正定的协方差特征值全 >= 0；下面这个不是
+bad = np.array([[1.0, 2.0], [2.0, 1.0]])
+assert np.linalg.eigvalsh(Sig).min() >= 0
+assert np.linalg.eigvalsh(bad).min() < 0
+</code></pre><p>检查点（与图中数值同源）：(1) 样本协方差向 K 收敛；(2) 条件方差与公式一致；(3) 合法协方差矩阵的特征值均非负，而非负定矩阵会出现负特征值。</p></section>
+<section id="boundaries"><h2>边界与陷阱</h2><ul><li><strong>不相关 ≠ 独立（除非联合高斯）。</strong>取 X~N(0,1)，S 等概率取 ±1 且与 X 独立，令 Y=SX。可算出 Y~N(0,1) 也是高斯，且 Cov(X,Y)=E[S]E[X²]=0；但 |X|=|Y|，两者明显相关，并不独立。原因是 (X,Y) 不是<strong>联合</strong>高斯。这正是本章反复强调“联合”的原因。</li><li><strong>协方差必须非负定。</strong>随手写下的对称函数不一定合法。若某线性组合的方差为负，则不存在任何实高斯向量与之对应。RBF、线性核等常见核已保证非负定，自造核应验证。</li><li><strong>CLT 是极限陈述，不是恒等式。</strong>“很多小效应相加”通常只给出近似高斯；有限样本、重尾项或强相关都会破坏该近似，直接套用高斯结论会低估尾部风险。</li><li><strong>线性保持高斯，非线性不保持。</strong>限幅、平方、量化后一般不再是高斯；此时均值与协方差只能给出二阶信息，完整分布需重新求。</li><li><strong>GPR 的置信区间依赖核假设。</strong>预测方差的可信度取决于核能否描述真实结构。若真实函数比核假设更不光滑、或含多重尺度，后验方差会在未采样区过于乐观；应先验证残差，而不应盲目相信窄带。</li></ul><figure><img src="../assets/svg/15-covariance-valid.svg" alt="左侧合法协方差矩阵的特征值均非负并对应椭圆；右侧含负特征值的矩阵无法定义实椭圆" width="1000" height="400" loading="lazy"><figcaption>图 15.4　非负定是可用的充要约束：特征值出现负值，就不存在对应的实高斯分布。数值为教学例。</figcaption></figure><p>下一章将把“窄带”假设叠加在高斯过程上，引入希尔伯特变换、解析信号与复包络——通信与雷达中几乎无处不在的表示工具。</p></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li><a href="https://ocw.mit.edu/courses/res-6-012-introduction-to-probability-spring-2018/pages/part-iii-random-processes/">MIT OpenCourseWare · Random Processes</a>：高斯过程、均值/协方差函数与线性变换下的高斯性。</li><li><a href="https://www.probabilitycourse.com/chapter6/6_1_5_random_vectors.php">ProbabilityCourse · Random Vectors</a>：多维高斯、分块协方差与非负定性。</li><li><a href="https://gaussianprocess.org/gpml/">Rasmussen &amp; Williams, Gaussian Processes for Machine Learning (MIT Press, 2006)</a>：第二章定义与核函数，第三章条件分布与边缘似然。</li><li><a href="https://www.probabilitycourse.com/chapter5/5_3_2_conditional_distributions.php">ProbabilityCourse · Conditional Distributions</a>：条件均值与条件方差的定义背景。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="14.html">← 第 14 章</a><a href="../index.html#content">全部章节</a><a href="16.html">第 16 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>

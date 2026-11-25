@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig15a-title fig15a-desc">
+<title id="fig15a-title">有限维联合高斯分布确定一个高斯过程</title>
+<desc id="fig15a-desc">左侧时间轴上是同一高斯过程的三条样本路径与四个采样时刻；右侧是其中两个时刻的联合密度等高线，等高线为椭圆，说明任意有限维分布都是多维高斯。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="42" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">任意有限维分布都是多维高斯，过程即被完全刻画</text>
+<line x1="60" y1="250" x2="540" y2="250" stroke="#dce7e6"/>
+<line x1="80" y1="90" x2="80" y2="270" stroke="#dce7e6"/>
+<text x="545" y="255" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">t</text>
+<g fill="none" stroke="#137f83" stroke-width="2.4" opacity="0.9">
+<path d="M80 175 Q150 150 210 185 Q280 225 350 195 Q420 165 490 200"/>
+<path d="M80 200 Q160 230 230 195 Q300 160 370 200 Q440 235 500 205"/>
+</g>
+<path d="M80 145 Q170 120 240 165 Q320 215 400 175 Q470 145 520 170" fill="none" stroke="#ce704f" stroke-width="2.6"/>
+<g fill="#7564ad">
+<circle cx="120" cy="176" r="5"/><circle cx="245" cy="188" r="5"/>
+<circle cx="370" cy="200" r="5"/><circle cx="470" cy="190" r="5"/>
+</g>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#7564ad" text-anchor="middle">
+<text x="120" y="285">t₁</text><text x="245" y="285">t₂</text><text x="370" y="285">t₃</text><text x="470" y="285">t₄</text>
+</g>
+<text x="300" y="320" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">三条样本路径（同一过程的不同实现）</text>
+<g transform="translate(700,205)">
+<ellipse cx="0" cy="0" rx="120" ry="70" fill="#f4f1fa" stroke="#7564ad" stroke-width="2" transform="rotate(-18)"/>
+<ellipse cx="0" cy="0" rx="78" ry="42" fill="none" stroke="#7564ad" stroke-width="1.6" transform="rotate(-18)"/>
+<ellipse cx="0" cy="0" rx="36" ry="19" fill="none" stroke="#7564ad" stroke-width="1.4" transform="rotate(-18)"/>
+<circle cx="0" cy="0" r="5" fill="#7564ad"/>
+</g>
+<line x1="540" y1="205" x2="575" y2="205" stroke="#dce7e6"/>
+<text x="700" y="105" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#7564ad">联合密度 (X(t₁), X(t₂))</text>
+<text x="700" y="330" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">等高线为椭圆 ⟺ 二维联合高斯</text>
+</svg>

@@ -176,12 +176,12 @@
       "num": "15",
       "title": "高斯过程",
       "topics": [
-        "高斯过程定义与性质",
+        "高斯过程定义与非负定协方差",
         "线性系统保持高斯性",
-        "高斯过程回归GPR"
+        "条件分布与高斯过程回归"
       ],
       "file": "chapters/15.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "系统与模型"
     },
     {
