@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig21b-title fig21b-desc">
+<title id="fig21b-title">维纳滤波通过最小化误差均方值求最优脉冲响应</title>
+<desc id="fig21b-desc">期望信号S与噪声N相加得到观测X，X经滤波器h得到估计，S与估计相减得误差，最优准则是使误差均方最小，等价于误差与观测正交。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">最小化 E[(S−Ŝ)²] ⟺ 误差与观测正交</text>
+<rect x="60" y="110" width="120" height="46" rx="10" fill="#e5f4f0" stroke="#137f83"/>
+<text x="120" y="139" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#0b585e">S(t) 信号</text>
+<rect x="60" y="210" width="120" height="46" rx="10" fill="#fff3ed" stroke="#ce704f"/>
+<text x="120" y="239" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#a04a2e">N(t) 噪声</text>
+<circle cx="250" cy="183" r="20" fill="#fff" stroke="#5d7078" stroke-width="2"/>
+<text x="250" y="190" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="16" fill="#20343d">+</text>
+<path d="M180 133 H250 V163" fill="none" stroke="#5d7078" stroke-width="2"/>
+<path d="M180 233 H250 V203" fill="none" stroke="#5d7078" stroke-width="2"/>
+<line x1="270" y1="183" x2="380" y2="183" stroke="#5d7078" stroke-width="2.4"/>
+<text x="325" y="172" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">X(t)=S+N</text>
+<rect x="380" y="158" width="120" height="50" rx="10" fill="#f4f1fa" stroke="#7564ad"/>
+<text x="440" y="188" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#524a86">h(t)</text>
+<line x1="500" y1="183" x2="640" y2="183" stroke="#5d7078" stroke-width="2.4"/>
+<text x="570" y="172" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">Ŝ(t)</text>
+<circle cx="660" cy="183" r="20" fill="#fff" stroke="#5d7078" stroke-width="2"/>
+<text x="660" y="190" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="16" fill="#20343d">−</text>
+<path d="M120 110 V70 H660 V163" fill="none" stroke="#137f83" stroke-width="2" stroke-dasharray="6 5"/>
+<line x1="680" y1="183" x2="820" y2="183" stroke="#ce704f" stroke-width="2.4"/>
+<text x="750" y="172" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">误差 e=S−Ŝ</text>
+<rect x="820" y="158" width="140" height="50" rx="10" fill="#eef7f5" stroke="#9dc9c4"/>
+<text x="890" y="188" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#0b585e">min E[e²]</text>
+<text x="60" y="320" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">维纳-霍夫方程 R_dX(τ)=∫h(α)R_XX(τ−α)dα 由正交性 E[e·X]=0 推出。</text>
+<text x="60" y="355" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">需已知信号/噪声相关函数与平稳性；形状为教学示意。</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig21c-title fig21c-desc">
+<title id="fig21c-title">非因果维纳滤波按信噪比加权各频率</title>
+<desc id="fig21c-desc">信号功率谱在低频占主导，噪声谱近似平坦；维纳增益在信噪比高处接近一，在噪声占主导的高频处下降到接近零。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">H(ω)=S_SS/(S_SS+S_NN)：高频抑制，低频通过</text>
+<line x1="90" y1="300" x2="880" y2="300" stroke="#dce7e6"/>
+<line x1="90" y1="70" x2="90" y2="310" stroke="#dce7e6"/>
+<polyline points="90,124 240,168 390,223 540,267 690,289 840,296" fill="none" stroke="#137f83" stroke-width="3"/>
+<line x1="90" y1="267" x2="840" y2="267" stroke="#ce704f" stroke-width="2.6" stroke-dasharray="6 5"/>
+<polyline points="90,115 240,124 390,146 540,190 690,245 840,274" fill="none" stroke="#7564ad" stroke-width="3.2"/>
+<text x="250" y="150" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">信号谱 S_SS</text>
+<text x="640" y="258" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">噪声谱 S_NN</text>
+<text x="470" y="182" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">维纳增益 H(ω)</text>
+<text x="880" y="320" text-anchor="end" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">频率 ω</text>
+<text x="90" y="345" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">信噪比高的频率 H≈1，噪声占主导的频率 H≈0；过渡平滑。曲线为教学示意，非具体数值。</text>
+</svg>

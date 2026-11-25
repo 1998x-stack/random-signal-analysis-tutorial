@@ -249,11 +249,11 @@
       "title": "维纳滤波",
       "topics": [
         "维纳-霍夫方程",
-        "非因果/因果IIR滤波",
-        "谱分解法"
+        "非因果与因果维纳滤波",
+        "谱分解与正则化"
       ],
       "file": "chapters/21.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "统计推断与应用"
     },
     {

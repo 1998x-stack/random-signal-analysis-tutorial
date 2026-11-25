@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig21a-title fig21a-desc">
+<title id="fig21a-title">滤波平滑与预测使用不同时间范围的观测</title>
+<desc id="fig21a-desc">时间轴上一个当前时刻，滤波只用过去观测估计当前值，平滑用包含未来的观测估计过去值，预测用过去观测估计未来值。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">观测范围不同：滤波 / 平滑 / 预测</text>
+<line x1="70" y1="210" x2="930" y2="210" stroke="#dce7e6" stroke-width="2"/>
+<line x1="520" y1="150" x2="520" y2="270" stroke="#20343d" stroke-dasharray="5 5"/>
+<text x="520" y="290" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#20343d">当前 t</text>
+<text x="930" y="200" text-anchor="end" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">时间</text>
+<rect x="70" y="120" width="450" height="16" fill="#e5f4f0" stroke="#137f83"/>
+<text x="295" y="112" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#0b585e">滤波：用 τ≤t 估计 S(t)</text>
+<rect x="200" y="150" width="620" height="16" fill="#f4f1fa" stroke="#7564ad"/>
+<text x="510" y="185" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">平滑：用 τ≤T（含未来）估计 S(t)</text>
+<rect x="70" y="240" width="450" height="16" fill="#fff3ed" stroke="#ce704f"/>
+<text x="295" y="278" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">预测：用 τ≤t 估计 S(t+α)</text>
+<line x1="520" y1="248" x2="640" y2="248" stroke="#ce704f" stroke-width="2" marker-end="url(#m1)"/>
+<line x1="640" y1="225" x2="640" y2="242" stroke="#ce704f" stroke-width="2"/>
+<text x="660" y="252" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#a04a2e">未来 +α</text>
+<defs><marker id="m1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#ce704f"/></marker></defs>
+<text x="70" y="345" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">三者共享同一 MMSE 准则，仅目标相对观测时间的偏移不同。形状为教学示意。</text>
+</svg>

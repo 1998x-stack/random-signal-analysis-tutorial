@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig21d-title fig21d-desc">
+<title id="fig21d-title">因果维纳滤波用谱分解加白化再最优因果滤波</title>
+<desc id="fig21d-desc">观测功率谱分解为因果部分与反因果部分之积，先通过白化滤波器把有色观测变白，再对白噪声做最优因果滤波，得到可实现的最优估计。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">因果解：白化 + 最优因果滤波（谱分解）</text>
+<rect x="60" y="160" width="150" height="56" rx="10" fill="#f1f7f5" stroke="#9dc9c4"/>
+<text x="135" y="193" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#20343d">有色观测 X</text>
+<path d="M210 188 H310" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#s1)"/>
+<rect x="310" y="160" width="180" height="56" rx="10" fill="#f4f1fa" stroke="#7564ad"/>
+<text x="400" y="185" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#524a86">白化 1/S⁺(ω)</text>
+<text x="400" y="204" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#5d7078">S_XX = S⁺·S⁻</text>
+<path d="M490 188 H590" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#s1)"/>
+<rect x="590" y="160" width="190" height="56" rx="10" fill="#f4f1fa" stroke="#7564ad"/>
+<text x="685" y="185" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#524a86">最优因果滤波</text>
+<text x="685" y="204" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#5d7078">（白噪声域）</text>
+<path d="M780 188 H880" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#s1)"/>
+<text x="905" y="193" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#0b585e">Ŝ</text>
+<text x="250" y="255" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">变白</text>
+<text x="540" y="255" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">在白色域求解</text>
+<defs><marker id="s1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#5d7078"/></marker></defs>
+<text x="60" y="330" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">S⁺ 的极点零点都在左半平面（因果），S⁻ 在右半平面；因果约束 h(t)=0,t&lt;0 使性能略差于非因果。</text>
+</svg>
