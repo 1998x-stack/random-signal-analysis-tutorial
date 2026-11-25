@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig20d-title fig20d-desc">
+<title id="fig20d-title">正交性原理：估计量是参数在观测空间上的正交投影</title>
+<desc id="fig20d-desc">参数θ作为空间中的向量，观测张成的平面为子空间，MMSE估计是θ在该平面上的投影，估计误差θ减θ尖号与该平面正交即与所有观测不相关。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">E[(θ−θ̂)·Yᵀ]=0：误差与观测正交</text>
+<polygon points="180,270 620,270 700,200 260,200" fill="#eef7f5" stroke="#9dc9c4" stroke-width="2"/>
+<text x="440" y="290" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#0b585e">观测张成的子空间 span(Y)</text>
+<line x1="440" y1="235" x2="440" y2="235" stroke="none"/>
+<circle cx="440" cy="235" r="0" fill="none"/>
+<line x1="300" y1="320" x2="440" y2="235" stroke="#137f83" stroke-width="2.6" marker-end="url(#o1)"/>
+<text x="350" y="300" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#0b585e">θ̂ 投影</text>
+<path d="M300 320 L520 170" fill="none" stroke="#ce704f" stroke-width="2.6"/>
+<circle cx="520" cy="170" r="5" fill="#ce704f"/>
+<text x="530" y="165" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#a04a2e">θ</text>
+<line x1="440" y1="235" x2="520" y2="170" stroke="#7564ad" stroke-width="2.6" marker-end="url(#o2)"/>
+<path d="M438 233 L432 224" fill="none" stroke="#7564ad" stroke-width="2"/>
+<text x="500" y="225" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#524a86">误差 θ−θ̂</text>
+<circle cx="300" cy="320" r="5" fill="#20343d"/>
+<text x="270" y="338" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">原点</text>
+<defs>
+<marker id="o1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#137f83"/></marker>
+<marker id="o2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#7564ad"/></marker>
+</defs>
+<text x="28" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">正交投影是 MMSE 的几何含义，也是维纳滤波与卡尔曼滤波的共同基础。示意图，非具体数值。</text>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig20b-title fig20b-desc">
+<title id="fig20b-title">MMSE、MAP、ML 分别取后验均值、后验众数与似然峰值</title>
+<desc id="fig20b-desc">后验密度曲线较宽且右偏，其上标出后验众数即MAP与后验均值即MMSE两个位置；似然函数曲线峰值略靠左，对应ML估计，无需先验。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">三种准则取同一后验上的不同点</text>
+<line x1="120" y1="300" x2="900" y2="300" stroke="#dce7e6"/>
+<line x1="120" y1="70" x2="120" y2="310" stroke="#dce7e6"/>
+<polyline points="170,278 270,168 370,113 470,124 570,168 670,223 770,260 870,282" fill="none" stroke="#137f83" stroke-width="3"/>
+<polyline points="170,256 270,146 320,124 370,142 470,201 570,252 670,278" fill="none" stroke="#ce704f" stroke-width="2.6"/>
+<line x1="320" y1="124" x2="320" y2="300" stroke="#a04a2e" stroke-dasharray="4 4"/>
+<line x1="370" y1="113" x2="370" y2="300" stroke="#524a86" stroke-dasharray="4 4"/>
+<line x1="420" y1="126" x2="420" y2="300" stroke="#137f83" stroke-dasharray="4 4"/>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12">
+<text x="320" y="322" text-anchor="middle" fill="#a04a2e">ML</text>
+<text x="370" y="322" text-anchor="middle" fill="#524a86">MAP</text>
+<text x="420" y="322" text-anchor="middle" fill="#137f83">MMSE</text>
+</g>
+<text x="600" y="120" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">后验 p(θ|Y)（贝叶斯）</text>
+<text x="600" y="255" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">似然 p(Y|θ)（频率学派）</text>
+<text x="120" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">MAP=后验众数，MMSE=后验均值，ML=似然峰值；后验靠先验与似然共同决定。形状为教学示意。</text>
+</svg>

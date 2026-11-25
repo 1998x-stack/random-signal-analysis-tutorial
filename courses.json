@@ -237,11 +237,11 @@
       "title": "估计理论基础",
       "topics": [
         "MMSE/MAP/ML准则",
-        "Cramér-Rao下界",
+        "无偏/一致/有效与CRLB",
         "正交性原理"
       ],
       "file": "chapters/20.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "统计推断与应用"
     },
     {

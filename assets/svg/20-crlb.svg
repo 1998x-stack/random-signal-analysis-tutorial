@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig20c-title fig20c-desc">
+<title id="fig20c-title">似然越尖锐，Fisher信息越大，Cramér-Rao下界越低</title>
+<desc id="fig20c-desc">左侧似然函数高而窄对应大的Fisher信息与小的方差下界，右侧似然函数低而宽对应小的Fisher信息与大的方差下界。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">CRLB：无偏估计量方差的下界 Var(θ̂) ≥ 1/I(θ)</text>
+<line x1="70" y1="300" x2="440" y2="300" stroke="#dce7e6"/>
+<path d="M120 300 Q190 90 260 300" fill="none" stroke="#137f83" stroke-width="3"/>
+<line x1="190" y1="300" x2="190" y2="120" stroke="#7564ad" stroke-dasharray="4 4"/>
+<text x="255" y="130" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#0b585e">尖锐似然</text>
+<text x="255" y="330" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">I(θ) 大 → 下界低</text>
+<line x1="540" y1="300" x2="930" y2="300" stroke="#dce7e6"/>
+<path d="M590 300 Q740 220 890 300" fill="none" stroke="#ce704f" stroke-width="3"/>
+<line x1="740" y1="300" x2="740" y2="255" stroke="#7564ad" stroke-dasharray="4 4"/>
+<text x="735" y="205" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">平坦似然</text>
+<text x="735" y="330" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#ce704f">I(θ) 小 → 下界高</text>
+<text x="70" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">Fisher 信息度量似然对参数变化的敏感度；形状为教学示意，非具体数值。</text>
+</svg>

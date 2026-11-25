@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig20a-title fig20a-desc">
+<title id="fig20a-title">估计问题的要素：参数、含噪观测与估计量</title>
+<desc id="fig20a-desc">待估参数θ经过含噪观测过程得到随机观测Y，估计量g把Y映射为估计值θ尖号；右下角说明估计量本身是随机变量，具有分布。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">估计量 θ̂=g(Y) 本身也是随机变量</text>
+<rect x="60" y="120" width="140" height="64" rx="12" fill="#e5f4f0" stroke="#137f83"/>
+<text x="130" y="158" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e">参数 θ</text>
+<rect x="290" y="120" width="170" height="64" rx="12" fill="#f4f1fa" stroke="#7564ad"/>
+<text x="375" y="150" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#524a86">含噪观测 p(Y|θ)</text>
+<text x="375" y="170" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">（噪声随机）</text>
+<rect x="560" y="120" width="150" height="64" rx="12" fill="#f1f7f5" stroke="#9dc9c4"/>
+<text x="635" y="158" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#20343d">观测 Y</text>
+<rect x="800" y="120" width="150" height="64" rx="12" fill="#fff3ed" stroke="#ce704f"/>
+<text x="875" y="158" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#a04a2e">估计量 g(·)</text>
+<path d="M200 152 H290" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#e1)"/>
+<path d="M460 152 H560" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#e1)"/>
+<path d="M710 152 H800" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#e1)"/>
+<path d="M875 120 V90 H130 V120" fill="none" stroke="#ce704f" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="500" y="84" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">误差 θ̂−θ 随观测变化</text>
+<defs><marker id="e1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#5d7078"/></marker></defs>
+<line x1="60" y1="320" x2="440" y2="320" stroke="#dce7e6"/>
+<path d="M150 320 Q250 230 350 320" fill="none" stroke="#137f83" stroke-width="2.6"/>
+<text x="250" y="345" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">θ̂ 的抽样分布（均值、方差、偏差）</text>
+<text x="60" y="380" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">评价估计量不能只看一次结果，而要看它整个分布的性质。形状为教学示意。</text>
+</svg>
