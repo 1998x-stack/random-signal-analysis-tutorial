@@ -188,12 +188,12 @@
       "num": "16",
       "title": "窄带随机信号分析",
       "topics": [
-        "希尔伯特变换",
+        "希尔伯特变换与90°移相",
         "解析信号与复包络",
-        "I/Q正交表示"
+        "I/Q正交表示与窄带过程"
       ],
       "file": "chapters/16.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "系统与模型"
     },
     {

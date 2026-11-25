@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig16a-title fig16a-desc">
+<title id="fig16a-title">希尔伯特变换是幅度不变的九十度移相器</title>
+<desc id="fig16a-desc">上半部分画出余弦x(t)及其希尔伯特变换正弦x̂(t)，两者相位相差九十度；下半部分说明幅频响应恒为一，正频率相移负九十度、负频率正九十度。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">x(t)=cos 与 x̂(t)=sin：同幅值，相差 90°</text>
+<line x1="70" y1="150" x2="620" y2="150" stroke="#dce7e6"/>
+<line x1="70" y1="70" x2="70" y2="230" stroke="#dce7e6"/>
+<path d="M70 150 Q140 70 210 150 Q280 230 350 150 Q420 70 490 150 Q560 230 620 165" fill="none" stroke="#137f83" stroke-width="3"/>
+<path d="M70 70 Q140 150 210 230 Q280 150 350 70 Q420 150 490 230 Q560 150 620 118" fill="none" stroke="#7564ad" stroke-width="2.6"/>
+<text x="640" y="112" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#137f83">x(t)=cos(ω₀t)</text>
+<text x="640" y="240" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#7564ad">x̂(t)=sin(ω₀t)</text>
+<rect x="60" y="270" width="410" height="105" rx="12" fill="#eef7f5" stroke="#9dc9c4"/>
+<text x="85" y="308" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e">幅频 |H(f)| = 1（f≠0）</text>
+<text x="85" y="342" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e">正频率 −90°，负频率 +90°</text>
+<rect x="520" y="270" width="420" height="105" rx="12" fill="#f4f1fa" stroke="#c9bfe6"/>
+<text x="545" y="308" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#524a86">双重变换 H[H[x]] = −x</text>
+<text x="545" y="342" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#524a86">能量守恒，且 ∫x·x̂ dt = 0</text>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig16b-title fig16b-desc">
+<title id="fig16b-title">解析信号只保留正频率，复包络是搬到基带的结果</title>
+<desc id="fig16b-desc">左panel实信号频谱关于零频对称，在正负中心频率各有一团；中panel解析信号把负频率置零并把正频率加倍；右panel复包络把正频率搬移到零频附近。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">从实信号频谱到解析信号，再到复包络（基带）</text>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif">
+<line x1="40" y1="290" x2="320" y2="290" stroke="#dce7e6"/>
+<line x1="180" y1="120" x2="180" y2="300" stroke="#dce7e6"/>
+<path d="M95 290 Q120 200 145 290 Z" fill="#137f83" opacity="0.75"/>
+<path d="M215 290 Q240 200 265 290 Z" fill="#137f83" opacity="0.75"/>
+<text x="180" y="322" font-size="12" fill="#5d7078" text-anchor="middle">实信号 X(f)：±f₀ 对称</text>
+<text x="180" y="110" font-size="12" fill="#137f83" text-anchor="middle">幅值 A</text>
+<line x1="360" y1="290" x2="640" y2="290" stroke="#dce7e6"/>
+<line x1="500" y1="120" x2="500" y2="300" stroke="#dce7e6"/>
+<path d="M500 290 Q525 165 550 290 Z" fill="#7564ad" opacity="0.85"/>
+<text x="500" y="322" font-size="12" fill="#5d7078" text-anchor="middle">解析信号 Z(f)：仅正频率，加倍</text>
+<text x="567" y="175" font-size="12" fill="#524a86">幅值 2A</text>
+<line x1="680" y1="290" x2="960" y2="290" stroke="#dce7e6"/>
+<line x1="740" y1="120" x2="740" y2="300" stroke="#dce7e6"/>
+<path d="M705 290 Q730 205 755 290 Z" fill="#ce704f" opacity="0.8"/>
+<text x="820" y="322" font-size="12" fill="#5d7078" text-anchor="middle">复包络 x̃(t)：移到 0 附近</text>
+<text x="770" y="180" font-size="12" fill="#a04a2e">低通</text>
+</g>
+<text x="28" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">x̃(t)=z(t)·e^(−j2πf₀t)，带宽仅由包络决定，可用远低于 f₀ 的采样率处理。形状为教学示意。</text>
+</svg>

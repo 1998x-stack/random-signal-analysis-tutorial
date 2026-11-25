@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig16d-title fig16d-desc">
+<title id="fig16d-title">窄带过程的功率谱集中在正负中心频率附近</title>
+<desc id="fig16d-desc">上轴功率谱在正负中心频率各处形成宽度为B的窄带，且B远小于中心频率；下轴同相与正交分量的功率谱是把正频率部分搬到基带后的低通谱。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">窄带条件 B ≪ f₀：谱集中在 ±f₀，其余近似为零</text>
+<line x1="60" y1="180" x2="940" y2="180" stroke="#dce7e6"/>
+<path d="M200 180 Q230 90 260 180 Z" fill="#137f83" opacity="0.8"/>
+<path d="M740 180 Q770 90 800 180 Z" fill="#137f83" opacity="0.8"/>
+<line x1="500" y1="90" x2="500" y2="190" stroke="#dce7e6"/>
+<line x1="230" y1="70" x2="230" y2="180" stroke="#7564ad" stroke-dasharray="4 4"/>
+<line x1="260" y1="70" x2="260" y2="180" stroke="#7564ad" stroke-dasharray="4 4"/>
+<text x="245" y="62" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">B</text>
+<text x="205" y="205" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">−f₀</text>
+<text x="770" y="205" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">+f₀</text>
+<text x="500" y="205" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">0</text>
+<text x="500" y="105" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">Sₓ(f)</text>
+<rect x="60" y="250" width="880" height="10" fill="#f1f7f5"/>
+<line x1="60" y1="300" x2="940" y2="300" stroke="#dce7e6"/>
+<rect x="330" y="256" width="340" height="8" fill="#ce704f" opacity="0.5"/>
+<path d="M330 300 Q430 250 530 300" fill="none" stroke="#ce704f" stroke-width="2.6"/>
+<path d="M470 300 Q570 250 670 300" fill="none" stroke="#ce704f" stroke-width="2.6" opacity="0.6"/>
+<text x="500" y="245" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">基带：I/Q 的低通功率谱</text>
+<text x="60" y="345" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">同相 I(t) 与正交 Q(t) 为零均值宽平稳过程；若噪声谱在 ±f₀ 附近对称，则它们等功率且互不相关。</text>
+<text x="60" y="380" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">形状为教学示意；真实谱形由包络与滤波器决定。</text>
+</svg>

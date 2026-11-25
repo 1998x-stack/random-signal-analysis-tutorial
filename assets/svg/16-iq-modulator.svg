@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig16c-title fig16c-desc">
+<title id="fig16c-title">I/Q 正交调制器把两路基带合成为一个带通信号</title>
+<desc id="fig16c-desc">同相分量I(t)与余弦载波相乘，正交分量Q(t)与负正弦载波相乘，两路相加得到窄带信号x(t)=I cos − Q sin。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">x(t) = I(t)·cos(2πf₀t) − Q(t)·sin(2πf₀t)</text>
+<rect x="50" y="90" width="120" height="54" rx="10" fill="#eef7f5" stroke="#137f83"/>
+<text x="110" y="124" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e">I(t)</text>
+<rect x="50" y="240" width="120" height="54" rx="10" fill="#eef7f5" stroke="#137f83"/>
+<text x="110" y="274" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e">Q(t)</text>
+<line x1="170" y1="117" x2="300" y2="117" stroke="#dce7e6" stroke-width="2"/>
+<line x1="170" y1="267" x2="300" y2="267" stroke="#dce7e6" stroke-width="2"/>
+<circle cx="330" cy="117" r="22" fill="#fff" stroke="#7564ad" stroke-width="2"/>
+<text x="330" y="124" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="18" fill="#524a86">×</text>
+<circle cx="330" cy="267" r="22" fill="#fff" stroke="#7564ad" stroke-width="2"/>
+<text x="330" y="274" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="18" fill="#524a86">×</text>
+<rect x="250" y="40" width="170" height="34" rx="8" fill="#f4f1fa" stroke="#c9bfe6"/>
+<text x="335" y="63" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">cos(2πf₀t)</text>
+<rect x="250" y="320" width="170" height="34" rx="8" fill="#f4f1fa" stroke="#c9bfe6"/>
+<text x="335" y="343" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">−sin(2πf₀t)</text>
+<path d="M352 117 H470" fill="none" stroke="#137f83" stroke-width="2.4"/>
+<path d="M352 267 H470" fill="none" stroke="#137f83" stroke-width="2.4"/>
+<circle cx="500" cy="192" r="24" fill="#fff" stroke="#137f83" stroke-width="2"/>
+<text x="500" y="199" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="18" fill="#0b585e">+</text>
+<path d="M470 117 H500 V168" fill="none" stroke="#137f83" stroke-width="2.4"/>
+<path d="M470 267 H500 V216" fill="none" stroke="#137f83" stroke-width="2.4"/>
+<line x1="524" y1="192" x2="700" y2="192" stroke="#137f83" stroke-width="3"/>
+<rect x="700" y="165" width="140" height="54" rx="10" fill="#e5f4f0" stroke="#137f83"/>
+<text x="770" y="199" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e">x(t) 带通</text>
+<text x="770" y="330" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">上变频后占用 f₀ 附近很窄的带宽</text>
+</svg>
