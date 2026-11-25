@@ -1,226 +1,41 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第22章 卡尔曼滤波</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html" class="active">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>开篇：维纳做不到的，卡尔曼来做</h2>
-
-        <p>大家好，我是你们的讲师。上一章我们学习了维纳滤波——一个在频域中优雅地解决了"从噪声中恢复信号"的问题。但维纳滤波有一个致命的软肋：它要求信号和噪声都是<strong>平稳</strong>的。在现实世界中，目标的运动是变速的、信道的衰落是时变的、心电信号的波形是随着呼吸在变化的——几乎没有什么重要的信号是真正平稳的。</p>
-
-        <p>卡尔曼滤波（Kalman filtering）的出现彻底改变了这一局面。1960年，鲁道夫·卡尔曼（Rudolf Kalman）发表了一篇题为"A New Approach to Linear Filtering and Prediction Problems"的论文，提出了一种完全在<strong>时域</strong>、基于<strong>状态空间</strong>、以<strong>递推</strong>方式工作的最优滤波算法。它不仅适用于非平稳信号，计算量还极其小（每次更新只需要几个矩阵运算），而且形式优雅到让人惊叹——五个方程，囊括了整个预测-修正循环的全部内容。如今，从阿波罗登月的导航计算机到你的手机GPS芯片，卡尔曼滤波几乎无处不在。</p>
-
-        <h2>从维纳到卡尔曼</h2>
-
-        <p>要理解卡尔曼滤波为什么"高级"，先要看清维纳滤波的局限：</p>
-
-        <ul>
-            <li><strong>维纳滤波</strong>：频域方法，要求信号平稳，需要知道信号和噪声的全部过去和未来的统计特性（Wiener-Hopf 方程是无限时间积分），计算的是整个冲击响应 h(t)，然后一次性处理所有数据。形象地说，维纳滤波是"洗照片"——拍完整个胶卷后一次性显影。</li>
-            <li><strong>卡尔曼滤波</strong>：时域方法，不要求平稳，只依赖当前时刻的状态和观测，用递推方式逐次更新估计。形象地说，卡尔曼滤波是"看直播"——每一帧画面到达时马上处理，不需要等待整场比赛结束。</li>
-        </ul>
-
-        <p>这个转变不仅仅是数学上的便利——它代表了信号处理思想的一次飞跃：<strong>从"批量处理"到"在线处理"</strong>。卡尔曼滤波不需要存储全部历史数据，只需要记住当前的状态估计和估计误差协方差，就可以在每次新的观测到来时更新估计。这种"递推"特性，使得卡尔曼滤波特别适合实时系统——而实时系统恰恰是大多数工程应用的真实运行方式。</p>
-
-        <div class="highlight">
-            <strong>历史趣闻：</strong>卡尔曼1960年发表论文时，他的思想并没有立刻被接受。当时NASA的工程师们正为阿波罗登月的导航问题头疼——阿波罗飞船的导航计算机内存只有 2K 字（约 4KB），根本装不下维纳滤波所需的数据。卡尔曼在访问NASA艾姆斯研究中心时与工程师 Stanley Schmidt 交流，后者立刻意识到卡尔曼滤波的递推特性完美适配了阿波罗的有限计算资源。此后，卡尔曼滤波成了阿波罗导航系统的一部分，并随着阿波罗的成功而一举成名。
-        </div>
-
-        <h2>状态空间模型</h2>
-
-        <p>卡尔曼滤波的数学基础是<strong>状态空间模型</strong>（state-space model）。它用两个方程来描述一个动态系统：</p>
-
-        <h3>状态方程：系统如何演变</h3>
-
-        <pre><code>x_k = F · x_{k-1} + w_{k-1}</code></pre>
-
-        <p>其中：</p>
-        <ul>
-            <li><strong>x_k</strong>：k 时刻的系统状态向量。例如对于目标跟踪问题，x_k 可能包含目标的位置和速度：<code>[p_x, p_y, v_x, v_y]^T</code>。</li>
-            <li><strong>F</strong>：状态转移矩阵，描述系统从 k-1 时刻到 k 时刻的动态变化。如果目标是匀速运动且采样时间为 &Delta;t，则 F 是一个块对角矩阵，每个维度包含一个 <code>[[1, &Delta;t], [0, 1]]</code> 的子块。</li>
-            <li><strong>w_{k-1}</strong>：过程噪声，通常假设为零均值高斯白噪声，协方差矩阵为 Q。它刻画了"模型的不确定性"——即使 F 是完美的，实际运动也可能有随机扰动（如风对飞机的影响）。</li>
-        </ul>
-
-        <h3>观测方程：传感器如何测量</h3>
-
-        <pre><code>z_k = H · x_k + v_k</code></pre>
-
-        <p>其中：</p>
-        <ul>
-            <li><strong>z_k</strong>：k 时刻的观测量。例如雷达测量的是目标距离和角度。</li>
-            <li><strong>H</strong>：观测矩阵，将状态空间映射到测量空间。如果你的状态包含位置，而传感器直接测量位置，那么 H 就是一个简单的选择矩阵。</li>
-            <li><strong>v_k</strong>：观测噪声，通常假设为零均值高斯白噪声，协方差矩阵为 R。它刻画了传感器的测量误差。</li>
-        </ul>
-
-        <div class="tip">
-            <strong>状态空间的哲学：</strong>状态空间模型最深刻的思想是——把"我们关心的变量"（状态）和"我们实际能测量到的变量"（观测）<strong>分开</strong>。你的状态是"目标在三维空间中的真实位置和速度"，但你只能得到一个有延迟、有噪声的雷达回波。卡尔曼滤波的工作就是：利用系统的物理规律（状态方程）和传感器的模型（观测方程），从观测中"反推"出状态的最优估计。
-        </div>
-
-        <h2>卡尔曼滤波的五个方程</h2>
-
-        <p>卡尔曼滤波的全部内容可以浓缩为五个方程，分为"预测"和"更新"两个步骤：</p>
-
-        <h3>预测步（Time Update）</h3>
-
-        <pre><code>1. 状态预测：
-   x̂_{k|k-1} = F · x̂_{k-1|k-1}
-
-2. 误差协方差预测：
-   P_{k|k-1} = F · P_{k-1|k-1} · F^T + Q</code></pre>
-
-        <p>预测步的直觉很简单：基于上一时刻的估计，用状态转移矩阵 F 推算当前时刻的状态。同时，因为预测是不完美的（过程噪声 Q 的存在），我们需要增大误差协方差 P 来反映预测的不确定性增加。</p>
-
-        <h3>更新步（Measurement Update）</h3>
-
-        <pre><code>3. 卡尔曼增益：
-   K_k = P_{k|k-1} · H^T · (H · P_{k|k-1} · H^T + R)^{-1}
-
-4. 状态更新：
-   x̂_{k|k} = x̂_{k|k-1} + K_k · (z_k - H · x̂_{k|k-1})
-
-5. 误差协方差更新：
-   P_{k|k} = (I - K_k · H) · P_{k|k-1}</code></pre>
-
-        <p>更新步做的事情是：当新的观测 z_k 到达时，比较"实际观测值"和"根据预测算出的期望观测值 H·x̂_{k|k-1}"，两者的差就是<strong>新息</strong>（innovation）。然后用卡尔曼增益 K_k 做加权，修正状态估计。</p>
-
-        <div class="highlight">
-            <strong>卡尔曼滤波的运作流程可以总结为一个循环：</strong>
-            <br><br>
-            ① 根据物理模型预测下一时刻的状态 → ② 当新观测到来时，计算"预测值"和"实际值"的差异 → ③ 按卡尔曼增益的比例修正状态 → ④ 更新误差协方差 → ⑤ 回到①。
-            <br><br>
-            每一次循环，卡尔曼增益 K_k 自动地完成了"我应该更相信模型（预测）还是更相信传感器（观测）"的权衡。预测误差协方差 P_{k|k-1} 大时，K 变大，更信任观测；观测噪声 R 大时，K 变小，更信任模型。
-        </div>
-
-        <h2>卡尔曼滤波的直觉</h2>
-
-        <h3>预测-修正循环</h3>
-
-        <p>卡尔曼滤波的本质就是一个<strong>预测-修正循环</strong>（predict-correct cycle）。这个循环在日常生活中非常常见：</p>
-
-        <ul>
-            <li>你约了一个朋友吃饭，你知道他通常走路速度是 1.4 m/s（状态模型），上次见他是在地铁出口（上一状态），那么你可以"预测"他目前大约在什么地方（状态预测）。</li>
-            <li>然后你给他打了个电话，他告诉你他路过了一家便利店——这就是"观测"。</li>
-            <li>你根据预测的位置和观测到的位置（可能他说得不精确），折中一下得到一个更好的位置估计。如果他的步行速度很稳定（Q 小），你更相信预测；如果他的定位描述很准确（R 小），你更相信观测。</li>
-        </ul>
-
-        <p>这个循环在卡尔曼滤波中以数学方式精确运行——每一步都有严谨的概率论依据：在线性高斯假设下，卡尔曼滤波给出的就是 MMSE 最优估计。</p>
-
-        <h3>卡尔曼增益 K 的物理含义</h3>
-
-        <p>卡尔曼增益 K_k 是卡尔曼滤波中最重要的单一量。它的大小决定了滤波器的行为：</p>
-
-        <pre><code>如果 P_{k|k-1} &gt;&gt; R（模型很不确定，观测很可靠）：
-   K_k → H^{-1}  →  完全相信观测，忽略预测
-
-如果 P_{k|k-1} &lt;&lt; R（模型很确定，观测噪声大）：
-   K_k → 0  →  完全相信模型，忽略观测</code></pre>
-
-        <p>更妙的是，卡尔曼增益会<strong>自适应地调整</strong>：在初始阶段，P 通常较大（因为我们不知道初始状态），K 也较大，滤波器会积极利用观测来收敛；随着滤波器的运行，P 逐渐减小，K 也逐渐变小，滤波器变得更加依赖模型预测。这种"从信任观测到信任模型"的平滑过渡，是卡尔曼滤波区别于固定增益滤波器的核心优势。</p>
-
-        <h2>卡尔曼滤波 vs 维纳滤波</h2>
-
-        <table>
-            <tr><th>特性</th><th>维纳滤波</th><th>卡尔曼滤波</th></tr>
-            <tr><td>数学域</td><td>频域</td><td>时域（状态空间）</td></tr>
-            <tr><td>处理方式</td><td>批处理</td><td>递推（在线）</td></tr>
-            <tr><td>适用信号</td><td>平稳过程</td><td>平稳和非平稳均可</td></tr>
-            <tr><td>对先验的要求</td><td>需要全部相关函数</td><td>需要 F, H, Q, R 矩阵</td></tr>
-            <tr><td>计算复杂度</td><td>O(N²) 或 O(N log N)</td><td>O(n²), n 为状态维度</td></tr>
-            <tr><td>存储需求</td><td>全部历史数据</td><td>仅当前状态 + 协方差</td></tr>
-            <tr><td>多变量扩展</td><td>困难</td><td>天然支持（矩阵形式）</td></tr>
-            <tr><td>实时性</td><td>差（需整段数据）</td><td>好（逐点更新）</td></tr>
-            <tr><td>经典应用</td><td>图像去噪、语音增强</td><td>导航、目标跟踪、控制</td></tr>
-        </table>
-
-        <h2>扩展卡尔曼滤波（EKF）简介</h2>
-
-        <p>经典卡尔曼滤波假设系统的状态方程和观测方程都是<strong>线性</strong>的。但现实中的大多数系统都是非线性的——例如，飞机的空气动力学方程包含速度的平方项，雷达的距离-角度测量涉及三角函数。这些非线性关系无法用 F 和 H 矩阵精确描述。</p>
-
-        <p><strong>扩展卡尔曼滤波</strong>（Extended Kalman Filter, EKF）的解决思路非常直接：把非线性函数在估计点处做<strong>一阶泰勒展开</strong>（线性化），然后用线性化的雅可比矩阵代替 F 和 H：</p>
-
-        <pre><code>非线性状态方程：x_k = f(x_{k-1}) + w_{k-1}
-        线性化：F_k = ∂f/∂x |_{x̂_{k-1|k-1}}
-
-        非线性观测方程：z_k = h(x_k) + v_k
-        线性化：H_k = ∂h/∂x |_{x̂_{k|k-1}}</code></pre>
-
-        <p>EKF 的局限性是明显的：线性化只在一阶近似下有效。当非线性程度严重时（例如角度变化剧烈时），EKF 可能发散。这就引出了更先进的方法：</p>
-
-        <ul>
-            <li><strong>无迹卡尔曼滤波</strong>（Unscented Kalman Filter, UKF）：用确定性采样的 sigma 点来传播非线性，不需要计算雅可比矩阵，对中等非线性系统更准确、更稳定。</li>
-            <li><strong>粒子滤波</strong>（Particle Filter）：用蒙特卡洛采样逼近任意分布，适用于强非线性和非高斯场景——但计算量也相应大得多。</li>
-        </ul>
-
-        <div class="tip">
-            <strong>选型建议：</strong>如果你的系统是线性的，用经典卡尔曼滤波（因为它是理论最优的）。如果非线性程度较弱（弱到一阶泰勒展开足够近似），用 EKF。如果非线性程度中等且状态维度不高（< 10），用 UKF。如果系统高度非线性或非高斯，用粒子滤波。永远不要在可以用简单方法的场景下用复杂方法——卡尔曼滤波已经够优雅了，不需要给它增加不必要的负担。
-        </div>
-
-        <h2>踩坑故事：阿波罗登月中 Q/R 矩阵的调参艺术</h2>
-
-        <p>卡尔曼滤波历史上最著名的"踩坑"经历，正是它的成名战场——阿波罗登月计划。</p>
-
-        <p>阿波罗飞船的导航系统中，卡尔曼滤波被用来融合多个传感器的数据：惯性测量单元（IMU）、星体跟踪器、地面雷达的数据。系统设计者需要确定过程噪声协方差矩阵 Q 和观测噪声协方差矩阵 R 的值。Q 应该取多大？这反映了"对系统模型的信任程度"——如果你认为飞船的运动模型非常精确，Q 可以很小；反之，Q 应该大一些以容忍模型误差。</p>
-
-        <p>在早期的开发测试中，工程师们凭经验和直觉设定了 Q 和 R。结果在仿真中，卡尔曼滤波反复出现<strong>发散</strong>——估计误差不仅没有收敛，反而随着时间推移越来越大。他们花了大量时间排查代码、检查传感器模型，最后发现问题出在 Q 矩阵的设置上：Q 被设置得太小了，导致滤波器过度信任模型，当实际飞行轨迹与模型有微小偏差时，滤波器拒绝接受观测数据的"纠正"，最终与真实状态越走越远。</p>
-
-        <p>解决方案是什么呢？不是改变算法，而是<strong>改变参数</strong>。经过反复调试，工程师们将 Q 矩阵中的某些元素增大了一个数量级，滤波器立刻收敛了。后来人们发明了"自适应调 Q"技术——通过在线估计新息的统计特性来动态调整 Q 和 R，让滤波器自己"学会"合适的参数。</p>
-
-        <div class="warning">
-            <strong>工程教训：</strong>卡尔曼滤波并不是一个"设置好就可以不用管"的算法。Q 和 R 矩阵的选择直接决定了滤波器的收敛性和稳定性。"Q 太小"会让滤波器变得"顽固"——拒绝接受观测证据，导致发散；"Q 太大"又会让滤波器变得"神经质"——对噪声过于敏感，估计结果剧烈抖动。在实际工程中，调参是卡尔曼滤波落地中最费时、最需要经验的部分。一个常用的经验法则是：先用离线数据做参数扫描（grid search），找到在测试集上表现最好的 Q/R 组合，然后在线上运行时加入自适应机制来微调。
-        </div>
-
-        <h2>本章小结与衔接</h2>
-
-        <p>这一章我们从维纳滤波的局限出发，介绍了卡尔曼滤波的革命性思想——状态空间模型、递推处理、预测-修正循环。我们仔细学习了五个核心方程，理解了卡尔曼增益如何自适应地平衡模型和观测之间的信任。然后通过对比表格看清了卡尔曼滤波与维纳滤波的区别，简单了解了 EKF 及其变体，最后从阿波罗登月的真实经历中体会了调参的重要性。</p>
-
-        <p>至此，我们已经走完了随机信号分析中最核心的理论脉络：从概率论基础到随机过程，从平稳性到功率谱，从经典滤波到现代估计方法。从下一章开始，我们将进入<strong>功率谱估计</strong>的专题——当功率谱密度本身无法通过解析公式获得时，我们如何从有限的数据样本中把它"估计"出来？经典方法（周期图、自相关法）和现代方法（AR模型、MUSIC）各有什么优劣？让我们带着这些问题，进入第23章。</p>
-
-        <div class="footer-nav">
-            <a href="21.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="23.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="卡尔曼滤波：状态空间模型、预测-修正五方程、卡尔曼增益直觉、与维纳滤波对比、EKF/UKF/粒子滤波简介、Q与R调参，含原创SVG与可复现检查。"><title>第 22 章 · 卡尔曼滤波 | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">从维纳到卡尔曼</a><a href="#model">状态空间模型</a><a href="#equations">预测-修正五方程</a><a href="#intuition">卡尔曼增益直觉</a><a href="#ekf">EKF 与变体</a><a href="#experiment">可复现核查</a><a href="#boundaries">边界与陷阱</a><a href="#sources">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 统计推断与应用 / 第 22 章</div>
+<header class="article-header"><p class="chapter-kicker">CHAPTER 22 · 统计推断与应用</p><h1>卡尔曼滤波</h1><p class="dek">把维纳滤波的批量频域解改写成时域递推：只需要当前状态估计与误差协方差，就能在每次观测到来时按最优增益更新。它不要求平稳，天然支持多变量，是导航、跟踪与控制的核心。</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>写出状态方程与观测方程，说明 F、H、Q、R 的含义</li><li>写出卡尔曼滤波的预测与修正五方程</li><li>解释卡尔曼增益如何权衡模型与观测，并说明 EKF 的线性化思路</li></ul></div></header>
+<section id="opening"><h2>从维纳到卡尔曼：批量到递推</h2><p>维纳滤波是频域批处理方法：要求信号平稳，需要知道完整的互相关/功率谱，一次解出整条冲激响应，处理前要拿到全部数据。卡尔曼滤波则是<strong>时域递推</strong>：不要求平稳，只依赖当前状态与误差协方差，每来一个观测就更新一次——无需存储全部历史。</p><p>这种“从批量到在线”的转变不只是便捷，还直接开肩了工程可行性。20 世纪 60 年代，阿波罗导航计算机内存有限，难以容纳维纳滤波所需的整段统计信息；卡尔曼滤波的递推结构完美适配了这种受限资源，因而被用于导航系统。</p><figure><img src="../assets/svg/22-predict-correct.svg" alt="预测、新息、修正三个环节组成的递推循环，下方回到预测步" width="1000" height="400" loading="lazy"><figcaption>图 22.1　卡尔曼滤波的预测—修正循环：逐点更新，适合实时系统。流程为教学示意。</figcaption></figure></section>
+<section id="model"><h2>状态空间模型</h2><p>卡尔曼滤波建立在<strong>状态空间模型</strong>上，它把“系统如何演变”与“传感器能看到什么”分开描述。状态方程：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="状态方程"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="当前状态等于转移矩阵乘上一状态加上过程噪声"><msub><mi>x</mi><mi>k</mi></msub><mo>=</mo><mi>F</mi><msub><mi>x</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>w</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub></math><span class="eq-label">(22.1) 状态方程</span></div><p>其中 F 是状态转移矩阵，w<sub>k−1</sub>~N(0,Q) 是过程噪声，Q 刻画模型不确定性（如风对飞行器的扰动）。观测方程：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="观测方程"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="观测等于观测矩阵乘状态加上观测噪声"><msub><mi>z</mi><mi>k</mi></msub><mo>=</mo><mi>H</mi><msub><mi>x</mi><mi>k</mi></msub><mo>+</mo><msub><mi>v</mi><mi>k</mi></msub></math><span class="eq-label">(22.2) 观测方程</span></div><p>其中 H 把状态映射到观测空间，v<sub>k</sub>~N(0,R) 是观测噪声，R 刻画传感器误差。</p><div class="note"><p><strong>只有这四个矩阵需要先验：</strong>F、H 来自物理/几何模型，Q、R 反映模型与传感器的可信度。稳健与否很大程度上取决于 Q、R 的选取（见本章末）。</p></div></section>
+<section id="equations"><h2>预测-修正五方程</h2><p><strong>预测步</strong>用状态方程外推，并因过程噪声 Q 而放大不确定度：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="状态预测与协方差预测"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="状态预测等于转移矩阵乘上一估计，协方差预测等于F P F转置加Q"><msub><mover><mi>x</mi><mo>^</mo></mover><mrow><mi>k</mi><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>F</mi><msub><mover><mi>x</mi><mo>^</mo></mover><mrow><mi>k</mi><mo>−</mo><mn>1</mn><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>,</mo><mspace width="0.8em"/><msub><mi>P</mi><mrow><mi>k</mi><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>F</mi><msub><mi>P</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><msup><mi>F</mi><mi>T</mi></msup><mo>+</mo><mi>Q</mi></math><span class="eq-label">(22.3) 预测步</span></div><p><strong>修正步</strong>先算卡尔曼增益，再用它修正状态与协方差：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="卡尔曼增益"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="增益等于预测协方差与观测矩阵的乘积乘以新息协方差的逆"><msub><mi>K</mi><mi>k</mi></msub><mo>=</mo><msub><mi>P</mi><mrow><mi>k</mi><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><msup><mi>H</mi><mi>T</mi></msup><msup><mrow><mo>(</mo><mi>H</mi><msub><mi>P</mi><mrow><mi>k</mi><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><msup><mi>H</mi><mi>T</mi></msup><mo>+</mo><mi>R</mi><mo>)</mo></mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup></math><span class="eq-label">(22.4) 卡尔曼增益</span></div><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="状态更新"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="状态更新等于预测加上增益乘新息"><msub><mover><mi>x</mi><mo>^</mo></mover><mrow><mi>k</mi><mo>|</mo><mi>k</mi></mrow></msub><mo>=</mo><msub><mover><mi>x</mi><mo>^</mo></mover><mrow><mi>k</mi><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>K</mi><mi>k</mi></msub><mo>(</mo><msub><mi>z</mi><mi>k</mi></msub><mo>−</mo><mi>H</mi><msub><mover><mi>x</mi><mo>^</mo></mover><mrow><mi>k</mi><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>)</mo></math><span class="eq-label">(22.5) 状态更新（新息加权）</span></div><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="协方差更新"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="协方差更新等于单位阵减增益与观测矩阵乘积再乘预测协方差"><msub><mi>P</mi><mrow><mi>k</mi><mo>|</mo><mi>k</mi></mrow></msub><mo>=</mo><mrow><mo>(</mo><mi>I</mi><mo>−</mo><msub><mi>K</mi><mi>k</mi></msub><mi>H</mi><mo>)</mo></mrow><msub><mi>P</mi><mrow><mi>k</mi><mo>|</mo><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub></math><span class="eq-label">(22.6) 协方差更新</span></div><p>其中 z<sub>k</sub>−H x̂<sub>k|k−1</sub> 称为<strong>新息</strong>（innovation）——实际观测与预测观测之差。下一步的预测以本次修正后的 x̂<sub>k|k</sub>、P<sub>k|k</sub> 为起点，如此循环。</p></section>
+<section id="intuition"><h2>卡尔曼增益的直觉</h2><p>增益 K 是滤波器的“信任旋钮”：预测协方差 P<sub>k|k−1</sub> 大（模型不确定）时 K 变大，更信任观测；观测噪声 R 大时 K 变小，更信任模型。极限情形：P≫R 时 K→H⁻¹，几乎完全信任观测；P≪R 时 K→0，几乎完全信任模型。</p><p>更妙的是 K 会<strong>自适应</strong>：初始阶段 P 较大（不知初始状态），K 较大，积极利用观测收敛；随递推进行 P 减小、K 减小，逐渐依赖模型。这种“从信任观测到信任模型”的过渡是卡尔曼滤波优于固定增益滤波的核心。</p><figure><img src="../assets/svg/22-kf-tracking.svg" alt="真实位置曲线、散布的含噪测量点与平滑的卡尔曼估计曲线" width="1000" height="400" loading="lazy"><figcaption>图 22.2　真实轨迹、含噪测量与卡尔曼估计：估计比测量平滑，并能抑制起始处的离群测量。数值由正文示例实际迭代得到。</figcaption></figure><figure><img src="../assets/svg/22-kalman-gain.svg" alt="卡尔曼增益从约0.83单调下降到约0.32并稳定" width="1000" height="400" loading="lazy"><figcaption>图 22.3　同一次运行中卡尔曼增益从约 0.83 收敛到约 0.32，误差协方差同时下降。</figcaption></figure></section>
+<section id="ekf"><h2>扩展卡尔曼滤波与变体</h2><p>经典卡尔曼滤波要求状态方程与观测方程都是线性的。对非线性系统 x<sub>k</sub>=f(x<sub>k−1</sub>)+w、z<sub>k</sub>=h(x<sub>k</sub>)+v，<strong>扩展卡尔曼滤波</strong>（EKF）在估计点处做一阶泰勒展开，用雅可比矩阵代替 F、H：F<sub>k</sub>=∂f/∂x、H<sub>k</sub>=∂h/∂x。</p><figure><img src="../assets/svg/22-ekf.svg" alt="非线性状态函数曲线与其在估计点的切线，远离估计点处偏差变大" width="1000" height="400" loading="lazy"><figcaption>图 22.4　EKF 在估计点对非线性函数做一阶线性化。示意图，非线性强度决定近似误差。</figcaption></figure><p>线性化只在一阶近似下有效，强非线性时 EKF 可能发散。替代方案：<strong>无迹卡尔曼滤波</strong>（UKF）用确定性 sigma 点传播非线性，无需雅可比；<strong>粒子滤波</strong>用蒙特卡罗采样逼近任意分布，适合强非线性/非高斯，但计算量更大。</p><div class="note"><p><strong>选型参考：</strong>线性系统用经典卡尔曼滤波（线性高斯下它就是 MMSE 最优）；弱非线性用 EKF；中等非线性且状态维数不高可用 UKF；强非线性或非高斯用粒子滤波。能用简单方法时不要上复杂方法。</p></div></section>
+<section id="experiment"><h2>可复现核查</h2><p>下面运行一个二维（位置+速度）卡尔曼滤波器：沿恒速运动产生轨迹与含噪位置测量，验证卡尔曼增益从约 0.83 收敛到约 0.32、误差协方差单调下降、稳态值与图 22.3 一致。纯 Python。</p><pre class="code-block"><code>import random
+random.seed(22)
+dt = 1.0
+xt, xe, P = [0.0, 1.0], [0.0, 1.0], [[5.0, 0.0], [0.0, 5.0]]
+Q00 = Q11 = 0.01
+R = 2.0
+Ks, Ps = [], []
+for k in range(20):
+    xt = [xt[0] + dt * xt[1] + random.gauss(0, 0.1), xt[1] + random.gauss(0, 0.1)]
+    z = xt[0] + random.gauss(0, R ** 0.5)
+    xp = [xe[0] + dt * xe[1], xe[1]]                     # 预测
+    Pp = [[P[0][0] + dt*P[1][0] + dt*(P[0][1] + dt*P[1][1]) + Q00, P[0][1] + dt*P[1][1]],
+          [P[1][0] + dt*P[1][1], P[1][1] + Q11]]
+    S = Pp[0][0] + R
+    K = [Pp[0][0] / S, Pp[1][0] / S]                     # 增益
+    innov = z - xp[0]
+    xe = [xp[0] + K[0]*innov, xp[1] + K[1]*innov]        # 修正
+    P = [[(1 - K[0])*Pp[0][0], (1 - K[0])*Pp[0][1]],
+         [Pp[1][0] - K[1]*Pp[0][0], Pp[1][1] - K[1]*Pp[0][1]]]
+    Ks.append(K[0]); Ps.append(P[0][0])
+assert abs(Ks[0] - 0.8335) &lt; 0.005
+assert abs(Ks[-1] - 0.3188) &lt; 0.005
+assert all(Ps[i+1] &lt;= Ps[i] + 1e-9 for i in range(len(Ps)-1))
+assert abs(Ps[-1] - 0.638) &lt; 0.005
+</code></pre><p>检查点：K 从 0.834 降到 0.319，P<sub>00</sub> 从 1.67 单调降到 0.638，与图 22.3 中的曲线一致。测试文件 <code>examples/test_chapter_22.py</code> 复用同一构造。</p></section>
+<section id="boundaries"><h2>边界与陷阱</h2><ul><li><strong>Q、R 调参决定成败。</strong>Q 太小会使滤波器“顽固”地拒绝观测纠正，导致发散；Q 太大又会对噪声过于敏感、估计抖动。常用做法是离线参数扫描，再用新息统计做在线自适应调整。</li><li><strong>线性高斯是最优前提。</strong>经典卡尔曼滤波在“线性 + 高斯”下给出 MMSE 最优；二者任一不成立时，它至多是最优线性估计，精度可能明显下降。</li><li><strong>EKF 依赖线性化。</strong>强非线性或初始误差很大时，雅可比近似失效，EKF 可能发散；应考虑 UKF 或粒子滤波。</li><li><strong>模型与传感器要匹配。</strong>F、H 描错了系统或观测几何，再好的调参也无效；应先验证模型。</li><li><strong>数值与循环性。</strong>标准协方差更新式 (22.6) 在病态或高维时可能失去对称正定，需要 Joseph 形式或平方根滤波等数值稳定实现。</li></ul><p>至此，估计与滤波的主线告一段落。下一章转向功率谱估计：当功率谱无法解析给出时，如何从有限样本中估计它。</p></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li>R. E. Kalman, “A New Approach to Linear Filtering and Prediction Problems,” <em>Journal of Basic Engineering</em>, 1960：卡尔曼滤波原始论文。</li><li>G. Welch &amp; G. Bishop, <em>An Introduction to the Kalman Filter</em>, UNC-Chapel Hill, TR 95-041：五方程与直觉讲解。</li><li>D. Simon, <em>Optimal State Estimation: Kalman, H-infinity, and Nonlinear Approaches</em>, Wiley, 2006：EKF/UKF 与数值稳定性。</li><li><a href="https://ocw.mit.edu/courses/6-432-stochastic-processes-detection-and-estimation-spring-2004/">MIT OpenCourseWare · Stochastic Processes, Detection and Estimation</a>：状态空间与递推估计。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="21.html">← 第 21 章</a><a href="../index.html#content">全部章节</a><a href="23.html">第 23 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>

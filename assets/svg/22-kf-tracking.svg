@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig22b-title fig22b-desc">
+<title id="fig22b-title">卡尔曼滤波在含噪测量中估计真实位置</title>
+<desc id="fig22b-desc">一条平滑的真实位置曲线、散布其周围的含噪测量点、以及卡尔曼滤波估计曲线；估计曲线比测量平滑，并能抑制起始处的离群测量。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">真实轨迹 / 含噪测量 / 卡尔曼估计（一次实际运行）</text>
+<line x1="90" y1="320" x2="880" y2="320" stroke="#dce7e6"/>
+<line x1="90" y1="55" x2="90" y2="330" stroke="#dce7e6"/>
+<polyline points="90,308 130,297 170,286 210,277 250,268 290,260 330,250 370,240 410,229 450,221 490,213 530,200 570,186 610,173 650,155 690,139 730,124 770,109 810,96 850,84" fill="none" stroke="#137f83" stroke-width="2.6"/>
+<polyline points="90,262 130,275 170,275 210,277 250,279 290,272 330,263 370,258 410,237 450,234 490,226 530,215 570,202 610,185 650,174 690,152 730,139 770,115 810,102 850,77" fill="none" stroke="#7564ad" stroke-width="3"/>
+<g fill="#ce704f">
+<circle cx="90" cy="253" r="3.4"/><circle cx="130" cy="290" r="3.4"/><circle cx="170" cy="278" r="3.4"/>
+<circle cx="210" cy="280" r="3.4"/><circle cx="250" cy="282" r="3.4"/><circle cx="290" cy="265" r="3.4"/>
+<circle cx="330" cy="253" r="3.4"/><circle cx="370" cy="257" r="3.4"/><circle cx="410" cy="210" r="3.4"/>
+<circle cx="450" cy="241" r="3.4"/><circle cx="490" cy="223" r="3.4"/><circle cx="530" cy="206" r="3.4"/>
+<circle cx="570" cy="191" r="3.4"/><circle cx="610" cy="167" r="3.4"/><circle cx="650" cy="174" r="3.4"/>
+<circle cx="690" cy="127" r="3.4"/><circle cx="730" cy="138" r="3.4"/><circle cx="770" cy="89" r="3.4"/>
+<circle cx="810" cy="105" r="3.4"/><circle cx="850" cy="56" r="3.4"/>
+</g>
+<text x="360" y="80" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#7564ad">卡尔曼估计</text>
+<text x="560" y="150" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">真实位置</text>
+<text x="140" y="300" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">含噪测量</text>
+<text x="90" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">数值由正文的二维状态（位置+速度）卡尔曼滤波实际迭代得到；起始测量是离群点，估计随后收敛。</text>
+</svg>

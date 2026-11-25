@@ -261,11 +261,11 @@
       "title": "卡尔曼滤波",
       "topics": [
         "状态空间模型",
-        "预测-更新五大方程",
-        "EKF与UKF简介"
+        "预测-修正五方程",
+        "EKF/UKF与调参"
       ],
       "file": "chapters/22.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "统计推断与应用"
     },
     {

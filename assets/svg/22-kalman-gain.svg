@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig22c-title fig22c-desc">
+<title id="fig22c-title">卡尔曼增益随递推从大到小自适应收敛</title>
+<desc id="fig22c-desc">卡尔曼增益在初始阶段较大表示更信任观测，随步数增加单调下降到约零点三二并稳定，表示逐渐更信任模型预测。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">卡尔曼增益 K 自适应收敛（同一次实际运行）</text>
+<line x1="90" y1="320" x2="880" y2="320" stroke="#dce7e6"/>
+<line x1="90" y1="70" x2="90" y2="330" stroke="#dce7e6"/>
+<line x1="90" y1="247" x2="860" y2="247" stroke="#7564ad" stroke-dasharray="6 5"/>
+<text x="700" y="240" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">K → 0.32（稳态）</text>
+<polyline points="90,128 130,146 170,160 210,178 250,194 290,207 330,217 370,225 410,231 450,236 490,240 530,242 570,244 610,245 650,246 690,246 730,246 770,247 810,247 850,247" fill="none" stroke="#ce704f" stroke-width="3"/>
+<text x="160" y="136" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">初始更信任观测（K≈0.83）</text>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">
+<text x="90" y="340" text-anchor="middle">0</text><text x="490" y="340" text-anchor="middle">10</text><text x="850" y="340" text-anchor="middle">19</text>
+<text x="880" y="340" text-anchor="end">k</text>
+</g>
+<text x="90" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">同一次运行中误差协方差 P 也单调下降（1.67→0.64）；数值为正文示例参数的实际迭代结果。</text>
+</svg>

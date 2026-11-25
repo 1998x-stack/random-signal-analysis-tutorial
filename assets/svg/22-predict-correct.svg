@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig22a-title fig22a-desc">
+<title id="fig22a-title">卡尔曼滤波的预测修正递推循环</title>
+<desc id="fig22a-desc">预测步用状态方程推算状态与协方差，观测步计算新息，更新步用卡尔曼增益修正状态并更新协方差，然后回到预测步循环。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">预测—修正循环：只保存当前状态与协方差</text>
+<rect x="90" y="110" width="200" height="80" rx="12" fill="#e5f4f0" stroke="#137f83"/>
+<text x="190" y="145" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#0b585e">预测</text>
+<text x="190" y="168" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#5d7078">x̂=Fx̂, P=FPFᵀ+Q</text>
+<rect x="400" y="110" width="200" height="80" rx="12" fill="#f4f1fa" stroke="#7564ad"/>
+<text x="500" y="145" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#524a86">新息</text>
+<text x="500" y="168" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#5d7078">z−Hx̂</text>
+<rect x="710" y="110" width="200" height="80" rx="12" fill="#fff3ed" stroke="#ce704f"/>
+<text x="810" y="145" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#a04a2e">修正</text>
+<text x="810" y="168" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="11" fill="#5d7078">x̂←x̂+K(z−Hx̂)</text>
+<path d="M290 150 H400" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#c1)"/>
+<path d="M600 150 H710" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#c1)"/>
+<path d="M810 190 V250 H190 V190" fill="none" stroke="#5d7078" stroke-width="2.4" marker-end="url(#c1)"/>
+<text x="500" y="242" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">更新协方差 P=(I−KH)P，下一时刻继续</text>
+<defs><marker id="c1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6 z" fill="#5d7078"/></marker></defs>
+<text x="90" y="330" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">与维纳滤波的批处理不同，卡尔曼滤波逐点更新，适合实时系统。流程为教学示意。</text>
+</svg>

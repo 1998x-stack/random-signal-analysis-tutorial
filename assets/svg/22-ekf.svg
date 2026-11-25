@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig22d-title fig22d-desc">
+<title id="fig22d-title">扩展卡尔曼滤波在估计点对非线性函数做一阶线性化</title>
+<desc id="fig22d-desc">一条非线性状态转移曲线与它在估计点处的切线段，切线代表线性化近似；在远离估计点处非线性与切线偏差变大，说明线性化只在局部有效。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">EKF：用雅可比矩阵代替 F、H（一阶线性化）</text>
+<line x1="80" y1="320" x2="880" y2="320" stroke="#dce7e6"/>
+<line x1="80" y1="70" x2="80" y2="330" stroke="#dce7e6"/>
+<path d="M110 300 Q300 120 500 110 Q700 105 860 150" fill="none" stroke="#137f83" stroke-width="3"/>
+<line x1="330" y1="196" x2="700" y2="98" stroke="#ce704f" stroke-width="2.4" stroke-dasharray="6 5"/>
+<circle cx="470" cy="118" r="5.5" fill="#7564ad"/>
+<line x1="470" y1="118" x2="470" y2="320" stroke="#7564ad" stroke-dasharray="4 4"/>
+<text x="470" y="345" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">估计点 x̂</text>
+<text x="740" y="95" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">切线（线性化）</text>
+<text x="250" y="120" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">非线性状态函数 f(x)</text>
+<text x="640" y="160" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">远离估计点处偏差变大</text>
+<text x="80" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">强非线性会使一阶近似失效，EKF 可能发散；可改用 UKF（sigma 点）或粒子滤波。示意图。</text>
+</svg>
