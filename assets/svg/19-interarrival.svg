@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig19b-title fig19b-desc">
+<title id="fig19b-title">到达间隔服从指数分布并具有无记忆性</title>
+<desc id="fig19b-desc">左panel为指数密度在不同间隔长度上的取值，均值在参数倒数处；右panel为生存函数，从任意时刻s起再等t的生存概率与从头等t相同。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">间隔 X 服从 Exp(λ)；无记忆性 P(X&gt;s+t|X&gt;s)=P(X&gt;t)</text>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">
+<line x1="100" y1="320" x2="500" y2="320" stroke="#dce7e6"/>
+<line x1="100" y1="70" x2="100" y2="330" stroke="#dce7e6"/>
+<polyline points="100,80 165,174 230,232 295,266 360,288 490,308" fill="none" stroke="#137f83" stroke-width="3"/>
+<line x1="230" y1="232" x2="230" y2="320" stroke="#7564ad" stroke-dasharray="4 4"/>
+<text x="230" y="345" text-anchor="middle" fill="#524a86">均值 1/λ</text>
+<text x="300" y="110" text-anchor="middle" fill="#137f83">f_X(t)=λe^(−λt)（λ=1）</text>
+</g>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">
+<line x1="560" y1="320" x2="900" y2="320" stroke="#dce7e6"/>
+<line x1="560" y1="70" x2="560" y2="330" stroke="#dce7e6"/>
+<polyline points="560,80 610,174 660,232 710,266 760,288 860,308" fill="none" stroke="#ce704f" stroke-width="3"/>
+<line x1="630" y1="199" x2="630" y2="320" stroke="#137f83" stroke-dasharray="4 4"/>
+<line x1="730" y1="243" x2="730" y2="320" stroke="#137f83" stroke-dasharray="4 4"/>
+<text x="630" y="345" text-anchor="middle">s</text>
+<text x="730" y="345" text-anchor="middle">s+t</text>
+<text x="760" y="110" text-anchor="middle" fill="#a04a2e">生存函数 P(X&gt;t)=e^(−λt)</text>
+</g>
+<text x="28" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">曲线为教学示意，λ=1；均值、方差均为 1/λ 与 1/λ²。</text>
+</svg>

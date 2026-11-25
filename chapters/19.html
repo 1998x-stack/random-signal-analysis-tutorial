@@ -1,219 +1,37 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第19章 泊松过程与散弹噪声</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html" class="active">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>开篇：从离散事件到随机脉冲的桥梁</h2>
-
-        <p>大家好，我是你们的讲师。在前面几章中，我们讨论了高斯过程、窄带信号和马尔可夫链——这些随机过程都有一个共同特点：它们描述的是<strong>连续变化</strong>的物理量，比如电压的起伏、相位的变化。但生活中还有另一类随机现象，它们发生在<strong>离散的时间点</strong>上——顾客到达收银台、网络数据包到达路由器、光电探测器接收到光子。这类"事件到达"的随机性，需要用一种全新的工具来刻画。</p>
-
-        <p>本章要介绍的<strong>泊松过程</strong>，就是描述"随机到达"最经典的数学模型。它不仅是排队论和通信网络的基石，也是理解<strong>散弹噪声</strong>（shot noise）的关键——而散弹噪声正是电子器件中一种基本的噪声类型。从光通信中的光子计数到半导体器件中的电流起伏，泊松过程的身影无处不在。</p>
-
-        <h2>泊松过程的定义与性质</h2>
-
-        <h3>计数过程：从"事件到达"说起</h3>
-
-        <p>想象一个场景：你盯着一个网络监控仪表盘，观察数据包到达某个交换机的时间。你在 <code>t=0</code> 时刻开始计数，记 <code>N(t)</code> 为 <code>[0, t]</code> 时间内到达的数据包总数。<code>N(t)</code> 是一个随机变量——下一时刻它变成多少，取决于这段时间内到达了多少个包。<code>{N(t), t &ge; 0}</code> 这样的随机过程被称为<strong>计数过程</strong>（counting process），它的样本路径是一条从0开始、每次事件到达时跳变+1的阶梯函数。</p>
-
-        <p>泊松过程是在所有计数过程中最重要的一个。它其实是两条假设约束下的产物：</p>
-
-        <ul>
-            <li><strong>独立增量</strong> (independent increments)：任意两个不交叠的时间段内，事件到达的数量是相互独立的。换句话说，过去到达了多少个包，不影响未来一段时间内到达的包数。</li>
-            <li><strong>平稳增量</strong> (stationary increments)：事件到达的数量只依赖于时间段的长度，而不依赖于其起始位置。也就是说，[1s, 3s] 和 [5s, 7s] 内的到达数分布相同。</li>
-        </ul>
-
-        <p>有了这两条性质，加上"事件不会同时到达"这一常规假设，就可以推导出泊松过程的完整分布。</p>
-
-        <h3>核心公式：事件计数与泊松分布</h3>
-
-        <p>对于强度为 <code>&lambda;</code> 的泊松过程（&lambda; 表示单位时间内事件的平均到达率），在长度为 t 的时间段内恰好有 k 个事件到达的概率为：</p>
-
-        <pre><code>P(N(t) = k) = (&lambda;t)^k · e^(-&lambda;t) / k! ,   k = 0, 1, 2, ...</code></pre>
-
-        <p>这个公式你应该很眼熟——它就是<strong>泊松分布</strong>的概率质量函数。参数 <code>&lambda;t</code> 既是均值也是方差：<code>E[N(t)] = Var[N(t)] = &lambda;t</code>。泊松分布的一个有趣特点是均值等于方差——这在实际应用中是一个可以用来检验数据是否符合泊松假设的快速指标。</p>
-
-        <div class="tip">
-            <strong>直观理解：</strong>&lambda; 是"事件到达的速率"，单位是"个/秒"。如果 &lambda; = 5，那么平均每秒钟有5个事件到达。但泊松过程的美妙之处在于，它不仅仅告诉你均值是5，还告诉你"一秒钟内恰好到达3个的概率是多少"——这在系统容量设计、缓冲器大小估算中至关重要。
-        </div>
-
-        <p>从定义还可以推出泊松过程的<strong>联合分布</strong>：对任意时间点 <code>0 &le; t₁ &lt; t₂ &lt; ... &lt; tₙ</code>，增量 <code>N(t₁)-N(0), N(t₂)-N(t₁), ..., N(tₙ)-N(tₙ₋₁)</code> 是相互独立的泊松随机变量，参数分别为 <code>&lambda;(t₁-0), &lambda;(t₂-t₁), ..., &lambda;(tₙ-tₙ₋₁)</code>。这个性质在仿真中非常有用——你无需模拟每一时刻的到达，只需按时间段生成独立泊松变量即可。</p>
-
-        <h2>到达时间与时间间隔</h2>
-
-        <h3>第 k 次到达时间：Gamma 分布</h3>
-
-        <p>现在我们换个视角：不再问"一段时间内到了多少"，而是问"第 k 个事件什么时候到"。记 <code>Sₖ</code> 为第 k 个事件到达的时刻，它满足 <code>Sₖ = inf{t &ge; 0: N(t) = k}</code>。</p>
-
-        <p>由于泊松过程的增量独立且平稳，第 k 次到达时间 Sₖ 服从<strong>Gamma分布</strong>（也称埃尔朗分布）：</p>
-
-        <pre><code>Sₖ ~ Gamma(k, &lambda;)
-
-        其PDF为：
-        f_{Sₖ}(t) = &lambda;^k · t^{k-1} · e^(-&lambda;t) / (k-1)!,   t &ge; 0</code></pre>
-
-        <p>特别地，当 k=1 时，S₁ 即第一次到达时间，它服从指数分布——这与下面要讲的到达间隔是一回事。</p>
-
-        <h3>到达时间间隔：指数分布的无记忆性</h3>
-
-        <p>如果说泊松过程是计数过程的"王冠"，那<strong>指数分布</strong>就是这颗王冠上的明珠。记 <code>X₁ = S₁, X₂ = S₂ - S₁, ..., Xₙ = Sₙ - Sₙ₋₁</code> 为相邻事件之间的时间间隔。可以证明：</p>
-
-        <pre><code>X₁, X₂, ..., Xₙ 独立同分布，均服从指数分布 Exp(&lambda;)
-
-        PDF: f_X(t) = &lambda; · e^(-&lambda;t),   t &ge; 0
-        CDF: F_X(t) = 1 - e^(-&lambda;t),   t &ge; 0
-        均值: 1/&lambda;,  方差: 1/&lambda;²</code></pre>
-
-        <p>指数分布有一个在随机过程中极其重要的性质——<strong>无记忆性</strong>（memoryless property）：</p>
-
-        <pre><code>P(X &gt; s + t | X &gt; s) = P(X &gt; t),   &forall; s, t &ge; 0</code></pre>
-
-        <p>翻译成大白话："如果我已经等了 s 秒还没等到事件，那我还需要再等 t 秒以上的概率，和从头开始等 t 秒以上的概率是一样的。"——也就是说，<strong>历史等待时间对未来的等待没有任何信息</strong>。这正是泊松过程"独立增量"假设的直接后果。如果事件到达有"忙时"和"闲时"之分，那就不满足无记忆性了。</p>
-
-        <div class="highlight">
-            <strong>工程意义：</strong>指数分布的无记忆性让泊松过程成为一个"完美随机"的到达模型——它没有状态、没有记忆、没有任何可预测的模式。这既是它的优势（数学处理极其简洁），也是它的局限（现实中的到达往往有记忆，如网络流量的自相似性）。理解这一点至关重要：在什么场景下可以使用泊松模型，什么场景下不行。
-        </div>
-
-        <h2>泊松冲激序列</h2>
-
-        <p>在随机信号分析中，我们经常关心的不是"事件到达的时间本身"，而是事件到达时产生的<strong>物理效应</strong>。一个典型的模型是：每个事件到达时刻 tᵢ 产生一个单位冲激 &delta;(t-tᵢ)。这样就构造了一个<strong>泊松冲激序列</strong>：</p>
-
-        <pre><code>S(t) = Σᵢ &delta;(t - tᵢ),   求和遍及所有到达时刻</code></pre>
-
-        <p>这个过程在数学上是一个广义随机过程——它的"值"定义在广义函数空间上，而不是普通的实数。但它的统计特性却有非常清晰的物理解释。</p>
-
-        <h3>泊松冲激序列的统计特性</h3>
-
-        <p>泊松冲激序列的均值函数为：</p>
-
-        <pre><code>E[S(t)] = &lambda;</code></pre>
-
-        <p>也就是说，均值的功率谱密度为 &lambda;·&delta;(&omega;)。而其交流部分（零均值化后）的功率谱密度在<strong>所有非零频率上为常数</strong>：</p>
-
-        <pre><code>S_{SS}(&omega;) = &lambda;,   &omega; ≠ 0</code></pre>
-
-        <p>注意这个结论——泊松冲激序列的 PSD 在所有频率上平坦！这与我们在第10章学过的<strong>白噪声</strong>的定义完全一致。也就是说，泊松冲激序列（扣除直流分量后）是严格意义上的白噪声——尽管它的幅度分布不是高斯分布，但其功率谱是平坦的。</p>
-
-        <div class="tip">
-            <strong>联系与辨析：</strong>白噪声的定义是关于功率谱的平坦性，而非幅度分布。高斯白噪声是"幅度服从高斯分布 + 功率谱平坦"，而泊松冲激序列是"幅度服从泊松冲激分布 + 功率谱平坦"。两者都是白噪声，但统计特性截然不同。这个区别在系统分析中很重要——通过线性系统后，高斯白噪声的输出仍然是高斯过程，而泊松白噪声的输出则不是。
-        </div>
-
-        <h2>散弹噪声</h2>
-
-        <p>有了泊松冲激序列的基础，我们现在可以讨论一个在电子工程中极其重要的噪声模型——<strong>散弹噪声</strong>（shot noise）。</p>
-
-        <h3>物理模型：电子发射的随机性</h3>
-
-        <p>散弹噪声的物理起源可以追溯到真空中电子管的阴极发射，或半导体中载流子穿越势垒的过程。以光电探测器为例：光子随机到达探测器表面，每个光子以一定的量子效率激发一个电子。这些电子的到达时刻服从泊松过程，而每个电子在电路中产生一个电流脉冲 h(t)。因此，总的散弹噪声电流可以写为：</p>
-
-        <pre><code>I(t) = Σᵢ Aᵢ · h(t - tᵢ)</code></pre>
-
-        <p>其中 tᵢ 是第 i 个载流子的到达时刻（泊松过程），Aᵢ 是第 i 个载流子的随机幅度（可能不同），h(t) 是单个载流子通过器件时产生的脉冲响应（通常是一个宽度很窄的脉冲）。</p>
-
-        <p>当每个载流子的幅度 Aᵢ 独立同分布且与到达过程独立时，这个模型就是<strong>复合泊松过程</strong>驱动的散弹噪声。</p>
-
-        <h3>坎贝尔定理：散弹噪声的均值与功率谱</h3>
-
-        <p>坎贝尔定理（Campbell's theorem）给出了散弹噪声的一阶和二阶统计量的闭合表达式。假设到达率为 &lambda;，单个脉冲响应为 h(t)，幅度均值为 E[A]，幅度二阶矩为 E[A²]：</p>
-
-        <pre><code>散弹噪声电流的均值：
-        E[I(t)] = &lambda; · E[A] · ∫ h(t) dt
-
-        散弹噪声电流的功率谱密度：
-        S_{II}(&omega;) = &lambda; · E[A²] · |H(&omega;)|²
-
-        其中 H(&omega;) 是 h(t) 的傅里叶变换。</code></pre>
-
-        <div class="highlight">
-            <strong>坎贝尔定理的物理含义：</strong>散弹噪声的功率谱与脉冲响应的幅度谱的平方成正比，与到达率 &lambda; 成正比。这意味着——脉冲越窄（H(&omega;) 带宽越宽），散弹噪声的频带就越宽。对于理想化的 &delta; 脉冲（即 h(t)=A·&delta;(t)），功率谱在所有频率上为常数，这就是白散弹噪声。
-        </div>
-
-        <h3>应用场景</h3>
-
-        <p>散弹噪声在电子工程中有广泛的应用：</p>
-
-        <ul>
-            <li><strong>光电探测器噪声</strong>：光子到达的泊松过程 + 光电转换效率，决定了探测器的信噪比下限。在弱光条件下，散弹噪声是主要噪声源，它决定了光学通信和天文观测的理论极限。</li>
-            <li><strong>晶体管散弹噪声</strong>：BJT 中基极-发射极结的载流子穿越势垒产生的电流起伏，是晶体管最主要的噪声源之一。运放输入级的设计很大程度上就是在与散弹噪声博弈。</li>
-            <li><strong>散粒噪声极限</strong>：在精密测量中，"散粒噪声极限"是一个不可逾越的物理极限——它来源于电流的离散粒子性。例如，在 MEMS 加速度计中，检测电容的充电电流也存在散弹噪声，制约着传感器的灵敏度。</li>
-        </ul>
-
-        <h2>泊松过程相关分布族总结</h2>
-
-        <table>
-            <tr><th>随机变量</th><th>含义</th><th>分布</th><th>均值</th><th>方差</th></tr>
-            <tr><td>N(t)</td><td>[0,t] 内到达事件数</td><td>Poisson(&lambda;t)</td><td>&lambda;t</td><td>&lambda;t</td></tr>
-            <tr><td>Xᵢ</td><td>第 i 个到达间隔</td><td>Exp(&lambda;)</td><td>1/&lambda;</td><td>1/&lambda;²</td></tr>
-            <tr><td>Sₖ</td><td>第 k 次到达时刻</td><td>Gamma(k, &lambda;)</td><td>k/&lambda;</td><td>k/&lambda;²</td></tr>
-            <tr><td>S(t)（零均值）</td><td>泊松冲激序列</td><td>广义过程</td><td>0</td><td>PSD = &lambda;</td></tr>
-            <tr><td>I(t)（复合泊松）</td><td>散弹噪声电流</td><td>复合泊松过程</td><td>&lambda;E[A]∫h</td><td>PSD = &lambda;E[A²]|H|²</td></tr>
-        </table>
-
-        <h2>踩坑故事：网络流量中的泊松迷思</h2>
-
-        <p>讲一个经典的工程判断失误。上世纪90年代，随着互联网的快速发展，网络工程师需要为路由器设计缓冲区和带宽分配策略。他们自然想到了用泊松过程来建模数据包的到达——毕竟电话网络中的呼叫到达就很好地符合泊松过程，而"互联网不也是通信网络吗？"</p>
-
-        <p>于是一大批网络设备基于泊松假设进行了设计。然而当这些设备部署到真实互联网上时，出现了严重的性能问题：缓冲器频繁溢出，丢包率远超预期。经过深入研究，研究者发现了一个颠覆认知的事实——<strong>网络流量不是泊松的</strong>，它是<strong>自相似的</strong>（self-similar）或<strong>具有长程依赖性</strong>（long-range dependent）。</p>
-
-        <p>什么意思呢？在泊松过程下，不同时间尺度上的流量特征是一致的——1秒内的计数分布和1分钟内的计数分布由同一个 &lambda; 参数决定。但真实网络流量呈现出一种"尺度不变"的模式：放大看（毫秒级）是突发性的，缩小看（小时级）还是突发性的。一个文件传输会产生一连串密集到达的数据包，然后是一段静默期——这完全不符合泊松过程的"完全随机"假设。</p>
-
-        <div class="warning">
-            <strong>深刻教训：</strong>泊松过程假设的是"完全随机"的到达，但很多真实系统中的事件并不是完全随机的——它们由人类行为、协议机制、物理过程驱动，呈现出聚类性和相关性。在建模时，一定要先验证数据是否符合泊松假设。一个简单的检查方法：计算样本的均值与方差，如果两者不相等（泊松分布要求相等），那就说明需要更复杂的模型（如自相似过程、马尔可夫调制的泊松过程等）。
-        </div>
-
-        <h2>本章小结与衔接</h2>
-
-        <p>本章我们学习了描述随机到达的核心模型——泊松过程，从它的定义（独立增量 + 平稳增量）出发，导出了计数分布、到达间隔分布、到达时间分布等一系列结果。我们还引入了泊松冲激序列和散弹噪声的概念，看到了它们与白噪声的内在联系。最后，坎贝尔定理给了我们计算散弹噪声统计特性的工具箱。</p>
-
-        <p>从下一章起，我们将进入信号处理领域的另一个核心分支——<strong>估计理论</strong>。如果说泊松过程是"描述随机现象"的工具，那么估计理论就是"从随机观测中提取信息"的工具。给定一堆带噪数据，你如何尽可能精确地估计出你关心的参数？MMSE、MAP、ML 这些准则分别解决什么问题？这些内容，将是我们后续维纳滤波和卡尔曼滤波的基础。下章见。</p>
-
-        <div class="footer-nav">
-            <a href="18.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="20.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="泊松过程与散弹噪声：独立平稳增量、泊松计数分布、到达间隔指数分布与无记忆性、泊松冲激序列的白噪声性质、散弹噪声与坎贝尔定理，含原创SVG与可复现检查。"><title>第 19 章 · 泊松过程与散弹噪声 | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">计数过程与泊松过程</a><a href="#interarrival">到达时间与间隔</a><a href="#impulse">泊松冲激序列</a><a href="#shot">散弹噪声与坎贝尔</a><a href="#experiment">可复现核查</a><a href="#boundaries">边界与陷阱</a><a href="#sources">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 系统与模型 / 第 19 章</div>
+<header class="article-header"><p class="chapter-kicker">CHAPTER 19 · 系统与模型</p><h1>泊松过程与散弹噪声</h1><p class="dek">从离散状态跳到连续时间：当事件“独立且平稳地到达”，计数就服从泊松分布，间隔就服从指数分布并具备无记忆性。把到达变成冲激，再通过脉冲响应相加，就得到散弹噪声与坎贝尔定理。</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>写出泊松过程的两条假设与计数分布 E[N(t)]=Var[N(t)]=λt</li><li>说明到达间隔指数分布的无记忆性，并列出相关分布族</li><li>用坎贝尔定理写出散弹噪声的均值与功率谱</li></ul></div></header>
+<section id="opening"><h2>计数过程与泊松过程</h2><p>从 t=0 开始观察某类事件（网络数据包、光子、顾客）到达，记 N(t) 为 [0,t] 内到达的总数。{N(t), t≥0} 称为<strong>计数过程</strong>，其样本路径是从 0 出发、每来一个事件跳跃 +1 的阶梯函数。</p><p>泊松过程由两条假设锁定：(1) <strong>独立增量</strong>——不交叠时间段内到达数相互独立；(2) <strong>平稳增量</strong>——到达数只依赖时间段长度。再加上“不会同时到达”的常规假设，可推出强度为 λ（单位时间平均到达率）的泊松分布：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="泊松计数概率质量函数"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="区间内到达k次的概率等于泊松质量函数"><mi>P</mi><mo>(</mo><mi>N</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mi>k</mi><mo>)</mo><mo>=</mo><mfrac><msup><mrow><mo>(</mo><mi>λ</mi><mi>t</mi><mo>)</mo></mrow><mi>k</mi></msup><mrow><mi>k</mi><mo>!</mo></mrow></mfrac><msup><mi>e</mi><mrow><mo>−</mo><mi>λ</mi><mi>t</mi></mrow></msup><mo>,</mo><mspace width="0.5em"/><mi>k</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mo>…</mo></math><span class="eq-label">(19.1) 泊松计数分布</span></div><p>该分布的均值与<strong>方差相等</strong>：E[N(t)]=Var[N(t)]=λt。这一特点是检验数据是否符合泊松假设的快速指标（见本章末）。对不同时间段，增量 N(t₂)−N(t₁) 相互独立且服从 Poisson(λ(t₂−t₁))。</p><figure><img src="../assets/svg/19-counting-path.svg" alt="三条阶梯曲线表示同一泊松过程的不同样本路径，每次到达上升一格" width="1000" height="400" loading="lazy"><figcaption>图 19.1　计数过程的样本路径。曲线为教学示意，跳跃时刻由泊松过程给出。</figcaption></figure><div class="note"><p><strong>仿真提示：</strong>由于增量独立平稳，无需逐时刻模拟：只需为各时间段生成独立的泊松变量再累加即可。</p></div></section>
+<section id="interarrival"><h2>到达时间与时间间隔</h2><p>记 Sₖ 为第 k 次到达时刻，则 Sₖ~Gamma(k,λ)，其密度为 λ<sup>k</sup>t<sup>k−1</sup>e<sup>−λt</sup>/(k−1)<sup>!</sup>（t≥0）。相邻间隔 Xᵢ=Sᵢ−S<sub>i−1</sub> 则独立同分布，服从指数分布 Exp(λ)：密度 f_X(t)=λe<sup>−λt</sup>，均值 1/λ，方差 1/λ²。</p><p>指数分布的关键性质是<strong>无记忆性</strong>：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="指数分布无记忆性"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="已知等待超过s的条件下再等超过t的概率等于从头等t"><mi>P</mi><mo>(</mo><mi>X</mi><mo>&gt;</mo><mi>s</mi><mo>+</mo><mi>t</mi><mspace width="0.3em"/><mo>|</mo><mspace width="0.3em"/><mi>X</mi><mo>&gt;</mo><mi>s</mi><mo>)</mo><mo>=</mo><mi>P</mi><mo>(</mo><mi>X</mi><mo>&gt;</mo><mi>t</mi><mo>)</mo><mo>,</mo><mspace width="0.6em"/><mo>∀</mo><mi>s</mi><mo>,</mo><mi>t</mi><mo>≥</mo><mn>0</mn></math><span class="eq-label">(19.2) 无记忆性</span></div><p>即“已经等了 s 还没来”不影响“还要再等多久”的分布。这是独立增量假设的直接后果；一旦到达存在“忙/闲”之分，无记忆性即失效。</p><figure><img src="../assets/svg/19-interarrival.svg" alt="左panel为指数密度曲线与均值位置，右panel为生存函数及从s到s+t的两条竖线" width="1000" height="400" loading="lazy"><figcaption>图 19.2　指数间隔与无记忆性：生存概率满足 e<sup>−(s+t)</sup>/e<sup>−s</sup>=e<sup>−t</sup>。曲线为教学示意（λ=1）。</figcaption></figure><div class="table-wrap"><table><thead><tr><th>随机变量</th><th>含义</th><th>分布</th><th>均值</th><th>方差</th></tr></thead><tbody><tr><td>N(t)</td><td>[0,t] 内到达数</td><td>Poisson(λt)</td><td>λt</td><td>λt</td></tr><tr><td>Xᵢ</td><td>到达间隔</td><td>Exp(λ)</td><td>1/λ</td><td>1/λ²</td></tr><tr><td>Sₖ</td><td>第 k 次到达时刻</td><td>Gamma(k,λ)</td><td>k/λ</td><td>k/λ²</td></tr></tbody></table></div></section>
+<section id="impulse"><h2>泊松冲激序列：幅度非高斯，谱却是白的</h2><p>若每个到达时刻 tᵢ 产生一个单位冲激 δ(t−tᵢ)，就得到<strong>泊松冲激序列</strong> S(t)=Σᵢδ(t−tᵢ)。它是一个广义随机过程，但其统计量含义清楚：均值 E[S(t)]=λ（频域对应直流处的冲激 λδ(ω)），而零均值化后的功率谱在所有非零频率上为常数：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="泊松冲激序列的功率谱"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="零均值泊松冲激序列功率谱等于到达率"><msub><mi>S</mi><mrow><mi>S</mi><mi>S</mi></mrow></msub><mo>(</mo><mi>ω</mi><mo>)</mo><mo>=</mo><mi>λ</mi><mo>,</mo><mspace width="0.6em"/><mi>ω</mi><mo>≠</mo><mn>0</mn></math><span class="eq-label">(19.3) 平坦功率谱</span></div><figure><img src="../assets/svg/19-impulse-psd.svg" alt="左侧为到达时刻的一串单位冲激，右侧为在非零频率上平坦的功率谱及直流冲激" width="1000" height="400" loading="lazy"><figcaption>图 19.3　泊松冲激序列：时域稀疏、频域平坦。形状为教学示意。</figcaption></figure><div class="warning"><p><strong>“白”不等于“高斯”：</strong>白噪声的定义是功率谱平坦，与幅度分布无关。泊松冲激序列是白噪声，但幅度非高斯；它通过线性系统后输出也一般不是高斯过程——这与高斯白噪声形成关键区别。</p></div></section>
+<section id="shot"><h2>散弹噪声与坎贝尔定理</h2><p>当每个到达载流子产生一个窄脉冲 h(t)、幅度 Aᵢ 独立同分布且与到达过程独立，电流可写为复合泊松过程 I(t)=ΣᵢAᵢh(t−tᵢ)。这就是<strong>散弹噪声</strong>模型，其均值与功率谱由<strong>坎贝尔定理</strong>给出：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="坎贝尔定理"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="均值等于到达率乘幅度均值乘脉冲积分，功率谱等于到达率乘幅度二阶矩乘幅度谱平方"><mi>E</mi><mo>[</mo><mi>I</mi><mo>]</mo><mo>=</mo><mi>λ</mi><mo>⋅</mo><mi>E</mi><mo>[</mo><mi>A</mi><mo>]</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi>∞</mi></mrow><mi>∞</mi></msubsup><mi>h</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>d</mi><mi>t</mi><mo>,</mo><mspace width="0.8em"/><msub><mi>S</mi><mrow><mi>I</mi><mi>I</mi></mrow></msub><mo>(</mo><mi>ω</mi><mo>)</mo><mo>=</mo><mi>λ</mi><mo>⋅</mo><mi>E</mi><mo>[</mo><msup><mi>A</mi><mn>2</mn></msup><mo>]</mo><mo>⋅</mo><msup><mrow><mo>|</mo><mi>H</mi><mo>(</mo><mi>ω</mi><mo>)</mo><mo>|</mo></mrow><mn>2</mn></msup></math><span class="eq-label">(19.4) 坎贝尔定理</span></div><p>其中 H(ω) 是 h(t) 的傅里叶变换。物理含义：功率谱与到达率 λ 成正比；脉冲越窄（|H|² 越宽），散弹噪声频带越宽。当 h(t)=A·δ(t) 时谱平坦，即<strong>白散弹噪声</strong>。</p><figure><img src="../assets/svg/19-campbell.svg" alt="左上为单个电流脉冲，左下为它们的和即散弹噪声波形，右为与脉冲幅度谱平方成正比的功率谱" width="1000" height="400" loading="lazy"><figcaption>图 19.4　散弹噪声与坎贝尔定理。形状为教学示意，参数由具体器件决定。</figcaption></figure><div class="note"><p><strong>典型场景：</strong>光电探测器（光子到达）、晶体管载流子穿越势垒、精密测量中的“散粒噪声极限”，都是散弹噪声的实例。</p></div></section>
+<section id="experiment"><h2>可复现核查</h2><p>下面用指数间隔生成强度 λ=4 的泊松到达，验证三件事：平均间隔≈1/λ；单位时间窗口计数样本的均值与方差都≈λ；均值-方差接近相等。纯 Python，固定种子。</p><pre class="code-block"><code>import random
+random.seed(19)
+λ, T = 4.0, 10000
+
+def arrivals(lam, horizon):
+    t, ts = 0.0, []
+    while True:
+        t += random.expovariate(lam)     # 指数间隔，均值 1/lam
+        if t &gt; horizon: break
+        ts.append(t)
+    return ts
+
+ts = arrivals(λ, T)
+gaps = [ts[0]] + [ts[i] - ts[i - 1] for i in range(1, len(ts))]
+assert abs(sum(gaps) / len(gaps) - 1 / λ) &lt; 0.01        # ≈ 0.25
+counts = [0] * T
+for t in ts:
+    counts[int(t)] += 1
+mean = sum(counts) / T
+var = sum((c - mean) ** 2 for c in counts) / T
+assert abs(mean - λ) &lt; 0.15 and abs(var - λ) &lt; 0.5       # 均值≈方差≈λ
+</code></pre><p>检查点：实测平均间隔≈0.248、窗口计数均值≈4.03、方差≈4.00，与 E[N]=Var[N]=λt 一致。测试文件 <code>examples/test_chapter_19.py</code> 复用同一构造。</p></section>
+<section id="boundaries"><h2>边界与陷阱</h2><ul><li><strong>均值=方差是快速检验。</strong>实测样本均值远大于方差（bursty）时就说明偏离泊松：真实网络流量、人类行为往往聚类且具有长程依赖，不能用单一 λ 描述。</li><li><strong>无记忆性是强假设。</strong>现实中存在“忙/闲”之分时，间隔分布不再是单参数指数，“已经等了很久”确实会改变未来等待的分布。</li><li><strong>散弹噪声与热噪声不同源。</strong>热噪声来自载流子无规热运动的连续叠加（高斯），散弹噪声来自离散载流子到达（泊松、非高斯）；两者均方值可能相近，但统计分布不同。</li><li><strong>谱平坦不等于幅度高斯。</strong>不要因为“白”就当作高斯噪声处理；非线性处理后差异会被放大。</li><li><strong>坎贝尔公式依赖独立性。</strong>若幅度 Aᵢ 与到达过程相关，或脉冲相互重叠使线性叠加不成立，需回到过程本身重新推导。</li></ul><p>下一章进入估计理论：给定带噪观测，如何用 MMSE、MAP、ML 等准则估计关心的参数。</p></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li><a href="https://www.probabilitycourse.com/chapter11/11_1_2_poisson_process.php">ProbabilityCourse · The Poisson Process</a>：泊松过程定义、计数分布与指数间隔。</li><li><a href="https://ocw.mit.edu/courses/6-262-discrete-stochastic-processes-spring-2011/">MIT OpenCourseWare · Discrete Stochastic Processes</a>：泊松过程、到达时间与无记忆性。</li><li>S. M. Ross, <em>Introduction to Probability Models</em>, 11th ed., Academic Press, 2014：泊松过程与复合泊松过程（第 5 章）。</li><li>N. R. Campbell, “The study of discontinuous phenomena,” <em>Proc. Cambridge Phil. Soc.</em>, 1909：坎贝尔定理起源。</li><li>S. B. Lowen &amp; M. C. Teich, “Power-law shot noise,” <em>IEEE Trans. Information Theory</em>, 1990：散弹噪声统计与谱背景。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="18.html">← 第 18 章</a><a href="../index.html#content">全部章节</a><a href="20.html">第 20 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>

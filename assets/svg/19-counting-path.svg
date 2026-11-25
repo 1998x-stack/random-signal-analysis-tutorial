@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig19a-title fig19a-desc">
+<title id="fig19a-title">泊松计数过程的样本路径是单调上升的阶梯函数</title>
+<desc id="fig19a-desc">三条阶梯曲线表示同一强度泊松过程的不同样本路径，每次事件到达上升一格，路径之间在相同时间点的步数不同但统计规律一致。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">计数过程 N(t)：从 0 出发、每次到达跳跃 +1</text>
+<line x1="90" y1="330" x2="900" y2="330" stroke="#dce7e6"/>
+<line x1="90" y1="55" x2="90" y2="340" stroke="#dce7e6"/>
+<polyline points="90,320 184,320 184,285 324,285 324,250 441,250 441,215 574,215 574,180 698,180 698,145 792,145 792,110 870,110" fill="none" stroke="#137f83" stroke-width="2.6"/>
+<polyline points="90,320 152,320 152,288 215,288 215,256 301,256 301,224 402,224 402,192 496,192 496,160 581,160 581,128 644,128 644,96 737,96 737,64 823,64 870,64" fill="none" stroke="#7564ad" stroke-width="2.4"/>
+<polyline points="90,320 240,320 240,288 380,288 380,256 520,256 520,224 660,224 660,192 800,192 800,160 870,160" fill="none" stroke="#ce704f" stroke-width="2.4" opacity="0.85"/>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">
+<text x="870" y="352" text-anchor="middle">t</text>
+<text x="82" y="62" text-anchor="end">N</text>
+<text x="82" y="114" text-anchor="end">6</text><text x="82" y="329" text-anchor="end">0</text>
+</g>
+<text x="470" y="86" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">三条样本路径</text>
+<text x="90" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">同一强度 λ 的不同实现：均值与方差都等于 λt（教学示意路径）。</text>
+</svg>

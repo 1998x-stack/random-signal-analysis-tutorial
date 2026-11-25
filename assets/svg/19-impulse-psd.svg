@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig19c-title fig19c-desc">
+<title id="fig19c-title">泊松冲激序列的功率谱在非零频率上平坦</title>
+<desc id="fig19c-desc">左panel为到达时刻的一串单位冲激，右panel为对应功率谱：直流处有一根冲激对应均值，非零频率上为常数λ，扣除直流后即为白噪声。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">S(t)=Σδ(t−tᵢ)：时域稀疏冲激，频域平坦（扣除直流）</text>
+<line x1="70" y1="250" x2="500" y2="250" stroke="#dce7e6"/>
+<g stroke="#137f83" stroke-width="2.4">
+<line x1="110" y1="250" x2="110" y2="110"/><line x1="190" y1="250" x2="190" y2="110"/>
+<line x1="235" y1="250" x2="235" y2="110"/><line x1="330" y1="250" x2="330" y2="110"/>
+<line x1="405" y1="250" x2="405" y2="110"/><line x1="470" y1="250" x2="470" y2="110"/>
+</g>
+<g fill="#137f83">
+<polygon points="110,110 106,120 114,120"/><polygon points="190,110 186,120 194,120"/>
+<polygon points="235,110 231,120 239,120"/><polygon points="330,110 326,120 334,120"/>
+<polygon points="405,110 401,120 409,120"/><polygon points="470,110 466,120 474,120"/>
+</g>
+<text x="285" y="285" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">到达时刻 t（泊松过程）</text>
+<line x1="560" y1="250" x2="900" y2="250" stroke="#dce7e6"/>
+<line x1="730" y1="90" x2="730" y2="260" stroke="#dce7e6"/>
+<line x1="580" y1="170" x2="880" y2="170" stroke="#ce704f" stroke-width="3"/>
+<line x1="730" y1="250" x2="730" y2="90" stroke="#7564ad" stroke-width="2.6"/>
+<polygon points="730,90 726,100 734,100" fill="#7564ad"/>
+<text x="745" y="110" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#524a86">直流 δ（均值 λ）</text>
+<text x="800" y="162" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">λ（平坦）</text>
+<text x="730" y="285" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">频率 ω</text>
+<text x="28" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">幅度分布非高斯，但（零均值化后）功率谱平坦——与第 10 章白噪声定义一致。形状为教学示意。</text>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig19d-title fig19d-desc">
+<title id="fig19d-title">散弹噪声是随机到达冲激经脉冲响应叠加的结果</title>
+<desc id="fig19d-desc">左上为到达时刻不同的单个电流脉冲，左下为它们的和即散弹噪声电流波形，右为对应功率谱等于到达率乘幅度二阶矩再乘脉冲响应幅度谱平方。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">散弹噪声：I(t)=Σ Aᵢ·h(t−tᵢ)，坎贝尔定理给出功率谱</text>
+<line x1="60" y1="180" x2="520" y2="180" stroke="#dce7e6"/>
+<path d="M90 180 Q110 120 130 180" fill="none" stroke="#137f83" stroke-width="2"/>
+<path d="M190 180 Q215 110 240 180" fill="none" stroke="#137f83" stroke-width="2"/>
+<path d="M340 180 Q360 128 380 180" fill="none" stroke="#137f83" stroke-width="2"/>
+<text x="290" y="205" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#137f83">单个脉冲 Aᵢh(t−tᵢ)</text>
+<line x1="60" y1="330" x2="520" y2="330" stroke="#dce7e6"/>
+<path d="M90 330 Q110 270 130 330 Q150 300 170 330 Q190 250 215 300 Q240 330 260 330 Q300 330 320 300 Q340 258 360 300 Q380 330 420 330 Q460 330 480 296 Q500 266 520 330" fill="none" stroke="#ce704f" stroke-width="2.4"/>
+<text x="290" y="355" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#a04a2e">电流和 I(t)</text>
+<line x1="600" y1="260" x2="930" y2="260" stroke="#dce7e6"/>
+<line x1="600" y1="90" x2="600" y2="270" stroke="#dce7e6"/>
+<path d="M600 260 Q680 100 760 260" fill="none" stroke="#7564ad" stroke-width="3"/>
+<text x="760" y="110" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">S_II(ω)=λ·E[A²]·|H(ω)|²</text>
+<text x="795" y="288" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">频率 ω</text>
+<text x="750" y="330" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">脉冲越窄，谱越宽；h=δ 时即为白散弹噪声</text>
+<text x="28" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">均值 E[I]=λ·E[A]·∫h(t)dt。形状为教学示意，参数由器件决定。</text>
+</svg>
