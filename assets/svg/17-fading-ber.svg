@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig17d-title fig17d-desc">
+<title id="fig17d-title">瑞利衰落信道相对加性高斯信道存在显著衰落代价</title>
+<desc id="fig17d-desc">纵轴为对数误码率横轴为平均信噪比分贝。加性高斯白噪声下BPSK曲线随信噪比指数下降即陡峭，而瑞利衰落下的平均误码率近似按平均信噪比倒数线性下降即平缓。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">BPSK 平均误码率：AWGN 指数下降 vs 瑞利衰落缓慢下降</text>
+<line x1="90" y1="320" x2="900" y2="320" stroke="#dce7e6"/>
+<line x1="90" y1="55" x2="90" y2="330" stroke="#dce7e6"/>
+<g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078">
+<text x="90" y="340" text-anchor="middle">0</text><text x="330" y="340" text-anchor="middle">10</text>
+<text x="570" y="340" text-anchor="middle">20</text><text x="810" y="340" text-anchor="middle">30</text>
+<text x="880" y="340" text-anchor="middle">γ̄(dB)</text>
+<text x="70" y="324" text-anchor="end">10⁰</text><text x="70" y="216" text-anchor="end">10⁻³</text>
+<text x="70" y="90" text-anchor="end">10⁻⁶</text>
+</g>
+<polyline points="90,290 186,280 282,268 378,254 570,226 810,190" fill="none" stroke="#ce704f" stroke-width="3"/>
+<polyline points="90,280 186,252 282,186 330,125 378,68" fill="none" stroke="#137f83" stroke-width="3"/>
+<text x="560" y="200" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">瑞利衰落 ≈ 1/(4γ̄)</text>
+<text x="300" y="80" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">AWGN：Q(√(2γ))</text>
+<text x="90" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">瑞利衰落需要高得多的发射功率才能达到同样误码率，这一差距称为衰落代价。曲线为公式计算的示意。</text>
+</svg>

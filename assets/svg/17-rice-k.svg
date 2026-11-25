@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig17c-title fig17c-desc">
+<title id="fig17c-title">随莱斯因子增大包络密度向直射幅度聚拢</title>
+<desc id="fig17c-desc">在固定每分量噪声方差下，K等于零分贝时为瑞利密度峰值靠近一；K为三分贝时峰值移向二；K为十分贝时峰值移向四点五并明显变窄。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">莱斯包络密度：K 越大越集中在直射幅度 A 附近</text>
+<line x1="90" y1="310" x2="900" y2="310" stroke="#dce7e6"/>
+<line x1="90" y1="60" x2="90" y2="320" stroke="#dce7e6"/>
+<polyline points="90,310 155,134 220,67 285,142 350,202 480,290 610,305" fill="none" stroke="#137f83" stroke-width="3"/>
+<polyline points="220,235 285,182 350,144 415,148 480,189 545,240 610,279" fill="none" stroke="#7564ad" stroke-width="3"/>
+<polyline points="545,222 610,174 675,150 740,165 805,205 870,252" fill="none" stroke="#ce704f" stroke-width="3"/>
+<text x="105" y="120" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">K=0 dB（瑞利）</text>
+<text x="330" y="138" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#524a86">K=3 dB，A≈2σ</text>
+<text x="640" y="140" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#a04a2e">K=10 dB，A≈4.5σ</text>
+<text x="500" y="342" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">r（以噪声标准差 σ 为单位），固定 σ，改变 A</text>
+<text x="90" y="375" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">f_R(r)=(r/σ²)exp(−(r²+A²)/2σ²)I₀(rA/σ²)；K=A²/(2σ²)。A=0 时退化为瑞利。曲线为教学示意。</text>
+</svg>

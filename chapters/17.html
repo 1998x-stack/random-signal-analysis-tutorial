@@ -1,220 +1,36 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第17章 窄带高斯信号的包络与相位</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html" class="active">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>从噪声中提取信号的"形"与"相"</h2>
-
-        <p>大家好，我是你们的讲师。上一章我们学习了窄带信号的I/Q表示和复包络，掌握了将高频信号"搬"到基带处理的技术。但有一个问题我们还没有回答：当窄带信号经过无线信道到达接收端时，它的幅度和相位发生了什么？特别是，当信号本身是高斯随机过程时，它的包络和相位服从什么分布？这可不是一个理论游戏——它直接决定了无线通信系统的误码率、信道容量和链路预算。</p>
-
-        <p>想象一下：你的手机距离基站1公里，信号强度大致是-80dBm。但如果你移动10厘米——半个波长——信号强度可能突然掉到-90dBm甚至更低。这就是多径衰落的结果：电磁波经过不同的反射路径到达接收天线，相互叠加或抵消。要想定量描述这种衰落，我们就必须研究窄带高斯信号的包络特性。本章将介绍三个极其重要的分布：<strong>瑞利分布</strong>（纯噪声/纯衰落场景）、<strong>均匀分布</strong>（随机相位）和<strong>莱斯分布</strong>（信号+噪声场景）。这些分布是无线通信信道建模的基石。</p>
-
-        <h2>窄带高斯噪声的数学模型</h2>
-
-        <p>设 <code>n(t)</code> 是一个零均值平稳窄带高斯随机过程，其中心频率为 f₀。根据上一章的结论，我们可以将它写成：</p>
-
-        <pre><code>n(t) = I(t) · cos(2πf₀t) - Q(t) · sin(2πf₀t)
-     = A(t) · cos(2πf₀t + Φ(t))
-
-其中：
-A(t) = √(I²(t) + Q²(t))  — 包络（envelope）
-Φ(t) = arctan(Q(t)/I(t)) — 相位（phase）
-I(t) 是同相分量，Q(t) 是正交分量</code></pre>
-
-        <p>关键事实：对于零均值平稳窄带高斯过程，它的同相分量 I(t) 和正交分量 Q(t) 是<strong>独立的零均值高斯随机过程</strong>，且具有相同的方差 σ²：</p>
-
-        <pre><code>I(t) ~ N(0, σ²),   Q(t) ~ N(0, σ²)
-E[I(t)] = E[Q(t)] = 0
-Var[I(t)] = Var[Q(t)] = σ²
-E[I(t)·Q(t)] = 0   （同一时刻不相关，对高斯而言等价于独立）</code></pre>
-
-        <p>这个结论在数学上可以这样理解：窄带高斯过程的正频率部分被搬移到基带后，其实部和虚部（即I和Q）在任意时刻是相互独立的高斯随机变量。这是后续所有推导的出发点。</p>
-
-        <h2>包络的瑞利分布</h2>
-
-        <h3>纯噪声：包络的分布</h3>
-
-        <p>在只有噪声（没有信号）的情况下，包络 <code>R = √(I² + Q²)</code> 的分布是什么？这等价于问：两个独立同分布零均值高斯随机变量的<strong>模长</strong>服从什么分布？答案是<strong>瑞利分布</strong>（Rayleigh distribution）。</p>
-
-        <pre><code>设 X = I ~ N(0, σ²), Y = Q ~ N(0, σ²)，且独立
-则 R = √(X² + Y²) 的概率密度函数为：
-
-f_R(r) = (r/σ²) · exp(-r²/(2σ²)),   r ≥ 0
-
-累积分布函数：F_R(r) = 1 - exp(-r²/(2σ²)),   r ≥ 0</code></pre>
-
-        <p>瑞利分布的PDF形状很有意思：它在 r=0 处值为0，然后迅速上升到峰值，再缓慢衰减——是一种"单峰右偏"的分布。它的关键数字特征为：</p>
-
-        <ul>
-            <li><strong>均值</strong>：E[R] = σ·√(π/2) ≈ 1.253σ</li>
-            <li><strong>中位数</strong>：R_med = σ·√(2ln2) ≈ 1.177σ</li>
-            <li><strong>方差</strong>：Var[R] = (2 - π/2)σ² ≈ 0.429σ²</li>
-            <li><strong>众数</strong>（峰值位置）：R_mode = σ</li>
-        </ul>
-
-        <p>注意中位数小于均值——这符合右偏分布的特征。有趣的是，包络的均值 1.253σ 大于各分量的标准差 σ，这意味着"向量的长度"在统计上大于"分量的分散程度"。</p>
-
-        <div class="highlight">
-            <strong>物理直觉：</strong>瑞利分布描述的是"多个随机散射路径叠加"后的信号幅度。如果你在室内用一个简单的接收机测量信号强度，当发射机和接收机都固定不动时，信号幅度是稳定的。但只要你在房间里走几步——哪怕只是移动几十厘米——接收到的信号幅度就会发生剧烈变化，这种变化的统计规律就是瑞利分布。这就是为什么瑞利分布也被称为<strong>瑞利衰落</strong>（Rayleigh fading）的物理基础。
-        </div>
-
-        <h3>瑞利衰落信道的物理基础</h3>
-
-        <p>在无线通信中，当发射机和接收机之间没有直射路径（line-of-sight, LOS），只有通过建筑物、地面、树木等反射的<strong>非视距</strong>（NLOS）路径时，接收信号的包络服从瑞利分布。这是因为大量散射路径的叠加效果，在复平面上的投影等价于两个正交的独立高斯随机变量——即同相和正交分量。</p>
-
-        <p>瑞利衰落是无线信道的最基本模型，它的"恶劣程度"可以作为其他信道模型的基准。在瑞利衰落信道中，接收信号的信噪比（SNR）服从指数分布——这意味着有相当大的概率出现深度衰落（信号强度远低于平均值的状态）。</p>
-
-        <h2>相位的均匀分布</h2>
-
-        <h3>纯噪声：相位均匀分布</h3>
-
-        <p>对于纯窄带高斯噪声，相位 <code>Φ = arctan(Q/I)</code> 服从 <code>[0, 2π)</code> 上的均匀分布：</p>
-
-        <pre><code>f_Φ(φ) = 1/(2π),   φ ∈ [0, 2π)</code></pre>
-
-        <p>这个结论的直觉非常简单：由于 I 和 Q 是独立同分布的零均值高斯随机变量，它们的联合分布在 (I,Q) 平面上是圆对称的（等高线是同心圆）。在这种圆对称下，角度 Φ 自然就是均匀分布的——没有任何方向是特殊的。</p>
-
-        <h3>包络与相位独立</h3>
-
-        <p>更重要的一个结论是：在纯噪声情况下，<strong>包络 R 和相位 Φ 是相互独立的随机变量</strong>。这个独立性可以直接从联合分布分解中得出：</p>
-
-        <pre><code>f_{I,Q}(i,q) = (1/(2πσ²)) · exp(-(i²+q²)/(2σ²))
-
-作变量代换：i = r·cos(φ), q = r·sin(φ)，雅可比行列式为 r，得到：
-f_{R,Φ}(r,φ) = r · f_{I,Q}(r·cos(φ), r·sin(φ))
-             = (r/(2πσ²)) · exp(-r²/(2σ²))
-             = [r/σ² · exp(-r²/(2σ²))] · [1/(2π)]
-             = f_R(r) · f_Φ(φ)
-
-证毕：包络与相位独立！</code></pre>
-
-        <p>这个独立性在实际分析中非常有用——意味着我们可以分别处理幅度衰落和随机相位，而不必担心两者之间的耦合。</p>
-
-        <h2>信号+噪声：莱斯分布</h2>
-
-        <h3>正弦信号加窄带噪声</h3>
-
-        <p>现在考虑更现实的情况：接收信号中既包含有用信号（通常是正弦波），又包含窄带高斯噪声。设：</p>
-
-        <pre><code>x(t) = s(t) + n(t)
-     = A·cos(2πf₀t) + I(t)·cos(2πf₀t) - Q(t)·sin(2πf₀t)
-     = [A + I(t)]·cos(2πf₀t) - Q(t)·sin(2πf₀t)
-     = R(t)·cos(2πf₀t + Φ(t))</code></pre>
-
-        <p>此时 I 分量的均值不再是零（因为信号分量贡献了直流偏置 A），而 Q 分量仍然保持零均值。包络的分布变为<strong>莱斯分布</strong>（Rice distribution），也称为广义瑞利分布。</p>
-
-        <pre><code>包络 R = √((A+I)² + Q²)，其PDF为：
-
-f_R(r) = (r/σ²) · exp(-(r² + A²)/(2σ²)) · I₀(rA/σ²),   r ≥ 0
-
-其中 I₀(·) 是第一类零阶修正贝塞尔函数，
-A 是信号的幅度，σ² 是噪声方差（每分量）。</code></pre>
-
-        <h3>莱斯因子</h3>
-
-        <p>莱斯分布的关键参数是<strong>莱斯因子</strong>（Rice factor）K：</p>
-
-        <pre><code>K = A²/(2σ²) = 信号功率/噪声功率（每分量）
-
-- 当 K = 0（即 A = 0，无信号）：莱斯分布退化为瑞利分布
-- 当 K → ∞（噪声可忽略）：包络趋近于一个确定值 A，但仍有随机相位
-- 典型值：室外微蜂窝 K ≈ 6~12dB，室内环境 K ≈ 4~10dB</code></pre>
-
-        <p>莱斯因子 K 是信道质量的"晴雨表"：K 越高，说明直射路径的能量远大于散射路径的总能量，信道质量越好；K 越低，说明信道接近瑞利衰落，通信可靠性越差。</p>
-
-        <table>
-            <tr><th>特性</th><th>瑞利分布（K=0）</th><th>莱斯分布（K>0）</th></tr>
-            <tr><td>PDF公式</td><td>f(r)=r/σ²·exp(-r²/(2σ²))</td><td>f(r)=r/σ²·exp(-(r²+A²)/(2σ²))·I₀(rA/σ²)</td></tr>
-            <tr><td>峰值位置</td><td>r=σ</td><td>靠近 A（随K增大趋于A）</td></tr>
-            <tr><td>形状</td><td>单峰右偏</td><td>单峰，K越大越对称</td></tr>
-            <tr><td>均值</td><td>σ·√(π/2)</td><td>σ·√(π/2)·₁F₁(-½;1;-K)（合流超几何函数）</td></tr>
-            <tr><td>应用场景</td><td>NLOS、室内、城市密集区</td><td>LOS、卫星通信、微蜂窝</td></tr>
-            <tr><td>衰落深度</td><td>深衰落概率高</td><td>深衰落概率低（K越大越低）</td></tr>
-            <tr><td>极限行为</td><td>K=0的特例</td><td>K→∞ 包络趋近于确定值A</td></tr>
-        </table>
-
-        <div class="tip">
-            <strong>实用技巧：</strong>在MATLAB或Python中生成瑞利和莱斯衰落信道非常容易。瑞利：<code>r = sigma * sqrt(randn² + randn²)</code>。莱斯：<code>r = sqrt((A+sigma*randn)² + (sigma*randn)²)</code>。这些简单几行代码就可以模拟出真实的无线信道衰落效应——很多通信系统仿真都是从这开始的。
-        </div>
-
-        <h2>包络分布的应用：误码率分析</h2>
-
-        <p>有了包络的分布，我们就可以计算无线通信系统的平均误码率（BER）。以BPSK调制为例，在加性高斯白噪声（AWGN）信道中，误码率为 <code>P_e = Q(√(2γ))</code>，其中 γ = E_b/N₀ 是信噪比。但在瑞利衰落信道中，γ 本身是一个随机变量（服从指数分布），因此平均误码率需要对 γ 的分布积分：</p>
-
-        <pre><code>P_e_avg = ∫₀^∞ Q(√(2γ)) · f_Γ(γ) dγ
-         = ½ · (1 - √(γ̄/(1+γ̄)))
-         ≈ 1/(4γ̄)   （当 γ̄ ≫ 1 时）
-
-其中 γ̄ 是平均信噪比，f_Γ(γ) = (1/γ̄)·exp(-γ/γ̄) 是指数分布。</code></pre>
-
-        <p>从这个公式可以看出一个残酷的事实：在瑞利衰落信道中，平均误码率随信噪比<strong>线性</strong>下降（1/γ̄），而在AWGN信道中，误码率是指数下降（e^{-γ}）。这意味着，要达到同样的误码率，瑞利衰落信道需要的发射功率要高得多——这就是"衰落代价"（fading penalty）。</p>
-
-        <div class="warning">
-            <strong>踩坑故事 — 低信噪比下误把瑞利当莱斯</strong>
-            <br><br>
-            某卫星物联网初创公司设计了一个窄带卫星IoT终端，用于在偏远地区收集环境传感器数据。他们的链路预算分析采用了一个莱斯信道模型，假设存在较强的直射路径分量（K=10dB），并据此计算了终端的发射功率需求和电池寿命。
-            <br><br>
-            产品原型测试的第一轮结果惨不忍睹：终端的连接成功率只有设计值的60%，并且在阴天条件下几乎完全失联。团队最初怀疑是天线效率问题，换了三种天线设计毫无改善。最终在实地信道测量中发现：设备部署的实际环境中，由于密集的树冠遮挡和建筑物反射，实际信道条件更接近瑞利衰落（K接近0dB），而非设计假定的莱斯信道（K=10dB）。
-            <br><br>
-            莱斯因子高估了10dB，导致链路预算中系统余量（link margin）严重不足。更致命的是，莱斯分布的尾部（深衰概率）远小于瑞利分布——在K=10dB的假设下，深度衰落（低于均值20dB）的概率几乎为零，而在实际瑞利信道中，深度衰落的概率高达约2%，这就是连接失败的直接原因。
-            <br><br>
-            <strong>教训：</strong>信道模型的选取直接影响系统设计决策。在不确定是否存在稳定直射路径时，最稳妥的做法是采用瑞利模型（最坏情况）或至少进行实地信道探测。对莱斯因子K的乐观估计会带来系统余量不足——而在物联网场景中，链路预算不足意味着数十万台的设备可能在某些天气条件下集体失联。永远不要用桌面假设替代实地测量。
-        </div>
-
-        <h2>本章小结与衔接</h2>
-
-        <p>本章将高斯过程和窄带信号分析结合起来，推导了窄带高斯信号包络和相位的统计分布。你学到了：纯噪声的包络服从瑞利分布（无线衰落信道的基准模型）、相位服从均匀分布（且包络与相位独立）、有信号存在时包络服从莱斯分布（莱斯因子K衡量直射路径与散射路径的功率比）。最关键的是，我们通过一个踩坑故事警示：错误地假设信道模型会导致系统设计中的灾难性错误。</p>
-
-        <p>下一章，我们将转向一个全新的方向——<strong>马尔可夫链</strong>。从现在开始，我们讨论的是离散状态空间、离散时间的随机过程。马尔可夫链是序列建模和随机决策的基石，在语音识别、自然语言处理、强化学习和PageRank算法中无处不在。准备好了吗？我们下章见。</p>
-
-        <div class="footer-nav">
-            <a href="16.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="18.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="窄带高斯信号的包络与相位：I/Q独立同方差高斯、瑞利包络、均匀相位与包络相位独立、莱斯分布与莱斯因子、瑞利衰落误码率，含原创SVG与可复现检查。"><title>第 17 章 · 窄带高斯信号的包络与相位 | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">从 I/Q 到包络相位</a><a href="#rayleigh">瑞利包络</a><a href="#phase">均匀相位与独立</a><a href="#rice">莱斯分布</a><a href="#fading">衰落代价</a><a href="#experiment">可复现核查</a><a href="#boundaries">边界与陷阱</a><a href="#sources">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 系统与模型 / 第 17 章</div>
+<header class="article-header"><p class="chapter-kicker">CHAPTER 17 · 系统与模型</p><h1>窄带高斯信号的包络与相位</h1><p class="dek">把上一章的 I/Q 表示与联合高斯假设合到一起，(I,Q) 就变成两个独立同方差的零均值高斯变量。用极坐标重写这个圆对称分布，包络的瑞利分布、相位的均匀分布以及二者的独立性几乎是“免费”得到的。</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>由 I/Q 的联合高斯推出瑞利包络密度与均匀相位，并说明二者独立</li><li>写出莱斯分布密度、莱斯因子 K 的定义与极限行为</li><li>解释瑞利衰落信道的衰落代价，并说明信道模型误选的风险</li></ul></div></header>
+<section id="opening"><h2>从 I/Q 到包络与相位</h2><p>设 n(t) 是零均值平稳窄带高斯随机过程，中心频率 f₀。由第 16 章的 I/Q 表示：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="窄带高斯过程的包络相位形式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="窄带过程等于包络乘载波相位的余弦"><mi>n</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>cos</mi><mrow><mo>(</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mn>0</mn></msub><mi>t</mi><mo>)</mo></mrow><mo>−</mo><mi>Q</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>sin</mi><mrow><mo>(</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mn>0</mn></msub><mi>t</mi><mo>)</mo></mrow><mo>=</mo><mi>A</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>cos</mi><mrow><mo>(</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mn>0</mn></msub><mi>t</mi><mo>+</mo><mi>Φ</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>)</mo></mrow></math><span class="eq-label">(17.1) 包络与相位形式</span></div><p>其中 A(t)=√(I²(t)+Q²(t)) 是<strong>包络</strong>，Φ(t)=arctan(Q(t)/I(t)) 是<strong>相位</strong>。</p><p>关键事实：对零均值平稳窄带高斯过程，固定时刻的 I 与 Q 是两个<strong>独立同方差的零均值高斯随机变量</strong>，即 I,Q~N(0,σ²) 且 Cov(I,Q)=0。高斯下不相关即独立，所以它们不仅不相关，而且独立。</p><figure><img src="../assets/svg/17-iq-to-polar.svg" alt="左panel为I与Q各自的零均值等方差高斯密度，右panel为(I,Q)平面上的圆对称等高线与包络半径和相位角" width="1000" height="400" loading="lazy"><figcaption>图 17.1　I、Q 独立同高斯使 (I,Q) 联合密度圆对称，于是可以用极坐标 (R,Φ) 重写。曲线为教学示意。</figcaption></figure><div class="warning"><p><strong>等方差与独立的前提：</strong>I、Q 等方差来自功率谱关于 ±f₀ 对称；“不相关 ⟹ 独立”则依赖二者<strong>联合高斯</strong>。若谱不对称，I、Q 仍联合高斯但相关，包络分布不再是标准瑞利。</p></div></section>
+<section id="rayleigh"><h2>瑞利包络</h2><p>纯噪声（无信号）时，问包络 R=√(I²+Q²) 的分布，等价于求两个独立同分布零均值高斯变量模长的分布。作极坐标变换 i=r cos φ, q=r sin φ，雅可比为 r，联合密度：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="瑞利包络密度"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="瑞利密度等于 r 除以方差乘以指数衰减"><msub><mi>f</mi><mi>R</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><mfrac><mi>r</mi><msup><mi>σ</mi><mn>2</mn></msup></mfrac><mi>exp</mi><mrow><mo>(</mo><mo>−</mo><mfrac><msup><mi>r</mi><mn>2</mn></msup><mrow><mn>2</mn><msup><mi>σ</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow><mo>,</mo><mspace width="0.6em"/><mi>r</mi><mo>≥</mo><mn>0</mn></math><span class="eq-label">(17.2) 瑞利分布密度</span></div><p>对应累积分布 F_R(r)=1−exp(−r²/2σ²)。它的关键数字特征（σ 为每分量标准差）为：</p><ul><li><strong>均值：</strong>E[R]=σ√(π/2)≈1.253σ</li><li><strong>中位数：</strong>σ√(2ln2)≈1.177σ</li><li><strong>方差：</strong>(2−π/2)σ²≈0.429σ²</li><li><strong>众数：</strong>σ（密度峰值位置）</li></ul><p>中位数小于均值，是右偏分布的特征。</p><figure><img src="../assets/svg/17-rayleigh-pdf.svg" alt="瑞利密度曲线从零升到峰值再右偏衰减，并标出众数σ、中位数1.177σ、均值1.253σ" width="1000" height="400" loading="lazy"><figcaption>图 17.2　瑞利密度：众数、中位数、均值依次右移。曲线为教学示意，坐标值与解析式一致。</figcaption></figure><div class="note"><p><strong>物理直觉：</strong>当收发之间没有直射路径、只有大量反射/散射时，接收包络近似服从瑞利分布，这就是<strong>瑞利衰落</strong>模型的基础。</p></div></section>
+<section id="phase"><h2>均匀相位与包络-相位独立</h2><p>把 (17.2) 的极坐标变换进行到底，同时看半径与角度：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="包络与相位的联合密度可分解"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="联合密度等于半径密度乘以均匀角度密度"><msub><mi>f</mi><mrow><mi>R</mi><mo>,</mo><mi>Φ</mi></mrow></msub><mo>(</mo><mi>r</mi><mo>,</mo><mi>φ</mi><mo>)</mo><mo>=</mo><mfrac><mi>r</mi><mrow><mn>2</mn><mi>π</mi><msup><mi>σ</mi><mn>2</mn></msup></mrow></mfrac><mi>exp</mi><mrow><mo>(</mo><mo>−</mo><mfrac><msup><mi>r</mi><mn>2</mn></msup><mrow><mn>2</mn><msup><mi>σ</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow><mo>=</mo><msub><mi>f</mi><mi>R</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo><mo>⋅</mo><mfrac><mn>1</mn><mrow><mn>2</mn><mi>π</mi></mrow></mfrac></math><span class="eq-label">(17.3) 包络与相位独立</span></div><p>右端与 φ 无关，说明相位在 [0,2π) 上<strong>均匀分布</strong>，且包络与相位<strong>相互独立</strong>。直觉是：I、Q 独立同方差使联合密度圆对称，没有任何方向特殊，角度自然均匀。</p><p>这个独立性很实用：幅度衰落与随机相位可以分开处理。下一章的包络/相位在看衰落时，也是基于这个分解。</p></section>
+<section id="rice"><h2>信号加噪声：莱斯分布</h2><p>现假设接收信号含一个确定性正弦与窄带噪声：x(t)=A·cos(2πf₀t)+n(t)。重写为同类形式：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="信号加噪声的包络相位形式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="信号加噪声等于同相分量加幅度乘余弦减去正交分量乘正弦"><mi>x</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mrow><mo>(</mo><mi>A</mi><mo>+</mo><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>)</mo></mrow><mi>cos</mi><mrow><mo>(</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mn>0</mn></msub><mi>t</mi><mo>)</mo></mrow><mo>−</mo><mi>Q</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>sin</mi><mrow><mo>(</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mn>0</mn></msub><mi>t</mi><mo>)</mo></mrow></math><span class="eq-label">(17.4) 正弦信号与窄带噪声之和</span></div><p>此时 I 分量均值变为 A（信号贡献直流），Q 仍零均值。包络 R=√((A+I)²+Q²) 服从<strong>莱斯分布</strong>（广义瑞利分布）：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="莱斯分布密度"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="莱斯密度含贝塞尔函数因子"><msub><mi>f</mi><mi>R</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><mfrac><mi>r</mi><msup><mi>σ</mi><mn>2</mn></msup></mfrac><mi>exp</mi><mrow><mo>(</mo><mo>−</mo><mfrac><mrow><msup><mi>r</mi><mn>2</mn></msup><mo>+</mo><msup><mi>A</mi><mn>2</mn></msup></mrow><mrow><mn>2</mn><msup><mi>σ</mi><mn>2</mn></msup></mrow></mfrac><mo>)</mo></mrow><msub><mi>I</mi><mn>0</mn></msub><mrow><mo>(</mo><mfrac><mrow><mi>r</mi><mi>A</mi></mrow><msup><mi>σ</mi><mn>2</mn></msup></mfrac><mo>)</mo></mrow><mo>,</mo><mspace width="0.5em"/><mi>r</mi><mo>≥</mo><mn>0</mn></math><span class="eq-label">(17.5) 莱斯分布密度</span></div><p>其中 I₀(·) 是第一类零阶修正贝塞尔函数。关键参数是<strong>莱斯因子</strong> K=A²/(2σ²)，即直射分量功率与噪声每分量功率之比。</p><figure><img src="../assets/svg/17-rice-k.svg" alt="固定噪声方差下K为0、3、10分贝时包络密度分别峰值在一、二、四点五附近且逐渐变窄" width="1000" height="400" loading="lazy"><figcaption>图 17.3　K 越大，包络越集中在直射幅度 A 附近。曲线为教学示意，形状由 (17.5) 决定。</figcaption></figure><div class="table-wrap"><table><thead><tr><th>特性</th><th>瑞利（K=0）</th><th>莱斯（K&gt;0）</th></tr></thead><tbody><tr><td>密度</td><td>r/σ²·e<sup>−r²/2σ²</sup></td><td>(17.5)，含 I₀(rA/σ²)</td></tr><tr><td>峰值位置</td><td>r=σ</td><td>靠近 A（K 越大越近）</td></tr><tr><td>K→∞ 极限</td><td>不适用</td><td>包络→确定值 A，相位仍随机</td></tr><tr><td>典型场景</td><td>NLOS、室内散射</td><td>LOS、卫星、微蜂窝</td></tr></tbody></table></div><div class="warning"><p><strong>K 是经验参数：</strong>K 需要由实地信道测量估计，不能凭桌面临界假设“应该有直射”。K 的高估会低估深衰落概率（见下节）。</p></div></section>
+<section id="fading"><h2>衰落代价：从包络分布到误码率</h2><p>以 BPSK 为例，加性高斯白噪声（AWGN）信道中，给定瞬时信噪比 γ 时误码率为 P<sub>e</sub>=Q(√(2γ))。但在瑞利衰落信道中 γ 本身是随机的（包络平方正比于功率，瑞利包络平方服从指数分布），平均误码率要对 γ 积分：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="瑞利衰落下的平均误码率"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="平均误码率等于二分之一乘以一减根号下信噪比比值"><msub><mover><mi>P</mi><mo>¯</mo></mover><mi>e</mi></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mo>(</mo><mn>1</mn><mo>−</mo><msqrt><mfrac><mover><mi>γ</mi><mo>¯</mo></mover><mrow><mn>1</mn><mo>+</mo><mover><mi>γ</mi><mo>¯</mo></mover></mrow></mfrac></msqrt><mo>)</mo></mrow><mo>≈</mo><mfrac><mn>1</mn><mrow><mn>4</mn><mover><mi>γ</mi><mo>¯</mo></mover></mrow></mfrac><mo>,</mo><mspace width="0.5em"/><mover><mi>γ</mi><mo>¯</mo></mover><mo>≫</mo><mn>1</mn></math><span class="eq-label">(17.6) 瑞利衰落平均误码率</span></div><p>对比很残酷：AWGN 下误码率随信噪比<strong>指数</strong>下降，而瑞利衰落下的平均误码率只随平均信噪比<strong>近似线性</strong>下降（∝1/γ̄）。达到同样误码率，衰落信道需要高得多的发射功率，这一差距称为<strong>衰落代价</strong>。</p><figure><img src="../assets/svg/17-fading-ber.svg" alt="对数坐标下AWGN的BPSK误码率随信噪比陡峭下降，瑞利衰落则缓慢下降" width="1000" height="400" loading="lazy"><figcaption>图 17.4　AWGN（陡）与瑞利衰落（缓）的平均误码率对比。曲线由 (17.6) 与 Q(√(2γ)) 计算得到。</figcaption></figure><div class="warning"><p><strong>深衰落与信道模型选取：</strong>瑞利包络的累积分布为 F_R(r)=1−e<sup>−r²/2σ²</sup>。以均值为参考，下降到均值 10%（约 −20 dB）以下的概率约 F_R(0.125σ)≈0.78%——看似不大，但在长时间链路中会不断出现。若把实际瑞利信道误当成高 K 的莱斯信道，就会严重低估这些深衰落造成的链路中断概率。K 必须由实地测量估计，而非桌面假设。</p></div></section>
+<section id="experiment"><h2>可复现核查</h2><p>下面用蒙特卡罗验证：I、Q 为独立标准正态时，包络的均值与方差符合瑞利解析值，相位在四个象限均匀，且包络与相位样本相关近似为零。仅用标准库，固定种子，可重跑。</p><pre class="code-block"><code>import random, math
+random.seed(17)
+N = 200000
+Rs, phis = [], []
+for _ in range(N):
+    I, Q = random.gauss(0, 1), random.gauss(0, 1)
+    Rs.append(math.hypot(I, Q))
+    phis.append(math.atan2(Q, I))          # (-pi, pi]
+mR = sum(Rs) / N
+vR = sum((r - mR) ** 2 for r in Rs) / N
+assert abs(mR - math.sqrt(math.pi / 2)) < 0.01          # ~1.2533
+assert abs(vR - (2 - math.pi / 2)) < 0.01               # ~0.4292
+quad = [0, 0, 0, 0]
+for p in phis:
+    quad[int((p + math.pi) / (math.pi / 2))] += 1
+assert 0.24 < min(quad) / N and max(quad) / N < 0.26     # 近似均匀
+mP = sum(phis) / N
+cov = sum((Rs[i] - mR) * (phis[i] - mP) for i in range(N)) / N
+assert abs(cov) < 0.01                                   # 包络与相位不相关
+</code></pre><p>检查点：实测均值≈1.254、方差≈0.430、四象限频率均≈0.25、协方差≈0，与 (17.2)(17.3) 的解析值一致。测试文件 <code>examples/test_chapter_17.py</code> 复用同一构造。</p></section>
+<section id="boundaries"><h2>边界与陷阱</h2><ul><li><strong>独立依赖联合高斯。</strong>“ I、Q 不相关就独立”只在二者联合高斯时成立；若只知各自边缘高斯，不相关并不能推出 (17.3) 的分解。</li><li><strong>等方差依赖谱对称。</strong>功率谱关于 ±f₀ 不对称时，I、Q 方差不等且可能相关，包络不再是标准瑞利分布，而是更一般的双变量分布。</li><li><strong>瑞利/莱斯的取舍要对数据诚实。</strong>无稳定直射时用瑞利（最坏情形）；有直射时用莱斯，但 K 必须实测。K 高估会低估深衰落与中断概率。</li><li><strong>包络分布不告诉你时间相关性。</strong>瑞利密度只描述某时刻的幅度分布；衰落速率、相干时间等动态特性由自相关/多普勒决定，不能从边缘密度推出。</li><li><strong>极限 K→∞ 是理想化。</strong>此时包络趋于确定值 A，但相位仍随机；实际信道不可能完全消除散射分量。</li></ul><p>下一章转向离散状态的随机过程：马尔可夫链。我们会在离散状态、离散时间上重新建立“无记忆性”与平稳分布的概念。</p></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li><a href="https://mathworld.wolfram.com/RayleighDistribution.html">Wolfram MathWorld · Rayleigh Distribution</a>：瑞利密度、累积分布与矩。</li><li><a href="https://mathworld.wolfram.com/RiceDistribution.html">Wolfram MathWorld · Rice Distribution</a>：莱斯密度与修正贝塞尔函数 I₀。</li><li>S. O. Rice, “Mathematical Analysis of Random Noise,” <em>Bell System Technical Journal</em>, 1944–1945：窄带噪声包络/相位分布的原始推导。</li><li>W. C. Jakes, <em>Microwave Mobile Communications</em>, Wiley, 1974：瑞利衰落信道模型与误码率。</li><li><a href="https://ocw.mit.edu/courses/6-450-principles-of-digital-communications-i-fall-2006/">MIT OpenCourseWare · Principles of Digital Communications I</a>：相干检测与衰落信道误码率背景。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="16.html">← 第 16 章</a><a href="../index.html#content">全部章节</a><a href="18.html">第 18 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>

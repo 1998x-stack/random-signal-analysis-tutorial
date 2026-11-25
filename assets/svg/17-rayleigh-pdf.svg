@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="fig17b-title fig17b-desc">
+<title id="fig17b-title">瑞利包络的概率密度及其众数中位数均值</title>
+<desc id="fig17b-desc">瑞利密度从零出发升到峰值再缓慢右偏衰减；众数在标准差σ处，中位数约1.177σ，均值约1.253σ，三者依次右移。</desc>
+<rect width="1000" height="400" rx="19" fill="#fffdf8"/>
+<text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">纯噪声包络 R 服从瑞利分布（σ=1 示意）</text>
+<line x1="90" y1="320" x2="900" y2="320" stroke="#dce7e6"/>
+<line x1="90" y1="70" x2="90" y2="330" stroke="#dce7e6"/>
+<polyline points="90,320 180,153 270,89 360,160 450,217 540,263 630,301 720,314 810,318" fill="none" stroke="#137f83" stroke-width="3.2"/>
+<line x1="270" y1="89" x2="270" y2="320" stroke="#7564ad" stroke-dasharray="4 4"/>
+<line x1="302" y1="118" x2="302" y2="320" stroke="#ce704f" stroke-dasharray="4 4"/>
+<line x1="316" y1="127" x2="316" y2="320" stroke="#ae7d30" stroke-dasharray="4 4"/>
+<text x="270" y="80" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#524a86">众数 σ</text>
+<text x="330" y="112" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#a04a2e">中位数 1.177σ</text>
+<text x="392" y="140" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#7a5820">均值 1.253σ</text>
+<text x="500" y="352" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">r（以 σ 为单位）</text>
+<text x="90" y="60" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#137f83">f_R(r) = (r/σ²)·exp(−r²/2σ²)</text>
+<text x="560" y="200" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">方差 (2−π/2)σ² ≈ 0.429σ²</text>
+<text x="560" y="224" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" fill="#5d7078">曲线为教学示意，数值为解析值。</text>
+</svg>
