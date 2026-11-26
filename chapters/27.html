@@ -1,192 +1,107 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第27章 现代信号处理前沿</title>
-    <link rel="stylesheet" href="theme.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fffdf8">
+<meta name="description" content="当信号稀疏、欠采样、非平稳或定义在图结构上时，经典谱分析的前提不再成立。压缩感知、时频与小波、图信号处理和数据驱动谱估计各自换了什么假设，又在哪里失效。">
+<title>第 27 章 · 现代信号处理前沿 | 随机信号分析</title>
+<link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html" class="active">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
+<a class="skip-link" href="#article-main">跳到正文</a>
+<header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">经典前提何时不够用</a><a href="#cs">压缩感知：用稀疏换采样</a><a href="#tf">时频与小波：换一种分辨率</a><a href="#graph">图信号处理：换一种“频率”</a><a href="#learning">数据驱动的谱估计</a><a href="#boundary">这些方法的边界</a><a href="#practice">可复现验证</a><a href="#synthesis">本章总结</a><a href="#references">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 统计推断与应用 / 第 27 章</div>
+<header class="article-header">
+<p class="chapter-kicker">CHAPTER 27 · 统计推断与应用</p>
+<h1>现代信号处理前沿</h1>
+<p class="dek">第 23、24 章的谱估计假设信号平稳、采样满足奈奎斯特率。当信号稀疏、欠采样、非平稳，或根本定义在图结构上时，这些前提被逐一放松。</p>
+<div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>说明压缩感知的稀疏假设与恢复条件，并指出它何时失效</li><li>对比 STFT 的固定分辨率与小波的多分辨率时频铺砌</li><li>解释图傅里叶变换如何把“频率”推广到图拉普拉斯特征值</li><li>指出数据驱动谱估计在分布漂移下的风险边界</li></ul></div>
+</header>
+<section id="opening"><h2>经典前提何时不够用</h2>
+<p>第 23、24 章的谱估计依赖几条前提：信号宽平稳、二阶矩有限、采样满足奈奎斯特率；很多推导还默认高斯或线性模型。四类现代场景会逐一打破这些前提：</p>
+<ul><li><strong>稀疏</strong>：频谱只有少数强分量（窄带干扰、雷达目标）。若已知“稀疏”，能否用比奈奎斯特更少的采样？→ 压缩感知。</li><li><strong>非平稳</strong>：频率随时间变化（语音、啁啾）。单张功率谱不足以描述，需要时频表示 → STFT 与小波。</li><li><strong>图结构</strong>：信号定义在传感器网络、社交网络上，不存在天然的时间或空间平移 → 图信号处理。</li><li><strong>模型难写但数据充足</strong>：用数据驱动模型直接从样本学映射 → 学习型谱估计。</li></ul>
+<p>记住一个态度：这些方法不是“更高级所以更好”，而是各自替换掉一条假设，也因此引入新的适用条件。下面逐一看它们换了什么、又在哪里失效。</p>
+</section>
+<section id="cs"><h2>压缩感知：用稀疏性换采样率</h2>
+<p>设未知信号 <code>x∈ℂ^N</code> 只有 <code>k</code> 个非零分量，<code>k≪N</code>；我们只能用 <code>m&lt;N</code> 个线性测量 <code>y=Ax</code>（<code>A</code> 为 <code>m×N</code> 测量矩阵）。<code>m&lt;N</code> 时方程欠定、有无穷多解，仅靠 <code>Ax=y</code> 无法确定信号。压缩感知的额外信息就是<strong>稀疏先验</strong>：在所有满足测量的解中，取非零项最少的那个。</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="稀疏恢复：零范数最小化与其一范数松弛"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="理想是零范数最小化，实际用一范数最小化代替"><munder><mo>min</mo><mi>x</mi></munder><msub><mrow><mo>∥</mo><mi>x</mi><mo>∥</mo></mrow><mn>0</mn></msub><mspace width="0.4em"/><mtext>s.t.</mtext><mspace width="0.4em"/><mi>A</mi><mi>x</mi><mo>=</mo><mi>y</mi><mspace width="1.2em"/><mo>→</mo><mspace width="1.2em"/><munder><mo>min</mo><mi>x</mi></munder><msub><mrow><mo>∥</mo><mi>x</mi><mo>∥</mo></mrow><mn>1</mn></msub><mspace width="0.4em"/><mtext>s.t.</mtext><mspace width="0.4em"/><msub><mrow><mo>∥</mo><mi>A</mi><mi>x</mi><mo>−</mo><mi>y</mi><mo>∥</mo></mrow><mn>2</mn></msub><mo>≤</mo><mi>ε</mi></math><span class="eq-label">(27.1) 零范数与其凸松弛</span></div>
+<p>左边的 <code>ℓ₀</code> 最小化是 NP 难问题；右边把它换成凸的 <code>ℓ₁</code> 最小化，可用线性规划求解。<strong>恢复保证</strong>依赖测量矩阵：若 <code>A</code> 满足阶数 <code>2k</code> 的有限等距性质（RIP），且测量数大致满足 <code>m ≥ C·k·log(N/k)</code>，则 <code>ℓ₁</code> 能准确恢复。尺度是 <code>k·log(N/k)</code> 而不是 <code>N</code>——省下的采样正是稀疏性提供的。</p>
+<figure><svg viewBox="0 0 1000 360" role="img" aria-labelledby="cs-t cs-d"><title id="cs-t">稀疏信号经欠采样测量后由一范数重建</title><desc id="cs-d">左侧是只有两个非零分量的稀疏信号，中间由 m 个欠采样线性测量得到观测向量，右侧一范数重建出同样的两个非零分量。</desc><rect width="1000" height="360" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">稀疏先验让 m&lt;N 个测量足以定位信号</text><line x1="70" y1="240" x2="310" y2="240" stroke="#dce7e6"/><g stroke="#2f7d7b" stroke-width="3"><line x1="140" y1="240" x2="140" y2="120"/><line x1="240" y1="240" x2="240" y2="165"/></g><circle cx="140" cy="120" r="5" fill="#2f7d7b"/><circle cx="240" cy="165" r="5" fill="#2f7d7b"/><text x="190" y="288" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#20343d">真实信号 x：仅 k=2 个非零</text><line x1="345" y1="180" x2="415" y2="180" stroke="#7564ad" stroke-width="2.4" marker-end="url(#cs-a)"/><text x="380" y="160" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#7564ad">y=Ax</text><rect x="440" y="80" width="180" height="170" rx="12" fill="#f3f1f9" stroke="#7564ad" stroke-dasharray="5 4"/><g fill="#7564ad"><circle cx="470" cy="120" r="4.5"/><circle cx="520" cy="110" r="4.5"/><circle cx="575" cy="135" r="4.5"/><circle cx="470" cy="180" r="4.5"/><circle cx="530" cy="200" r="4.5"/><circle cx="585" cy="175" r="4.5"/><circle cx="500" cy="225" r="4.5"/><circle cx="560" cy="230" r="4.5"/></g><text x="530" y="288" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#7564ad">m 个欠采样测量 y</text><line x1="640" y1="180" x2="705" y2="180" stroke="#7564ad" stroke-width="2.4" marker-end="url(#cs-a)"/><text x="672" y="160" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#7564ad">ℓ₁ min</text><line x1="740" y1="240" x2="940" y2="240" stroke="#dce7e6"/><g stroke="#2f7d7b" stroke-width="3"><line x1="800" y1="240" x2="800" y2="120"/><line x1="890" y1="240" x2="890" y2="165"/></g><circle cx="800" cy="120" r="5" fill="#2f7d7b"/><circle cx="890" cy="165" r="5" fill="#2f7d7b"/><text x="840" y="288" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#2f7d7b">重建 x̂：非零位置与幅度恢复</text><defs><marker id="cs-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#7564ad"/></marker></defs><text x="70" y="336" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">前提：信号确实稀疏，且测量矩阵与稀疏基不相干；图示为概念示意，非具体数值实验。</text></svg><figcaption>图 27.1　稀疏先验是压缩感知的全部额外信息：没有它，<code>m&lt;N</code> 个测量不可能确定 <code>x</code>。</figcaption></figure>
+<div class="warning"><p><strong>反例（这不是“无视奈奎斯特”）：</strong>若信号并不稀疏（例如宽带噪声），<code>ℓ₁</code> 会给出有偏的解；若测量矩阵的列高度相干，多个不同的稀疏解会给出相同测量，无法区分。</p></div>
+</section>
+<section id="tf"><h2>时频与小波：把分辨率换成另一张铺砌</h2>
+<p>非平稳信号的频率随时间变化（啁啾、语音共振峰），单张功率谱会把随时间变化的结构平均掉。短时傅里叶变换（STFT）用滑动窗分片处理：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="短时傅里叶变换定义"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="短时傅里叶变换等于信号乘窗函数的傅里叶变换"><mi>X</mi><mo>(</mo><mi>t</mi><mo>,</mo><mi>f</mi><mo>)</mo><mo>=</mo><mo>∫</mo><mi>x</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mi>w</mi><mo>(</mo><mi>τ</mi><mo>−</mo><mi>t</mi><mo>)</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi>f</mi><mi>τ</mi></mrow></msup><mspace width="0.2em"/><mi>d</mi><mi>τ</mi></math><span class="eq-label">(27.2) STFT</span></div>
+<p>窗一旦选定，时频分辨率就固定了：长窗频率分得清、但时间模糊；短窗时间定位准、但频率模糊。这是不确定性原理的直接后果，STFT 无法同时兼顾。</p>
+<figure><svg viewBox="0 0 1000 360" role="img" aria-labelledby="tf-t tf-d"><title id="tf-t">STFT 的均匀时频格与小波的二进时频格</title><desc id="tf-d">左图 STFT 用等大格子平铺时频面，时频分辨率处处相同；右图小波在高频用窄时窗、低频用宽时窗，分辨率随时频位置变化。</desc><rect width="1000" height="360" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">两种时频铺砌</text><text x="260" y="70" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14.5" fill="#2f7d7b">STFT：均匀格</text><g stroke="#2f7d7b" stroke-width="1.2" opacity="0.85"><line x1="60" y1="88" x2="460" y2="88"/><line x1="60" y1="148" x2="460" y2="148"/><line x1="60" y1="208" x2="460" y2="208"/><line x1="60" y1="268" x2="460" y2="268"/><line x1="60" y1="88" x2="60" y2="268"/><line x1="127" y1="88" x2="127" y2="268"/><line x1="193" y1="88" x2="193" y2="268"/><line x1="260" y1="88" x2="260" y2="268"/><line x1="327" y1="88" x2="327" y2="268"/><line x1="393" y1="88" x2="393" y2="268"/><line x1="460" y1="88" x2="460" y2="268"/></g><text x="740" y="70" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14.5" fill="#7564ad">小波：二进格</text><g stroke="#7564ad" stroke-width="1.2" opacity="0.85"><line x1="540" y1="88" x2="940" y2="88"/><line x1="540" y1="133" x2="940" y2="133"/><line x1="540" y1="178" x2="940" y2="178"/><line x1="540" y1="223" x2="940" y2="223"/><line x1="540" y1="268" x2="940" y2="268"/><line x1="540" y1="88" x2="540" y2="268"/><line x1="590" y1="88" x2="590" y2="133"/><line x1="640" y1="88" x2="640" y2="133"/><line x1="690" y1="88" x2="690" y2="133"/><line x1="740" y1="88" x2="740" y2="133"/><line x1="790" y1="88" x2="790" y2="133"/><line x1="840" y1="88" x2="840" y2="133"/><line x1="890" y1="88" x2="890" y2="133"/><line x1="940" y1="88" x2="940" y2="133"/><line x1="640" y1="133" x2="640" y2="178"/><line x1="740" y1="133" x2="740" y2="178"/><line x1="840" y1="133" x2="840" y2="178"/><line x1="940" y1="133" x2="940" y2="178"/><line x1="740" y1="178" x2="740" y2="223"/><line x1="940" y1="178" x2="940" y2="223"/><line x1="940" y1="223" x2="940" y2="268"/></g><g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078"><text x="50" y="100" text-anchor="end">高频</text><text x="50" y="264" text-anchor="end">低频</text><text x="500" y="100" text-anchor="end">高频</text><text x="500" y="264" text-anchor="end">低频</text><text x="260" y="292" text-anchor="middle">时间 →</text><text x="740" y="292" text-anchor="middle">时间 →</text></g><text x="60" y="336" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">小波在高频用短窗换取时间定位、在低频用长窗换取频率分辨，适合瞬变与宽频段并存的信号；代价是其变换系数不再是严格的频率采样。</text></svg><figcaption>图 27.2　同样的时频面，两种铺砌方式。选择哪种取决于信号的“频率随时间如何变化”，而非哪张图更好看。</figcaption></figure>
+<div class="note"><p>Wigner-Ville 分布能给出比 STFT 更高的时频聚集度，但对含多个分量的信号会出现交叉项（虚假的中间频率），通常需要与平滑核折衷使用。</p></div>
+</section>
+<section id="graph"><h2>图信号处理：把“频率”推广到网络</h2>
+<p>传感器网络、点云、脑功能连接上的观测并不具备时间或空间平移，傅里叶变换的 <code>e^{j2πft}</code> 无从定义。图信号处理换了一个出发点：用<strong>图拉普拉斯</strong>的谱代替频率。设图 <code>G=(V,E)</code>，邻接矩阵 <code>A</code>、度矩阵 <code>D</code>，定义</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="图拉普拉斯及图傅里叶变换"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="拉普拉斯等于度矩阵减邻接矩阵，特征分解为 U 乘对角特征值乘 U 转置，图傅里叶变换为 U 转置乘信号"><mi>L</mi><mo>=</mo><mi>D</mi><mo>−</mo><mi>A</mi><mo>=</mo><mi>U</mi><mi>Λ</mi><msup><mi>U</mi><mi>T</mi></msup><mo>,</mo><mspace width="1.2em"/><mover><mi>x</mi><mo>^</mo></mover><mo>=</mo><msup><mi>U</mi><mi>T</mi></msup><mi>x</mi></math><span class="eq-label">(27.3) 图傅里叶变换</span></div>
+<p><code>L</code> 对称半正定，特征值 <code>0=λ₀≤λ₁≤…</code> 就是“图频率”：小特征值对应在相邻节点上平滑变化的模式，大特征值对应在图上剧烈振荡的模式。基于 <code>U</code> 就能定义图上的滤波、采样与谱估计，它们与经典谱分析形式同构，只是“频率轴”变成了图的特征值轴。</p>
+<figure><svg viewBox="0 0 1000 360" role="img" aria-labelledby="gp-t gp-d"><title id="gp-t">图上的节点信号与其图频率谱</title><desc id="gp-d">左侧是一个六节点图，节点颜色表示信号的正负取值；右侧是拉普拉斯特征值构成的图频率轴，低特征值代表平滑模式，高特征值代表振荡模式。</desc><rect width="1000" height="360" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">图频率不是时间频率</text><g stroke="#b9cfcd" stroke-width="2"><line x1="140" y1="90" x2="280" y2="80"/><line x1="140" y1="90" x2="210" y2="175"/><line x1="280" y1="80" x2="210" y2="175"/><line x1="210" y1="175" x2="120" y2="265"/><line x1="210" y1="175" x2="300" y2="265"/><line x1="120" y1="265" x2="300" y2="265"/><line x1="300" y1="265" x2="390" y2="170"/><line x1="210" y1="175" x2="390" y2="170"/></g><g font-family="Arial,sans-serif" font-size="13" text-anchor="middle"><circle cx="140" cy="90" r="20" fill="#eef5f4" stroke="#2f7d7b" stroke-width="2"/><text x="140" y="95" fill="#164f59">+1</text><circle cx="280" cy="80" r="20" fill="#fbeae3" stroke="#ce704f" stroke-width="2"/><text x="280" y="85" fill="#a4482a">−1</text><circle cx="210" cy="175" r="20" fill="#eef5f4" stroke="#2f7d7b" stroke-width="2"/><text x="210" y="180" fill="#164f59">+0.5</text><circle cx="120" cy="265" r="20" fill="#fbeae3" stroke="#ce704f" stroke-width="2"/><text x="120" y="270" fill="#a4482a">−1</text><circle cx="300" cy="265" r="20" fill="#eef5f4" stroke="#2f7d7b" stroke-width="2"/><text x="300" y="270" fill="#164f59">+0.5</text><circle cx="390" cy="170" r="20" fill="#eef5f4" stroke="#2f7d7b" stroke-width="2"/><text x="390" y="175" fill="#164f59">+1</text></g><text x="210" y="330" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#20343d">节点信号 x（teal 为正、coral 为负）</text><line x1="560" y1="290" x2="940" y2="290" stroke="#dce7e6"/><g fill="#7564ad"><rect x="580" y="287" width="26" height="3"/><rect x="640" y="250" width="26" height="40"/><rect x="700" y="210" width="26" height="80"/><rect x="760" y="165" width="26" height="125"/><rect x="820" y="120" width="26" height="170"/><rect x="880" y="80" width="26" height="210"/></g><g font-family="Arial,sans-serif" font-size="12" fill="#5d7078"><text x="593" y="308" text-anchor="middle">λ₀</text><text x="653" y="308" text-anchor="middle">λ₁</text><text x="713" y="308" text-anchor="middle">λ₂</text><text x="773" y="308" text-anchor="middle">λ₃</text><text x="833" y="308" text-anchor="middle">λ₄</text><text x="893" y="308" text-anchor="middle">λ₅</text><text x="750" y="330" text-anchor="middle">图频率轴（拉普拉斯特征值）</text></g><text x="560" y="72" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">左→右：平滑模式 → 振荡模式</text><text x="560" y="348" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">柱高为示意；真实特征值由图拓扑唯一确定。</text></svg><figcaption>图 27.3　图频率的含义完全取决于图的连接方式；同一节点信号在不同图上会有不同的谱。</figcaption></figure>
+<p>典型用例：用图滤波器对节点观测做去噪与插值，或在传感器网络上做分布式估计。注意图本身必须是已知且合理的——图的结构错了，谱也就失去了意义。</p>
+</section>
+<section id="learning"><h2>数据驱动的谱估计</h2>
+<p>另一条路线是不再把模型解析写出来，而是用数据学一个从观测到谱（或其低维表示）的映射。这类方法以神经网络为主体，可用于频谱感知、调制识别、协方差估计等任务。</p>
+<p>把它放进本章的框架看：它替换的假设是“模型可解析写出”，代价是<strong>对训练分布的依赖</strong>。在训练分布覆盖良好的场景下，它可以做出经典方法难以做到的事；一旦部署数据与训练数据分布不同，它的性能没有可审计的保证。因此它更像“用样本换先验”，与压缩感知用“稀疏先验”换采样是同一类权衡。</p>
+<div class="note"><p>本章不展开网络结构与训练细节。需要强调的是：无论模型多复杂，它仍然隐含地编码了某类先验（平滑、稀疏、低秩…），不存在“无假设”的估计器。</p></div>
+</section>
+<section id="boundary"><h2>这些方法的边界</h2>
+<ul><li><strong>压缩感知</strong>：需要真稀疏或可压缩，且测量矩阵满足 RIP / 低相干。信号密集或测量高度相干时恢复失败——而失败的解看上去可能仍然“合理”，不会报错。</li><li><strong>时频与小波</strong>：分辨率受不确定性原理约束，不可能时频同时无限精确；Wigner-Ville 分布的交叉项会造出并不存在的中间频率。</li><li><strong>图信号处理</strong>：结果完全依赖图的选择；图上不存在天然的平移算子，采样与重建定理比经典情形更脆弱，图的构造错误会直接偷换结论。</li><li><strong>数据驱动</strong>：分布漂移下性能无可审计保证，且很难给出经典意义上的误差界或置信区间。</li></ul>
+<div class="warning"><p>共同点：每种方法都用一条<strong>更强的假设</strong>换来了经典方法做不到的能力。不要把“新方法”误当成“无假设”，也不要在没有核对分布与稀疏性前提时就相信结果。</p></div>
+</section>
+<section id="practice"><h2>用 25 行代码实验稀疏恢复</h2>
+<p>下面的程序构造一个 <code>N=6</code>、<code>k=2</code> 的稀疏信号，只用 <code>m=4&lt;N</code> 个随机线性测量。由于规模很小，我们直接穷举所有 2 稀疏支撑（即 <code>ℓ₀</code> 最小化），对每个支撑解最小二乘，取残差最小者。结果精确重现了真实信号的两个非零项。</p>
+<pre class="code-block"><code>import random, itertools
+random.seed(3)
+N, m, k = 6, 4, 2
+A = [[random.gauss(0, 1) for _ in range(N)] for _ in range(m)]
+xt = [0.0]*N; xt[1] = 2.0; xt[4] = -1.5     # 真信号（2 稀疏）
+y = [sum(A[i][j]*xt[j] for j in range(N)) for i in range(m)]
 
-        <h2>开篇：当经典工具遇到新时代</h2>
+def lsq(S):                                  # A_S 上的最小二乘（法方程）
+    G = [[sum(A[i][u]*A[i][v] for i in range(m)) for v in S] for u in S]
+    b = [sum(A[i][u]*y[i] for i in range(m)) for u in S]
+    for c in range(len(S)):                  # 高斯消元
+        p = max(range(c, len(S)), key=lambda r: abs(G[r][c]))
+        G[c], G[p] = G[p], G[c]; b[c], b[p] = b[p], b[c]
+        for r in range(c+1, len(S)):
+            f = G[r][c]/G[c][c]
+            for cc in range(c, len(S)): G[r][cc] -= f*G[c][cc]
+            b[r] -= f*b[c]
+    a = [0.0]*len(S)
+    for r in range(len(S)-1, -1, -1):
+        a[r] = (b[r]-sum(G[r][cc]*a[cc] for cc in range(r+1, len(S))))/G[r][r]
+    return a
 
-        <p>大家好，我是你们的讲师。走过前面26章，我们系统学习了随机信号分析的经典大厦：概率论地基、相关函数、功率谱密度、线性系统响应、最优滤波、参数估计、信号检测——这一整套理论体系在20世纪中叶基本成型，至今仍然是通信、雷达、控制等领域的基石。</p>
-
-        <p>但时代在变。过去十年，<strong>深度学习</strong>以前所未有的方式冲击了信号处理领域——CNN能直接从数据中学习信号特征，不再需要手调滤波器系数；<strong>压缩感知</strong>告诉我们奈奎斯特采样定理不是不可打破的铁律；<strong>图信号处理</strong>把傅里叶分析推广到了非欧几里得空间。这些前沿方向不是对经典理论的否定，而是对它的<strong>扩展和补充</strong>。本章我们就来一窥这些激动人心的新进展。</p>
-
-        <h2>深度学习与谱估计融合</h2>
-
-        <h3>从数据中学习谱特征</h3>
-
-        <p>经典功率谱估计（周期图、AR模型、MUSIC）都基于明确的数学模型和假设——信号由某些参数化过程生成。但真实世界的信号往往比模型更复杂：生物医学信号、地震波、水下声学信号，它们的生成机制难以用简洁的数学公式描述。</p>
-
-        <p>深度学习的思路截然不同：让神经网络从大量数据中<strong>自动学习</strong>信号到功率谱的映射。2025年，一种名为 <strong>AttnUNet++</strong> 的注意力机制U-Net架构被成功应用于核能谱估计，在低计数率场景下显著优于传统方法。其核心思想是将谱估计建模为<strong>图像到图像的翻译问题</strong>——把原始谱线看作"噪声图"，训练网络输出"干净谱图"。</p>
-
-        <div class="highlight">
-            <strong>关键洞察：</strong>深度学习谱估计的优势来自三个方面——(1) 非线性映射能力，能捕捉复杂的谱结构；(2) 端到端学习，不需要手工设计特征；(3) 利用空间/时间上下文信息，在低SNR下表现优异。代价是：需要大量标注数据，且泛化到训练分布外的信号时可能完全失效。
-        </div>
-
-        <h3>CNN/RNN在信号处理中的角色</h3>
-
-        <p>卷积神经网络（CNN）擅长捕捉局部频域模式——就像在图像中检测边缘一样，CNN可以在时频谱上检测出特定模式的时间-频率结构。循环神经网络（RNN）及其变体LSTM、GRU则擅长建模时序依赖——它们可以捕获信号的长期相关结构，在语音增强、心电去噪等任务中表现出色。</p>
-
-        <p>但请记住一个重要的原则：<strong>深度学习不是万能的</strong>。如果训练数据是从特定传感器在特定环境下采集的，当传感器型号或环境改变时，模型性能可能断崖式下降。深度学习的泛化问题，在信号处理中同样存在，甚至更严重——因为信号分布的变化往往比图像分类中的"域偏移"更细微、更难察觉。</p>
-
-        <h2>压缩感知</h2>
-
-        <h3>突破奈奎斯特</h3>
-
-        <p>自1928年奈奎斯特提出采样定理以来，"采样频率必须不低于信号最高频率的两倍"一直被视为不可动摇的铁律。但2006年由Donoho、Candes、Romberg和Tao提出的<strong>压缩感知</strong>（Compressive Sensing）理论，从根本上挑战了这一认知。</p>
-
-        <p>压缩感知的核心洞见是：<strong>如果信号在某个变换域（如小波域、DCT域）上是稀疏的，那么我们可以用远低于奈奎斯特率的采样率精确重建信号</strong>。"稀疏"的意思是：在变换域中，信号的大部分系数为零或接近零，只有少数非零系数携带了主要信息。</p>
-
-        <p>数学上，压缩感知解决如下问题：</p>
-
-        <pre><code>观测: y = Φx + e    (y ∈ ℝᵐ, x ∈ ℝⁿ, m ≪ n)
-
-目标: 从欠定方程 y = Φx 中恢复 x
-
-关键假设: x 在某个变换基 Ψ 下是稀疏的, 即 x = Ψα, α 中大部分元素为零
-
-重建: min ||α||₁  s.t. ||y - ΦΨα||₂ ≤ ε
-
-      ℓ₁ 最小化 → 稀疏解</code></pre>
-
-        <p>为什么 ℓ₁ 范数最小化能带来稀疏解？几何直觉是：ℓ₁ 球（菱形）的顶点位于坐标轴上，当约束集（观测方程定义的超平面）与 ℓ₁ 球相交时，交点倾向于落在顶点位置——即坐标轴上，对应的解就是稀疏的。而 ℓ₂ 球（圆球）与约束集的切点通常不在坐标轴上，解一般不稀疏。</p>
-
-        <h3>应用：MRI加速与单像素相机</h3>
-
-        <p>压缩感知的两个经典应用足以说明它的影响力：</p>
-
-        <ul>
-            <li><strong>磁共振成像（MRI）加速</strong>：MRI的成像速度受限于k-space的采样时间。压缩感知允许在k-space中随机欠采样（采集不到10%的数据），然后通过稀疏重建获得高质量图像。这意味着一台原本需要15分钟扫描的MRI，可以缩短到2分钟以内——对患者体验和医疗效率都是巨大的提升。</li>
-            <li><strong>单像素相机</strong>：传统的数码相机需要数百万个像素传感器。单像素相机使用数字微镜器件（DMD）+ 单个光电探测器，通过多次随机测量来重构图像。虽然成像速度慢，但在红外、太赫兹等传感器极其昂贵的波段具有独特优势。</li>
-        </ul>
-
-        <h2>时频分析与小波变换</h2>
-
-        <h3>STFT的局限：固定的时频分辨率</h3>
-
-        <p>短时傅里叶变换（STFT）是最经典的时频分析工具——把信号切成一帧一帧，对每一帧做FFT。但STFT有一个根本局限：<strong>时频分辨率由窗函数固定，无法同时实现高时间分辨率和高频率分辨率</strong>。</p>
-
-        <p>这个矛盾来自海森堡测不准原理在信号处理中的体现：时间分辨率 Δt 和频率分辨率 Δf 的乘积存在下界，Δt · Δf ≥ 1/(4π)。你想要精确知道"信号在什么时刻发生了变化"（小 Δt），就要牺牲频率精度（大 Δf）；反过来，你想精确知道"信号的频率成分"（小 Δf），就要牺牲时间精度（大 Δt）。</p>
-
-        <h3>小波变换：多分辨率分析</h3>
-
-        <p>小波变换（Wavelet Transform）解决了STFT的这一困境。它通过<strong>伸缩和平移</strong>一个母小波函数，实现了在不同频率范围使用不同时间分辨率：</p>
-
-        <ul>
-            <li>分析<strong>高频成分</strong>时使用短时间窗（高时间分辨率）</li>
-            <li>分析<strong>低频成分</strong>时使用长时间窗（高频率分辨率）</li>
-        </ul>
-
-        <p>这种"自动适配"的特性使得小波变换非常适合处理具有<strong>多尺度结构</strong>的信号——例如地震波包含从高频P波到低频面波的广泛频率范围，生物医学信号（EEG、ECG）也呈现明显的多尺度特征。离散小波变换（DWT）通过滤波器组高效实现，计算复杂度为 O(N)，与FFT相当。</p>
-
-        <h3>Wigner-Ville分布与EMD</h3>
-
-        <p>除了小波变换，还有几种重要的时频分析工具值得了解：</p>
-
-        <ul>
-            <li><strong>Wigner-Ville分布（WVD）</strong>：属于Cohen类双线性时频分布，具有极高的时频分辨率，但对交叉项（cross-term）敏感——多分量信号会产生虚假的"交叉频率"。</li>
-            <li><strong>经验模态分解（EMD）</strong>：一种数据驱动的自适应分解方法，将信号分解为若干个本征模态函数（IMF），适用于非线性、非平稳信号。</li>
-        </ul>
-
-        <p>选择哪种时频分析工具取决于具体问题：需要高分辨率且信号为单分量→WVD；信号具有多尺度结构→小波变换；信号高度非线性/非平稳且不想做先验假设→EMD。</p>
-
-        <h2>拓扑信号处理与前沿方向</h2>
-
-        <h3>图信号处理（GSP）</h3>
-
-        <p>传统的信号处理假设信号定义在均匀时间轴或规则网格上。但大量现代数据定义在<strong>图结构</strong>上：传感器网络、社交网络、大脑功能连接网络。图信号处理（Graph Signal Processing，简称GSP）把傅里叶分析推广到图域：</p>
-
-        <ul>
-            <li><strong>图傅里叶变换（GFT）</strong>：以图拉普拉斯矩阵的特征向量为基，对图信号进行频谱分解</li>
-            <li><strong>图滤波器</strong>：在频谱域对图信号进行滤波，实现平滑（保留低频）或锐化（保留高频）</li>
-            <li><strong>图小波</strong>：将多分辨率分析扩展到图结构上</li>
-        </ul>
-
-        <p>GSP不是书斋里的纯理论——它在交通流量预测（道路网络是天然图结构）、推荐系统（用户-物品二部图）、神经科学（大脑功能连接网络）等领域已有实际应用。</p>
-
-        <h3>单纯复形上的随机信号分析</h3>
-
-        <p>2026年的最新研究前沿进一步将随机信号分析从图扩展到<strong>单纯复形</strong>（Simplicial Complex）——图只包含顶点（0维）和边（1维），而单纯复形还包含三角形（2维）、四面体（3维）等高维结构。例如，大脑中的神经元不仅通过单突触连接（边），还形成复杂的环路（三角形和高阶结构）。在单纯复形上定义随机过程、相关函数和功率谱，是当前拓扑数据分析(TDA)与信号处理交叉领域的热点方向。</p>
-
-        <h3>自由亚实变换域功率谱（FMPS）</h3>
-
-        <p>另一个值得关注的前沿是自由亚实变换域功率谱（Free Subreal Transform Domain Power Spectrum，简称FMPS），它提供了一种在非均匀采样点集上计算功率谱的理论框架，对于处理天文观测、地震台阵等非均匀采样数据具有潜在的重要价值。</p>
-
-        <table>
-            <tr><th>方法论</th><th>数学基础</th><th>优势</th><th>局限性</th></tr>
-            <tr><td>经典谱估计（周期图）</td><td>傅里叶变换</td><td>计算简单，理论成熟</td><td>分辨率受限，频谱泄漏</td></tr>
-            <tr><td>参数化谱估计（AR/MUSIC）</td><td>线性代数，子空间</td><td>高分辨率，适合短数据</td><td>模型阶数选择困难</td></tr>
-            <tr><td>深度学习谱估计</td><td>神经网络</td><td>非线性映射，端到端学习</td><td>需大量数据，泛化性差</td></tr>
-            <tr><td>压缩感知</td><td>稀疏优化</td><td>亚奈奎斯特采样</td><td>信号需稀疏先验</td></tr>
-            <tr><td>图信号处理</td><td>谱图理论</td><td>非欧几里得域信号</td><td>图构建方式影响大</td></tr>
-        </table>
-
-        <h2>踩坑故事：深度学习谱估计的外场失效</h2>
-
-        <p>这是一个来自某研究所的真实案例。该团队开发了一套基于深度CNN的水声信号谱估计系统，在公开数据集（DeepShip、ShipEar）上取得了令人瞩目的结果——谱估计的归一化均方误差比传统Welch方法低了近60%。论文顺利发表，团队也着手将其部署到实际水下监测系统中。</p>
-
-        <p>然而，在外场测试中发生了令人沮丧的情况：系统的谱估计质量断崖式下降，甚至不如一个简单的周期图。训练集上的优异表现和外场实际性能之间的鸿沟让团队百思不得其解。</p>
-
-        <p>事后分析发现：公开数据集中的水声信号都是在浅海、良好天气条件下采集的，而外场测试恰逢一次寒潮过境——水温骤降、海面风浪增大，导致水下声传播特性和环境噪声频谱结构发生了显著变化。这个"域偏移"在视觉上不易察觉，但对于高维神经网络模型来说，输入分布已经离开了训练数据流形，模型的预测完全不可靠。</p>
-
-        <div class="warning">
-            <strong>教训：</strong>深度学习模型对训练数据分布之外的信号几乎没有任何泛化能力。在信号处理中应用深度学习时，必须牢记：(1) 训练数据要尽可能覆盖实际部署中可能遇到的各种环境条件；(2) 模型输出应当与物理知识交叉验证，不能盲目信任；(3) 对于安全关键系统，深度学习建议作为"辅助"而非"替代"传统方法。经典信号处理方法的优势在于：它们基于物理模型和数学假设，即使假设不完全满足，性能退化也是渐进的、可预测的——而不是像神经网络那样"突然崩溃"。
-        </div>
-
-        <h2>本章小结与展望</h2>
-
-        <p>本章我们纵览了现代信号处理的前沿方向：深度学习为谱估计带来了数据驱动的革命，但泛化问题仍是悬而未决的挑战；压缩感知打破了奈奎斯特的"紧箍咒"，让亚奈奎斯特采样成为现实；时频分析和小波变换为我们提供了在时间-频率平面上多分辨率观察信号的视角；而图信号处理和拓扑数据分析则将随机信号分析的边界从欧几里得空间扩展到了网络和高阶结构。</p>
-
-        <p>请记住：这些前沿不是对经典理论的替代，而是补充。你学过的自相关函数、功率谱密度、维纳滤波等经典概念，仍然是理解这些前沿的<strong>必备语言</strong>。没有经典理论做根基，前沿方向就成了无源之水。</p>
-
-        <p>下一章，也是本课程的<strong>最后一章</strong>，我们将做一个端到端的综合项目实战——把从第1章到第27章的所有知识串联起来，构建一个完整的随机信号分析与检测系统。让我们用一个有温度的项目来为这趟旅程画上句号。</p>
-
-        <div class="footer-nav">
-            <a href="26.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="28.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
+best = None
+for S in itertools.combinations(range(N), k):
+    a = lsq(S); res = sum((y[i]-sum(a[t]*A[i][S[t]] for t in range(k)))**2 for i in range(m))
+    if best is None or res &lt; best[0]: best = (res, S, a)
+_, S, a = best
+xr = [0.0]*N
+for t, j in enumerate(S): xr[j] = a[t]
+print(S, [round(v, 3) for v in xr])          # (1, 4) [0.0, 2.0, 0.0, 0.0, -1.5, 0.0]
+assert all(abs(xr[j]-xt[j]) &lt; 1e-6 for j in range(N))
+</code></pre>
+<div class="example"><p><strong>独立练习：</strong>把真实信号改为 5 个非零项（<code>k=5</code>），保持 <code>m=4</code>，观察恢复是否还唯一；再逐步增大 <code>m</code> 直到能恢复。这个实验直观展示了“测量数要随稀疏度增长”的尺度关系 <code>m∝k·log(N/k)</code>。</p></div>
+</section>
+<section id="synthesis"><h2>一条共同的主线：用先验换能力</h2>
+<p>把本章与第 23、24 章放在一起，可以看到一条清晰的主线：经典谱估计建立在平稳、奈奎斯特采样、二阶矩这几条假设上；每一个现代工具都放大了其中一条假设的适用范围，又注入了一条新的先验——压缩感知注入稀疏，时频与小波注入“频率缓慢变化”的局部结构，图信号处理注入图拓扑，学习型方法注入训练分布。先验越强，能做到的事越多，但一旦先验不成立，失效也越严重。</p>
+<details><summary>自检：压缩感知真的“绕过了奈奎斯特率”吗？</summary><p>严格说不是。信号的可自由度数（信息率）仍然受限于稀疏度 <code>k</code>；压缩感知把采样数从 <code>N</code> 降到约 <code>k·log(N/k)</code>，靠的是信号的稀疏结构，而不是让欠采样本身变得无损。对非稀疏信号，它不提供任何保证。</p></details>
+<details><summary>自检：为什么图的“频率”不能直接用拉普拉斯特征值的大小排序理解？</summary><p><code>L</code> 的特征向量是图上的正交模式，特征值衡量模式在边上的变化快慢。但“快”与“慢”是对<strong>这张图</strong>而言的；换一张连接方式，同一信号的谱就变了。没有图，就没有图频率。</p></details>
+<details><summary>自检：一个“深度学习谱估计在实验中胜出”的结论需要什么额外信息才能相信？</summary><p>至少需要：训练与测试分布是否相同、信噪比与信道条件是否匹配、对比的经典方法是否调好、以及是否报出了分布漂移下的性能。缺少这些，实验胜出不能推广到部署环境。</p></details>
+</section>
+<section id="references" class="references"><h2>延伸阅读与核查依据</h2><ol><li>E. J. Candès, J. Romberg, T. Tao, “Robust uncertainty principles: Exact signal reconstruction from highly incomplete frequency information,” <em>IEEE Transactions on Information Theory</em>, vol. 52, no. 2, pp. 489–509, 2006.——压缩感知与稀疏恢复的代表性工作，给出 <code>ℓ₁</code> 恢复条件。</li><li>D. L. Donoho, “Compressed sensing,” <em>IEEE Transactions on Information Theory</em>, vol. 52, no. 4, pp. 1289–1306, 2006.——同一方向的独立奠基。</li><li>S. Mallat, <em>A Wavelet Tour of Signal Processing</em>, 3rd ed., Academic Press, 2009.——STFT、小波与不确定性原理的标准教材。</li><li>D. I. Shuman, S. K. Narang, P. Frossard, A. Ortega, P. Vandergheynst, “The emerging field of signal processing on graphs,” <em>IEEE Signal Processing Magazine</em>, vol. 30, no. 3, pp. 83–98, 2013.——图傅里叶变换、图滤波与图上采样理论的综述。</li></ol><p>本章图 27.1–27.3 为概念示意图；图 27.3 的柱高与图 27.2 的格子未按真实数值绘制，已在图中注明。压缩感知的恢复尺度 <code>m∝k·log(N/k)</code> 来自上述文献。</p></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="26.html">← 第 26 章</a><a href="../index.html#content">全部章节</a><a href="28.html">第 28 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源代码</a></p></div></footer>
+<script defer src="../assets/js/site.js"></script>
 </body>
 </html>
