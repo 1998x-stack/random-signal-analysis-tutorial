@@ -313,7 +313,7 @@
         "ROC曲线与AUC"
       ],
       "file": "chapters/26.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "统计推断与应用"
     },
     {

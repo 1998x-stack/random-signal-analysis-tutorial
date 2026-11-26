@@ -1,255 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第26章 信号检测与假设检验</title>
-    <link rel="stylesheet" href="theme.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fffdf8">
+<meta name="description" content="在噪声中判断信号是否存在，是一个二元决策问题。从两类错误与 Neyman-Pearson 似然比检验，到匹配滤波器的闭式检测概率，再到 ROC 曲线与 AUC 的判读与边界。">
+<title>第 26 章 · 信号检测与假设检验 | 随机信号分析</title>
+<link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html" class="active">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>开篇：从"有没有信号"到"做出决策"</h2>
-
-        <p>大家好，我是你们的讲师。前25章我们花了大量篇幅讨论如何描述随机信号、如何估计它的参数、如何从噪声中滤出有用信号。但有一个根本问题我们还没正面回答：<strong>你凭什么说"这里有信号"？</strong></p>
-
-        <p>想象你是一名雷达操作员，盯着屏幕上闪烁的光点。屏幕上有一个微弱的回波——它是一架敌方飞行器，还是只是一群飞鸟？你的判断决定了是否要发射导弹。这就是<strong>信号检测</strong>问题的核心：在不确定性中做出二元决策。本章将系统介绍假设检验的数学框架、Neyman-Pearson准则、匹配滤波器以及ROC曲线，这些工具构成了几乎所有现代检测系统——从雷达、声纳到通信接收机、医学诊断——的理论基石。</p>
-
-        <h2>检测问题的数学表述</h2>
-
-        <h3>二元假设框架</h3>
-
-        <p>信号检测最基本的形式是二元假设检验。我们有两个互斥的假设：</p>
-
-        <ul>
-            <li><strong>H₀（零假设）</strong>：观测信号中只有噪声，没有目标信号。例如雷达接收到的纯噪声。</li>
-            <li><strong>H₁（备择假设）</strong>：观测信号中包含目标信号加噪声。例如雷达接收到目标回波加噪声。</li>
-        </ul>
-
-        <p>数学上表述为：</p>
-
-        <pre><code>H₀: Y = W          （只有噪声）
-H₁: Y = S + W      （信号 + 噪声）</code></pre>
-
-        <p>其中 Y 是我们观测到的数据，S 是未知的有用信号，W 是随机噪声。我们的任务是基于观测 Y，选择一个决策 D₀（判定 H₀ 成立）或 D₁（判定 H₁ 成立）。</p>
-
-        <h3>两类错误：虚警与漏检</h3>
-
-        <p>任何检测系统都无法完美无缺。我们要面对两类错误：</p>
-
-        <table>
-            <tr><th></th><th>实际 H₀ 为真</th><th>实际 H₁ 为真</th></tr>
-            <tr><th>判定 D₀</th><td>✅ 正确拒绝</td><td>❌ <strong>漏检</strong> (Miss)</td></tr>
-            <tr><th>判定 D₁</th><td>❌ <strong>虚警</strong> (False Alarm)</td><td>✅ 正确检测</td></tr>
-        </table>
-
-        <p>定义两个关键概率指标：</p>
-
-        <ul>
-            <li><strong>虚警概率</strong> P<sub>fa</sub> = P(D₁ | H₀)——"本来没信号，你非说它有"。在雷达中，这意味着把一只鸟当成了敌机。</li>
-            <li><strong>漏检概率</strong> P<sub>m</sub> = P(D₀ | H₁)——"信号明明在，你却说没有"。在雷达中，这意味着真的敌机飞过而你毫无察觉。</li>
-        </ul>
-
-        <p>显然我们希望两个错误都越小越好。但它们是跷跷板的两端——降低虚警率往往会增加漏检率，反之亦然。如何找到最佳平衡点？这就是Neyman-Pearson准则要解决的核心问题。</p>
-
-        <h2>Neyman-Pearson准则</h2>
-
-        <h3>固定虚警，最大化检测概率</h3>
-
-        <p>Neyman-Pearson（以下简称NP）准则的思想极其务实：<strong>给定一个可容忍的虚警概率上限 α，设计一个检测器使得检测概率 P<sub>d</sub> = 1 - P<sub>m</sub> 最大化</strong>。</p>
-
-        <p>为什么是固定虚警而不是固定漏检？因为在大多数工程场景中，虚警的代价更容易评估。例如雷达操作员可以容忍每100次扫描中误报1次目标（P<sub>fa</sub> = 0.01），但无法容忍漏掉真实目标。所以虚警率通常是系统设计时确定的"硬约束"，在这个约束下我们尽可能多地捕获真实目标。</p>
-
-        <h3>似然比检验</h3>
-
-        <p>NP准则给出一个极其优雅的检测器结构——<strong>似然比检验</strong>：</p>
-
-        <pre><code>Λ(Y) = P(Y | H₁) / P(Y | H₀)
-
-如果 Λ(Y) &gt; γ，则判 H₁（有信号）
-如果 Λ(Y) ≤ γ，则判 H₀（无信号）</code></pre>
-
-        <p>其中 Λ(Y) 是<strong>似然比</strong>——在两种假设下观测到 Y 的概率密度之比。γ 是<strong>检测阈值</strong>，由目标虚警概率 P<sub>fa</sub> 决定。具体地，阈值 γ 满足：</p>
-
-        <p style="text-align:center;">P<sub>fa</sub> = ∫<sub>{Y: Λ(Y) > γ}</sub> P(Y | H₀) dY = α</p>
-
-        <p>NP定理告诉我们：在所有可能的检测器中，似然比检验是在给定虚警率下检测概率最高的——没有比它更好的了。这是一个强有力的结论：<strong>你不需要发明新的检测结构，只需要计算似然比、选好阈值</strong>。</p>
-
-        <div class="tip">
-            <strong>直观理解：</strong>似然比 Λ(Y) 就是"数据 Y 在信号存在下的可能性"除以"数据 Y 在信号不存在下的可能性"。如果这个比值很大，说明数据更支持"信号存在"的假设，我们就判 H₁。就像在法庭上，控方证据（似然比）超过了"排除合理怀疑"的门槛（阈值），才能定罪。
-        </div>
-
-        <h3>如何确定阈值</h3>
-
-        <p>阈值 γ 由虚警概率 P<sub>fa</sub> 确定，通常需要知道在 H₀ 下 Λ(Y) 的概率分布。在 AWGN 这类简单场景中，Λ(Y) 是观测 Y 的单调函数（例如匹配滤波器的输出），阈值可以解析表达。在更复杂的模型中，往往需要通过蒙特卡洛仿真来确定阈值。</p>
-
-        <h2>AWGN中的信号检测</h2>
-
-        <h3>已知信号：匹配滤波器</h3>
-
-        <p>当噪声是加性高斯白噪声（AWGN）、信号波形完全已知时，最优检测器就是<strong>匹配滤波器</strong>：</p>
-
-        <pre><code>h(t) = s(T - t)</code></pre>
-
-        <p>匹配滤波器的冲激响应是信号 s(t) 的时间反转。为什么这个结构最优？因为它<strong>最大化输出信噪比</strong>。具体来说，在采样时刻 t = T，匹配滤波器的输出信噪比达到最大值：</p>
-
-        <p style="text-align:center;">SNR<sub>max</sub> = 2E / N₀</p>
-
-        <p>其中 E 是信号能量，N₀ 是噪声功率谱密度。这个结果与信号的具体形状无关——无论你用正弦波还是方波，只要能量相同，匹配滤波器能达到的信噪比上限就是一样的。</p>
-
-        <p>在 NP 框架下，匹配滤波器的输出与阈值比较：如果输出超过阈值，判 H₁；否则判 H₀。由于 AWGN 是高斯分布，匹配滤波器输出也是高斯随机变量，检测概率和虚警概率都有闭式表达式：</p>
-
-        <ul>
-            <li>P<sub>fa</sub> = Q(γ / σ)，其中 Q 是高斯分布的右尾函数</li>
-            <li>P<sub>d</sub> = Q(γ / σ - √(2E/N₀))</li>
-        </ul>
-
-        <h3>未知相位信号：非相干检测</h3>
-
-        <p>实际工程中，我们往往不知道信号的精确相位——例如通信接收机不知道载波相位，雷达不知道目标反射信号的相位。这时无法使用匹配滤波器（因为它需要信号波形完全已知），我们需要<strong>非相干检测</strong>。</p>
-
-        <p>标准做法是使用<strong>包络检波器</strong>：对接收信号做带通滤波后取包络（幅度），然后将包络与阈值比较。包络在 H₀ 下服从瑞利分布，在 H₁ 下服从莱斯分布。检测概率和虚警概率可以通过 Marcum Q-函数计算。</p>
-
-        <p>非相干检测的代价是：与相干检测（匹配滤波器）相比，大约有 1-3 dB 的性能损失——换句话说，要达到同样的检测概率，非相干检测需要多一倍左右的信号能量。这是"不知道相位"必须付出的代价。</p>
-
-        <h2>ROC曲线</h2>
-
-        <h3>性能评估的标准工具</h3>
-
-        <p>接收机工作特性（Receiver Operating Characteristic，简称ROC）曲线，是评价检测器性能的金标准。它描绘了<strong>检测概率 P<sub>d</sub> 随虚警概率 P<sub>fa</sub> 变化的曲线</strong>，参数是信噪比。</p>
-
-        <p>理想检测器的 ROC 曲线会紧贴左上角——在极低虚警率下达到极高检测概率。而无用的检测器（完全随机猜测）的 ROC 曲线就是对角线 P<sub>d</sub> = P<sub>fa</sub>。一个好的检测器位于两者之间。</p>
-
-        <h3>AUC：一个数字衡量全局性能</h3>
-
-        <p>ROC 曲线下的面积（Area Under the Curve，简称 AUC）是一个方便的标量指标：AUC = 1 是完美检测器，AUC = 0.5 是随机猜测。AUC 的优势在于它不依赖于具体阈值选择，反映了检测器的<strong>全局 discriminability</strong>。在医学诊断、机器学习分类等场景中，AUC 是最常用的性能评价指标之一。</p>
-
-        <table>
-            <tr><th>检测场景</th><th>信号知识</th><th>最优检测器</th><th>关键参数</th></tr>
-            <tr><td>确知信号</td><td>波形完全已知</td><td>匹配滤波器（相干检测）</td><td>信号能量 E，噪声谱密度 N₀</td></tr>
-            <tr><td>随机相位</td><td>波形已知，相位均匀分布</td><td>包络检波器（非相干检测）</td><td>SNR 损失约 1-3 dB</td></tr>
-            <tr><td>随机幅度</td><td>波形已知，幅度衰落</td><td>平方律检波器</td><td>衰落深度、分集阶数</td></tr>
-            <tr><td>随机频率</td><td>频率未知</td><td>滤波器组 + 最大值选择</td><td>频率搜索范围、通道数</td></tr>
-        </table>
-
-        <h3>Python实现：匹配滤波器检测与ROC曲线</h3>
-
-        <pre><code>import numpy as np
-import matplotlib.pyplot as plt
-from scipy import signal
-
-# 参数设置
-fs = 1000  # 采样率 (Hz)
-T = 1.0    # 信号持续时间 (s)
-t = np.linspace(0, T, int(fs*T), endpoint=False)
-f0 = 50    # 正弦信号频率 (Hz)
-s = np.sin(2 * np.pi * f0 * t)  # 已知信号
-E = np.sum(s**2) / fs           # 信号能量
-
-# 匹配滤波器（信号的时间反转）
-h = s[::-1]
-
-def simulate_detection(SNR_dB, N_trials=10000):
-    """在给定 SNR 下仿真检测性能"""
-    SNR_linear = 10**(SNR_dB/10)
-    sigma = np.sqrt(E / SNR_linear)  # 噪声标准差
-
-    # 生成 H0（纯噪声）和 H1（信号+噪声）的匹配滤波器输出
-    y_H0 = np.zeros(N_trials)
-    y_H1 = np.zeros(N_trials)
-
-    for i in range(N_trials):
-        noise = np.random.normal(0, sigma, len(t))
-        y_H0[i] = np.abs(np.convolve(noise, h, mode='same'))[len(t)//2]
-
-        noise2 = np.random.normal(0, sigma, len(t))
-        y_H1[i] = np.abs(np.convolve(s + noise2, h, mode='same'))[len(t)//2]
-
-    # 遍历不同阈值，生成 ROC 曲线
-    thresholds = np.linspace(0, max(y_H1.max(), y_H0.max()), 200)
-    Pfa = np.array([np.mean(y_H0 > th) for th in thresholds])
-    Pd  = np.array([np.mean(y_H1 > th) for th in thresholds])
-
-    return Pfa, Pd
-
-# 计算不同 SNR 下的 ROC 曲线
-SNRs = [-10, -5, 0, 5, 10]
-plt.figure(figsize=(8, 6))
-for SNR in SNRs:
-    Pfa, Pd = simulate_detection(SNR)
-    plt.plot(Pfa, Pd, label=f'SNR = {SNR} dB')
-
-plt.plot([0, 1], [0, 1], 'k--', label='随机猜测')
-plt.xscale('log')
-plt.xlabel('虚警概率 Pfa')
-plt.ylabel('检测概率 Pd')
-plt.title('匹配滤波器 ROC 曲线')
-plt.legend()
-plt.grid(True, alpha=0.3)
-plt.show()</code></pre>
-
-        <h2>踩坑故事：固定阈值在非平稳噪声下的惨痛教训</h2>
-
-        <p>讲一个我在某通信设备公司听来的真实案例。某团队设计了一个基于匹配滤波器的信号检测模块，在实验室测试中表现完美——SNR = 0 dB 时检测概率超过 99%，虚警率低于 0.1%。团队信心满满地部署到了外场测试。</p>
-
-        <p>结果外场的第一天就出了大问题：系统的虚警率飙升至 30% 以上，几乎每分钟都在误报！团队百思不得其解——算法和在实验室跑的是同一套代码，没有任何改动。</p>
-
-        <p>经过一周的排查，问题终于水落石出：<strong>系统使用了固定的检测阈值</strong>。在实验室里，噪声是 AWGN，功率稳定，固定阈值完全够用。但外场环境的噪声是非平稳的——附近工厂的大型电机启停、路过的车辆、甚至天气变化都会导致噪声功率在几分钟内波动 ±6 dB。当噪声功率变大时，固定阈值对应的虚警率呈指数级增长。</p>
-
-        <div class="warning">
-            <strong>教训：</strong>在真实工程中，噪声几乎从来不是平稳的。必须使用<strong>自适应阈值</strong>——根据实时估计的噪声功率动态调整检测门限。常见的做法包括：使用恒虚警率（CFAR，Constant False Alarm Rate）检测器，通过滑窗估计局部噪声功率来自适应调整阈值；或者用噪声功率归一化匹配滤波器的输出。永远不要假设噪声是平稳的，除非你有充分的物理理由。
-        </div>
-
-        <p>这个案例揭示了一个深刻的工程真理：<strong>一个在仿真中完美的算法，放在真实环境中可能脆弱不堪</strong>。算法的鲁棒性往往不来自更精巧的数学，而来自对真实环境物理特性的敬畏。</p>
-
-        <h2>本章小结</h2>
-
-        <p>本章我们系统学习了信号检测与假设检验的核心框架。我们从二元假设的数学表述出发，理解了虚警和漏检两类错误的权衡关系；然后介绍了 NP 准则及其给出的最优检测器结构——似然比检验；接着深入 AWGN 环境，分别讨论了已知信号的匹配滤波器和未知相位的非相干检测；最后通过 ROC 曲线学习了检测性能的评估方法，并用一个"固定阈值"的踩坑故事警示了非平稳噪声的工程陷阱。</p>
-
-        <p>检测是估计问题的"近亲"——估计回答"信号的值是多少"，检测回答"信号是否存在"。下一章，我们将跳出经典的检测与估计框架，放眼<strong>现代信号处理的前沿方向</strong>：深度学习与谱估计的融合、压缩感知突破奈奎斯特采样定理、时频分析与小波变换，以及拓扑信号处理等新兴领域。</p>
-
-        <div class="footer-nav">
-            <a href="25.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="27.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
+<a class="skip-link" href="#article-main">跳到正文</a>
+<header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">信号到底“有没有”</a><a href="#framework">二元假设与两类错误</a><a href="#np">Neyman-Pearson 与似然比</a><a href="#matched">匹配滤波器</a><a href="#roc">ROC 曲线与 AUC</a><a href="#boundary">阈值、非平稳与模型边界</a><a href="#practice">可复现验证</a><a href="#synthesis">本章总结</a><a href="#references">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 统计推断与应用 / 第 26 章</div>
+<header class="article-header">
+<p class="chapter-kicker">CHAPTER 26 · 统计推断与应用</p>
+<h1>信号检测与假设检验</h1>
+<p class="dek">前面的章节都在估计“信号是多少”。检测问的是更根本的问题：给定一串观测，信号究竟“有”还是“没有”？</p>
+<div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>写出二元假设、虚警概率与检测概率，并区分漏检与虚警</li><li>说明 Neyman-Pearson 引理给出的似然比检验为何在固定虚警下最优</li><li>对确知信号推导匹配滤波器输出，并算出 Pfa 与 Pd 的闭式表达</li><li>读懂 ROC 曲线与 AUC，并指出固定阈值在非平稳噪声下的失效</li></ul></div>
+</header>
+<section id="opening"><h2>“有信号”是一个可以被证伪的判断吗？</h2>
+<p>前面各章处理的是估计与滤波：默认信号存在，去还原它的参数、频谱或波形。检测面对的是更前置的一步。雷达收到一段回波、通信接收机收到一个符号周期内的采样，观测本身并不能直接告诉你“目标在不在”。</p>
+<p>关键转变是：把“有无”表述成<strong>两个互斥的概率模型</strong>，再设计一个判决规则，使得错误出现的频率可以被计算、被控制。本章只处理二元检测；多元检测与序贯检测是它的自然推广。</p>
+<div class="note"><p><strong>检测与估计的区别</strong>：估计的输出是连续参数（幅度、时延、频率），检测的输出是离散决策。工程上二者常级联——先判决是否存在，再对存在的情形估计参数。</p></div>
+</section>
+<section id="framework"><h2>二元假设与两类错误</h2>
+<p>把观测记为随机向量 <code>Y</code>，两个互斥假设分别给出它的分布：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="二元假设检验的两个模型"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="H0 下观测服从噪声分布，H1 下观测服从信号加噪声分布"><msub><mi>H</mi><mn>0</mn></msub><mo>:</mo><mspace width="0.3em"/><mi>Y</mi><mo>∼</mo><msub><mi>p</mi><mn>0</mn></msub><mo>(</mo><mi>y</mi><mo>)</mo><mspace width="2em"/><msub><mi>H</mi><mn>1</mn></msub><mo>:</mo><mspace width="0.3em"/><mi>Y</mi><mo>∼</mo><msub><mi>p</mi><mn>1</mn></msub><mo>(</mo><mi>y</mi><mo>)</mo></math><span class="eq-label">(26.1) 二元假设</span></div>
+<p>判决规则就是把观测空间分成两块：落入 <code>R₁</code> 就判 <code>H₁</code>，落入 <code>R₀</code> 就判 <code>H₀</code>。由此产生两种错误：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="虚警概率与检测概率的定义"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="虚警概率是 H0 下落入判决域 R1 的概率，检测概率是 H1 下的同一概率"><msub><mi>P</mi><mi>fa</mi></msub><mo>=</mo><msub><mo>∫</mo><mrow><msub><mi>R</mi><mn>1</mn></msub></mrow></msub><msub><mi>p</mi><mn>0</mn></msub><mo>(</mo><mi>y</mi><mo>)</mo><mspace width="0.2em"/><mi>d</mi><mi>y</mi><mo>,</mo><mspace width="1em"/><msub><mi>P</mi><mi>d</mi></msub><mo>=</mo><msub><mo>∫</mo><mrow><msub><mi>R</mi><mn>1</mn></msub></mrow></msub><msub><mi>p</mi><mn>1</mn></msub><mo>(</mo><mi>y</mi><mo>)</mo><mspace width="0.2em"/><mi>d</mi><mi>y</mi><mo>=</mo><mn>1</mn><mo>−</mo><msub><mi>P</mi><mi>m</mi></msub></math><span class="eq-label">(26.2) 虚警与检测</span></div>
+<p>其中 <code>Pfa</code> 是“无信号却判有”的虚警概率，<code>Pm</code> 是“有信号却判无”的漏检概率，检测概率 <code>Pd=1−Pm</code>。一个具体的一维示例能说清三者的几何关系。</p>
+<figure><svg viewBox="0 0 1000 400" role="img" aria-labelledby="pdf-t pdf-d"><title id="pdf-t">H0 与 H1 下的观测分布与判决门限</title><desc id="pdf-d">H0 下观测均值在 0，H1 下均值移到 3 个标准差处。门限右侧 H0 的尾部面积是虚警概率 Pfa≈0.01，H1 的尾部面积是检测概率 Pd≈0.75。</desc><rect width="1000" height="400" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">两类错误与判决门限的几何关系</text><line x1="90" y1="320" x2="560" y2="320" stroke="#dce7e6"/><line x1="90" y1="320" x2="90" y2="80" stroke="#dce7e6"/><polyline points="355.0,304.2 360.0,307.9 365.0,310.8 370.0,313.1 375.0,314.9 380.0,316.3 385.0,317.3 390.0,318.1 395.0,318.7 400.0,319.1 405.0,319.4 410.0,319.6 415.0,319.7 420.0,319.8 425.0,319.9 430.0,319.9 435.0,319.9 440.0,320.0 445.0,320.0 450.0,320.0 455.0,320.0 460.0,320.0 465.0,320.0 470.0,320.0 475.0,320.0 480.0,320.0 485.0,320.0 490.0,320.0 495.0,320.0 500.0,320.0 505.0,320.0 510.0,320.0 515.0,320.0 520.0,320.0 525.0,320.0 530.0,320.0 535.0,320.0 540.0,320.0 540,320 354.7,320" fill="#ce704f" opacity="0.35" stroke="none"/><polyline points="355.0,127.8 360.0,114.3 365.0,102.6 370.0,93.0 375.0,85.9 380.0,81.5 385.0,80.0 390.0,81.5 395.0,85.9 400.0,93.0 405.0,102.6 410.0,114.3 415.0,127.8 420.0,142.6 425.0,158.3 430.0,174.4 435.0,190.5 440.0,206.3 445.0,221.3 450.0,235.4 455.0,248.4 460.0,260.2 465.0,270.6 470.0,279.7 475.0,287.5 480.0,294.2 485.0,299.7 490.0,304.2 495.0,307.9 500.0,310.8 505.0,313.1 510.0,314.9 515.0,316.3 520.0,317.3 525.0,318.1 530.0,318.7 535.0,319.1 540.0,319.4 540,320 354.7,320" fill="#2f7d7b" opacity="0.30" stroke="none"/><polyline points="90.0,319.6 95.0,319.4 100.0,319.1 105.0,318.7 110.0,318.1 115.0,317.3 120.0,316.3 125.0,314.9 130.0,313.1 135.0,310.8 140.0,307.9 145.0,304.2 150.0,299.7 155.0,294.2 160.0,287.5 165.0,279.7 170.0,270.6 175.0,260.2 180.0,248.4 185.0,235.4 190.0,221.3 195.0,206.3 200.0,190.5 205.0,174.4 210.0,158.3 215.0,142.6 220.0,127.8 225.0,114.3 230.0,102.6 235.0,93.0 240.0,85.9 245.0,81.5 250.0,80.0 255.0,81.5 260.0,85.9 265.0,93.0 270.0,102.6 275.0,114.3 280.0,127.8 285.0,142.6 290.0,158.3 295.0,174.4 300.0,190.5 305.0,206.3 310.0,221.3 315.0,235.4 320.0,248.4 325.0,260.2 330.0,270.6 335.0,279.7 340.0,287.5 345.0,294.2 350.0,299.7 355.0,304.2 360.0,307.9 365.0,310.8 370.0,313.1 375.0,314.9 380.0,316.3 385.0,317.3 390.0,318.1 395.0,318.7 400.0,319.1 405.0,319.4 410.0,319.6 415.0,319.7 420.0,319.8 425.0,319.9 430.0,319.9 435.0,319.9 440.0,320.0 445.0,320.0 450.0,320.0 455.0,320.0 460.0,320.0 465.0,320.0 470.0,320.0 475.0,320.0 480.0,320.0 485.0,320.0 490.0,320.0 495.0,320.0 500.0,320.0 505.0,320.0 510.0,320.0 515.0,320.0 520.0,320.0 525.0,320.0 530.0,320.0 535.0,320.0 540.0,320.0" fill="none" stroke="#7564ad" stroke-width="2.6"/><polyline points="90.0,320.0 100.0,320.0 110.0,320.0 120.0,320.0 130.0,320.0 140.0,320.0 150.0,320.0 160.0,320.0 170.0,320.0 180.0,320.0 190.0,320.0 200.0,319.9 210.0,319.9 220.0,319.7 230.0,319.4 240.0,318.7 250.0,317.3 260.0,314.9 270.0,310.8 280.0,304.2 290.0,294.2 300.0,279.7 310.0,260.2 320.0,235.4 330.0,206.3 340.0,174.4 350.0,142.6 360.0,114.3 370.0,93.0 380.0,81.5 385.0,80.0 390.0,81.5 400.0,93.0 410.0,114.3 420.0,142.6 430.0,174.4 440.0,206.3 450.0,235.4 460.0,260.2 470.0,279.7 480.0,294.2 490.0,304.2 500.0,310.8 510.0,314.9 520.0,317.3 530.0,318.7 540.0,319.4" fill="none" stroke="#2f7d7b" stroke-width="2.6"/><line x1="354.7" y1="72" x2="354.7" y2="320" stroke="#ce704f" stroke-width="2" stroke-dasharray="6 5"/><line x1="250" y1="80" x2="250" y2="320" stroke="#7564ad" stroke-width="1.2" stroke-dasharray="3 4"/><line x1="385" y1="80" x2="385" y2="320" stroke="#2f7d7b" stroke-width="1.2" stroke-dasharray="3 4"/><g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5"><text x="232" y="68" text-anchor="middle" fill="#7564ad">H₀：只有噪声</text><text x="452" y="68" text-anchor="middle" fill="#2f7d7b">H₁：信号+噪声</text><text x="354.7" y="300" text-anchor="middle" fill="#ce704f">门限 γ</text><text x="470" y="300" fill="#ce704f">Pfa≈0.01</text><text x="470" y="210" fill="#2f7d7b">Pd≈0.75</text></g><g font-family="Arial,sans-serif" font-size="12" fill="#5d7078"><text x="560" y="340" text-anchor="end">观测统计量 Y</text><text x="70" y="200" text-anchor="middle" transform="rotate(-90 70 200)">概率密度</text></g><text x="90" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">示例：等方差高斯、均值差 d′=3 个标准差；门限由 Pfa=0.01 定出，对应 Pd≈0.75（数值为按模型计算，非实测）。</text></svg><figcaption>图 26.1　门限向右移，虚警面积（珊瑚色）变小，但检测面积（青色）也一起变小；两类错误被同一个门限绑定。</figcaption></figure>
+<div class="warning"><p>图 26.1 的取舍是检测问题的中心矛盾：<strong>降低虚警必然降低检测概率</strong>。除非改变两个分布在统计上的可分性（例如提高信噪比、增加观测时长），否则无法同时改善两者。</p></div>
+</section>
+<section id="np"><h2>Neyman-Pearson：固定虚警，最大化检测</h2>
+<p>两个错误都不可消除，但它们的代价往往不对称：漏检一架飞机可能意味着灾难，而多一次虚警只是多一次确认。Neyman-Pearson（NP）准则因此把虚警拉成硬约束：<strong>给定可容忍的虚警上限 <code>α</code>，在所有满足 <code>Pfa≤α</code> 的检验中，选检测概率 <code>Pd</code> 最大的那个。</strong></p>
+<p>NP 引理给出的答案是似然比检验（LRT）。把两假设下的密度之比定义为似然比：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="似然比及判决规则"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="似然比等于 H1 下与 H0 下密度的比值，大于门限则判 H1"><mi>Λ</mi><mo>(</mo><mi>y</mi><mo>)</mo><mo>=</mo><mfrac><mrow><msub><mi>p</mi><mn>1</mn></msub><mo>(</mo><mi>y</mi><mo>)</mo></mrow><mrow><msub><mi>p</mi><mn>0</mn></msub><mo>(</mo><mi>y</mi><mo>)</mo></mrow></mfrac><munderover><mo>≷</mo><mrow><msub><mi>H</mi><mn>0</mn></msub></mrow><mrow><msub><mi>H</mi><mn>1</mn></msub></mrow></munderover><mi>η</mi></math><span class="eq-label">(26.3) 似然比检验</span></div>
+<p>门限 <code>η</code> 由虚警约束确定：<code>Pfa=P(Λ(y)&gt;η | H₀)=α</code>。为什么 LRT 一定最优？直观地说，在门限右侧每一点上，<code>H₁</code> 的可能性至少是 <code>H₀</code> 的 <code>η</code> 倍；把判决域往“H₁ 相对可能性更高”的方向扩，必然以更大的虚警为代价。当似然比关于某个统计量 <code>T(y)</code> 单调时（常见的指数族都满足），LRT 就简化为“<code>T(y)</code> 超过某个门限”。</p>
+<div class="note"><p><strong>与 MAP 检验的区别：</strong>若已知两假设的先验概率且代价可量化，最小错误率准则（或 Bayes 风险最小）会用先验与代价共同定门限；NP 准则不需要先验，只用虚警上限 <code>α</code> 定门限，更适用于先验不可靠的工程场景。</p></div>
+</section>
+<section id="matched"><h2>AWGN 中最优检测：匹配滤波器</h2>
+<p>设观测为 <code>r(t)=s(t)+n(t)，0≤t≤T</code>，其中 <code>s(t)</code> 是确知信号、能量 <code>E=∫s²(t)dt</code>，<code>n(t)</code> 是双边谱密度为 <code>N₀/2</code> 的白高斯噪声。当似然比化简后，最优统计量是相关积分，等价于让信号通过一个冲激响应为时间反转的滤波器：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="匹配滤波器的冲激响应与采样输出"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="冲激响应等于信号的时间反转，采样时刻输出等于相关积分"><mi>h</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mi>s</mi><mo>(</mo><mi>T</mi><mo>−</mo><mi>t</mi><mo>)</mo><mo>,</mo><mspace width="1.2em"/><mi>y</mi><mo>(</mo><mi>T</mi><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mn>0</mn><mi>T</mi></msubsup><mi>r</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>s</mi><mo>(</mo><mi>t</mi><mo>)</mo><mspace width="0.2em"/><mi>d</mi><mi>t</mi></math><span class="eq-label">(26.4) 匹配滤波器</span></div>
+<figure><svg viewBox="0 0 1000 360" role="img" aria-labelledby="mf-t mf-d"><title id="mf-t">确知信号与匹配滤波器在采样时刻的峰值输出</title><desc id="mf-d">左图为矩形脉冲信号 s(t)；右图为它通过匹配滤波器后的输出，在 t=T 达到峰值，峰值高度正比于信号能量，并与门限比较做出判决。</desc><rect width="1000" height="360" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">匹配滤波器把能量累积为一个峰</text><line x1="60" y1="250" x2="430" y2="250" stroke="#dce7e6"/><line x1="60" y1="250" x2="60" y2="110" stroke="#dce7e6"/><polyline points="60,250 150,250 150,150 300,150 300,250 430,250" fill="none" stroke="#2f7d7b" stroke-width="2.6"/><text x="225" y="140" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#2f7d7b">确知信号 s(t)，能量 E</text><text x="245" y="284" text-anchor="middle" font-family="Arial,sans-serif" font-size="12.5" fill="#5d7078">t</text><text x="46" y="130" text-anchor="end" font-family="Arial,sans-serif" font-size="12.5" fill="#5d7078">幅度</text><line x1="560" y1="250" x2="960" y2="250" stroke="#dce7e6"/><line x1="560" y1="250" x2="560" y2="110" stroke="#dce7e6"/><polyline points="560,250 760,110 960,250" fill="none" stroke="#2f7d7b" stroke-width="2.6"/><line x1="560" y1="170" x2="960" y2="170" stroke="#ce704f" stroke-width="1.8" stroke-dasharray="6 5"/><line x1="760" y1="110" x2="760" y2="250" stroke="#7564ad" stroke-width="1.6" stroke-dasharray="4 4"/><circle cx="760" cy="110" r="6" fill="#2f7d7b"/><text x="930" y="162" text-anchor="end" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#ce704f">门限 γ</text><text x="770" y="104" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#2f7d7b">峰值 ∝ E，在 t=T 采样</text><text x="760" y="284" text-anchor="middle" font-family="Arial,sans-serif" font-size="12.5" fill="#5d7078">t = T</text><text x="90" y="336" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">匹配滤波使采样时刻输出信噪比达到上限 SNR=2E/N₀，与信号具体形状无关（只取决于能量）；输出为三角形是矩形脉冲的卷积结果。</text></svg><figcaption>图 26.2　能量相同而形状不同的信号，在匹配滤波器输出的峰值相同——决定可检测性的是能量，不是形状。</figcaption></figure>
+<p>在 <code>t=T</code> 采样后，门限判决只面对两个一维高斯分布：<code>H₀</code> 下 <code>y∼N(0,σ²)</code>，<code>H₁</code> 下 <code>y∼N(E,σ²)</code>，其中 <code>σ²=N₀E/2</code>。定义归一化距离 <code>d′=E/σ=√(2E/N₀)</code>，则性能有闭式表达：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="虚警与检测概率的闭式表达"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="虚警概率等于 Q 函数在门限除以标准差处的值，检测概率等于门限除以标准差减 d一阶"><msub><mi>P</mi><mi>fa</mi></msub><mo>=</mo><mi>Q</mi><mo>(</mo><mi>γ</mi><mo>/</mo><mi>σ</mi><mo>)</mo><mo>,</mo><mspace width="1.2em"/><msub><mi>P</mi><mi>d</mi></msub><mo>=</mo><mi>Q</mi><mrow><mo>(</mo><msup><mi>Q</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup><mo>(</mo><msub><mi>P</mi><mi>fa</mi></msub><mo>)</mo><mo>−</mo><msqrt><mrow><mn>2</mn><mi>E</mi><mo>/</mo><msub><mi>N</mi><mn>0</mn></msub></mrow></msqrt><mo>)</mo></mrow></math><span class="eq-label">(26.5) 检测性能</span></div>
+<p>其中 <code>Q(x)=(1/√(2π))∫_x^∞ e^(−u²/2)du</code> 是高斯右尾函数。式 (26.5) 说明：可检测性完全由单个量 <code>√(2E/N₀)</code> 决定。取 <code>E/N₀=4.5</code> 则 <code>√(2×4.5)=3</code>；若要求 <code>Pfa=0.01</code>，则 <code>γ/σ=Q⁻¹(0.01)≈2.326</code>，于是 <code>Pd=Q(2.326−3)≈0.750</code>。这三个数字将在可复现验证中直接算出。</p>
+</section>
+<section id="roc"><h2>ROC 曲线与 AUC</h2>
+<p>固定信噪比、连续改变门限 <code>γ</code>，会得到一整条 <code>(Pfa, Pd)</code> 轨迹，这就是接收机工作特性（ROC）曲线。它把检测器的全部工作点一次画完：门限向左移，工作点沿曲线向右上移动（高虚警、高检测）；向右移则向左下移动。</p>
+<figure><svg viewBox="0 0 1000 400" role="img" aria-labelledby="roc-t roc-d"><title id="roc-t">不同信噪比下的 ROC 曲线与操作点</title><desc id="roc-d">横轴为虚警概率、纵轴为检测概率。虚线对角线代表随机猜测；三条实线对应 d' 分别为 1.5、2.5、3.0。d'=3.0 时取 Pfa=0.01 的操作点，对应 Pd≈0.75。</desc><rect width="1000" height="400" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">ROC：同一检测器的全部工作点</text><line x1="90" y1="330" x2="500" y2="330" stroke="#dce7e6"/><line x1="90" y1="330" x2="90" y2="70" stroke="#dce7e6"/><line x1="90" y1="330" x2="500" y2="70" stroke="#5d7078" stroke-width="1.6" stroke-dasharray="6 5"/><polyline points="90.0,315.5 110.5,312.2 131.0,308.2 151.5,303.4 172.0,297.7 192.5,290.9 213.0,282.9 233.5,273.6 254.0,262.8 274.5,250.4 295.0,236.3 315.5,220.5 336.0,203.0 356.5,184.1 377.0,164.0 397.5,143.4 418.0,122.9 438.5,103.7 459.0,87.3 479.5,75.3 500.0,70.0" fill="none" stroke="#7564ad" stroke-width="2.4"/><polyline points="90.0,257.8 110.5,248.5 131.0,238.4 151.5,227.5 172.0,215.9 192.5,203.6 213.0,190.8 233.5,177.6 254.0,164.2 274.5,150.8 295.0,137.7 315.5,125.0 336.0,113.1 356.5,102.3 377.0,92.8 397.5,84.9 418.0,78.8 438.5,74.3 459.0,71.6 479.5,70.3 500.0,70.0" fill="none" stroke="#2f7d7b" stroke-width="2.4"/><polyline points="90.0,209.3 110.5,198.6 131.0,187.5 151.5,176.2 172.0,164.8 192.5,153.4 213.0,142.3 233.5,131.5 254.0,121.3 274.5,111.7 295.0,102.9 315.5,95.1 336.0,88.4 356.5,82.8 377.0,78.3 397.5,74.9 418.0,72.6 438.5,71.1 459.0,70.3 479.5,70.1 500.0,70.0" fill="none" stroke="#164f59" stroke-width="2.6"/><circle cx="226.7" cy="135.1" r="6" fill="#ce704f"/><line x1="226.7" y1="135.1" x2="226.7" y2="330" stroke="#ce704f" stroke-width="1.2" stroke-dasharray="4 4"/><g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5"><text x="300" y="296" fill="#7564ad">d′=1.5</text><text x="370" y="205" fill="#2f7d7b">d′=2.5</text><text x="420" y="150" fill="#164f59">d′=3.0</text><text x="236" y="126" fill="#ce704f">操作点 Pfa=0.01, Pd≈0.75</text><text x="300" y="300" fill="#5d7078"> 随机猜测</text></g><g font-family="Arial,sans-serif" font-size="12" fill="#5d7078"><text x="500" y="352" text-anchor="end">虚警概率 Pfa（对数刻度）</text><text x="66" y="200" text-anchor="middle" transform="rotate(-90 66 200)">检测概率 Pd</text></g><text x="90" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">曲线按等方差高斯、非相干的单次观测计算；d′=√(2E/N₀)。远离左上角的曲线意味着要达到同样 Pd 必须忍受更大 Pfa。</text></svg><figcaption>图 26.3　ROC 曲线越靠左上，检测器越好；对角线（Pd=Pfa）等于掷硬币。提高 d′（加大能量或延长积分）把整条曲线向左上推。</figcaption></figure>
+<p>用一个数字概括整条曲线，就是曲线下面积 <strong>AUC</strong>。在等方差高斯模型下它与 <code>d′</code> 有闭式关系 <code>AUC=Φ(d′/√2)=Q(−d′/√2)</code>：<code>d′=3.0</code> 对应 <code>AUC≈0.983</code>。AUC=0.5 是随机猜测，AUC=1 是完美检测；它不依赖具体门限，适合比较不同检测器的<strong>可分性上限</strong>。</p>
+<div class="note"><p>AUC 只说明“排序能力”，不说明某个门限下的实际性能。两个 AUC 相同的检测器，在 <code>Pfa=0.01</code> 处可能一个更好、另一个更差。工程上应同时看目标工作点附近的 ROC 局部形状。</p></div>
+</section>
+<section id="boundary"><h2>何时这些结论会失效</h2>
+<h3>反例一：固定门限遇上变噪声功率</h3>
+<p>式 (26.5) 把 <code>Pfa=Q(γ/σ)</code> 写成 <code>γ</code> 和噪声标准差 <code>σ</code> 的二元函数。如果按某个标称<code>σ</code>定好门限，而实际噪声变大，虚警会失控。具体地，仍取 <code>γ/σ=2.326</code>（对应 <code>Pfa=0.01</code>）；若噪声功率翻四倍、<code>σ</code> 变成 2 倍，则新的虚警为 <code>Q(2.326/2)=Q(1.163)≈0.122</code>——从 1% 蹦到 12%。</p>
+<p>解决办法不是重新发明检测器，而是让门限随噪声自适应：用邻近参考单元估计当前噪声功率，再按目标 <code>Pfa</code> 设定门限（恒虚警率，CFAR）。这正是“固定门限在非平稳噪声下失效”的标准对策。</p>
+<h3>边界二：相位未知时匹配滤波器不再可用</h3>
+<p>式 (26.4) 要求 <code>s(t)</code> 完全已知，包括载波相位。若相位 <code>φ</code> 在 <code>[0,2π)</code> 上未知，对 <code>φ</code> 取平均后，最优统计量变成包络（非相干检测）：<code>H₀</code> 下包络服从瑞利分布，<code>H₁</code> 下服从莱斯分布。与相干检测相比，非相干检测在高信噪比下大约损失 1 dB 量级，越接近检测门限损失越大。具体损失随误判要求而变，此处只作量级说明（教学简化）。</p>
+<h3>边界三：高斯与白噪声假设</h3>
+<p>式 (26.5) 的高斯尾部形式依赖于噪声服从高斯分布且各样本独立。若噪声重尾（脉冲噪声）、或相邻采样相关（有色噪声），同一门限下的真实 <code>Pfa</code> 会与公式严重偏离，尤其是小概率尾部。此时应改用噪声的实际分布，或先做预白化再检测。</p>
+<div class="warning"><p>小结：本章的闭式公式建立在“确知信号 + 平稳高斯白噪声”之上。一旦信号参数未知、噪声非平稳或非高斯，检测器结构或门限就必须相应修改，而 <strong>NP 引理本身仍然成立</strong>——变的只是似然比的具体形式。</p></div>
+</section>
+<section id="practice"><h2>用 15 行代码把三个数算出来</h2>
+<p>下面的程序只用标准库 <code>math</code>，不用仿真采样，直接对式 (26.5) 做数值计算；<code>Qinv</code> 用二分法求反函数。结果确定可复现。</p>
+<pre class="code-block"><code>import math
+def Q(x):
+    return 0.5 * math.erfc(x / math.sqrt(2))
+def Qinv(p):
+    lo, hi = -10.0, 10.0
+    for _ in range(200):          # 二分法求 Q 的反函数
+        mid = (lo + hi) / 2
+        if Q(mid) &gt; p: lo = mid
+        else: hi = mid
+    return (lo + hi) / 2
+
+E_over_N0 = 4.5
+d_prime = math.sqrt(2 * E_over_N0)     # d' = sqrt(2E/N0) = 3.0
+threshold = Qinv(0.01)                # 门限/σ，由 Pfa=0.01 定出
+Pfa = Q(threshold)                    # 0.0100
+Pd  = Q(threshold - d_prime)          # ≈ 0.7497
+AUC = Q(-d_prime / math.sqrt(2))      # ≈ 0.9831
+print(d_prime, Pfa, Pd, AUC)
+assert abs(Pfa - 0.01) &lt; 1e-3 and abs(Pd - 0.7497) &lt; 1e-3
+</code></pre>
+<div class="example"><p><strong>独立练习：</strong>保持 <code>Pfa=0.01</code>，把 <code>E/N₀</code> 从 4.5 提到 18（则 <code>d′=6</code>），预测 <code>Pd</code> 会怎样变化，再用代码核对。进一步：若噪声功率翻四倍而门限不变，用 <code>Q(threshold/2)</code> 算出的 <code>Pfa</code> 是否与上节估算一致？</p></div>
+</section>
+<section id="synthesis"><h2>把检测接回估计与滤波的主线</h2>
+<p>第 20–22 章解决“信号有多大”，第 25 章解决“统计未知时如何自适应”，本章解决“信号是否存在”。三者的共同语言是<strong>条件分布</strong>：估计与检测都从 <code>p(y|θ)</code> 或 <code>p(y|Hᵢ)</code> 出发，区别只在输出是连续参数还是离散决策。匹配滤波器同时出现在检测与估计中——它最大化输出信噪比，因此既是最优检测器，也是时延估计的前端。</p>
+<details><summary>自检：为什么不直接选一个使 <code>Pfa+Pm</code> 最小的门限？</summary><p>那需要两个错误的先验概率与代价可比。NP 准则回避了这个难题：它只要求 <code>Pfa</code> 不超过给定上限，不需要先验，也不需要对“漏检 vs 虚警”的代价定量。</p></details>
+<details><summary>自检：<code>d′=3</code> 与 <code>Pfa=0.01</code> 为何能直接给出 <code>Pd</code>？</summary><p>因为两个假设下的输出都是等方差高斯分布，且均值差固定为 <code>d′σ</code>。于是检测性能只依赖 <code>d′</code> 与门限，与信号的波形无关。</p></details>
+<details><summary>自检：AUC 相同是否意味着两个检测器一样好？</summary><p>不一定。AUC 是全局平均指标；工程关心的往往是某个低虚警工作点。应结合目标 <code>Pfa</code> 处的 ROC 局部斜率来比较。</p></details>
+</section>
+<section id="references" class="references"><h2>延伸阅读与核查依据</h2><ol><li>J. Neyman, E. S. Pearson, “On the problem of the most efficient tests of statistical hypotheses,” <em>Philosophical Transactions of the Royal Society A</em>, vol. 231, pp. 289–337, 1933.——NP 引理与似然比检验的原始文献。</li><li>D. O. North, “An analysis of the factors which determine signal/noise discrimination in pulsed-carrier systems,” RCA Technical Report PTR-6C, 1943.——匹配滤波器与输出信噪比最大化的早期工作。</li><li>S. M. Kay, <em>Fundamentals of Statistical Signal Processing, Vol. II: Detection Theory</em>, Prentice Hall, 1998.——LRT、ROC、非相干（包络/莱斯）检测的标准推导。</li><li>H. L. Van Trees, <em>Detection, Estimation, and Modulation Theory, Part I</em>, Wiley, 1968.——匹配滤波器与非相干检测性能损失的经典讨论。</li></ol><p>本章公式与数值均可在上述文献中找到对应；图 26.1–26.3 的数值为按模型的实际计算，已在正文与代码中给出算式，不代表任何实测误码或实测雷达数据。</p></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="25.html">← 第 25 章</a><a href="../index.html#content">全部章节</a><a href="27.html">第 27 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源代码</a></p></div></footer>
+<script defer src="../assets/js/site.js"></script>
 </body>
 </html>
