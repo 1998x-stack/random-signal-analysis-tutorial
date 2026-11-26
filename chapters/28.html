@@ -1,319 +1,96 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第28章 综合项目实战</title>
-    <link rel="stylesheet" href="theme.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fffdf8">
+<meta name="description" content="把全书工具串成一条端到端链路：BPSK 调制经多径与噪声信道，用匹配滤波器检测、用谱估计与自适应均衡处理失真、用卡尔曼滤波跟踪状态，并用可复现的误码实验核对理论。">
+<title>第 28 章 · 综合项目实战 | 随机信号分析</title>
+<link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html" class="active">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>开篇：从书架到工具箱</h2>
-
-        <p>大家好，我是你们的讲师。恭喜你走到这里——我们共同走过了27章、横跨概率论到前沿信号处理的漫漫长路。这一路你学到的每一个概念、每一个公式、每一段代码，就像工具箱里的一件件工具。但工具摆在架子上是没有用的——只有真正上手完成一个项目，它们才会变成你的肌肉记忆。</p>
-
-        <p>第28章，我们不学新理论。我们要做一件更有价值的事：<strong>把全书的工具串联起来，搭建一个完整的端到端随机信号分析与检测系统</strong>。从生成一段含有噪声的通信信号开始，经过功率谱分析、自适应噪声抵消、匹配滤波检测、卡尔曼滤波跟踪，到最后评估系统性能——这一整套流程，正是工业级信号处理系统的标准工作流。</p>
-
-        <p>准备好了吗？让我们动手。</p>
-
-        <h2>项目目标</h2>
-
-        <p>本项目要完成的任务是：<strong>设计并实现一个数字通信信号的端到端接收处理系统</strong>。具体来说，系统接收一段被噪声污染的BPSK调制信号，依次完成功率谱分析、噪声抑制、信号检测和参数跟踪，最终输出解调后的比特流并评估系统性能。</p>
-
-        <h2>系统架构</h2>
-
-        <p>整个系统分为5个模块，顺序串联：</p>
-
-        <table>
-            <tr><th>模块</th><th>功能</th><th>核心技术</th><th>对应章节</th></tr>
-            <tr><td>① 信号生成</td><td>生成BPSK调制信号 + AWGN噪声</td><td>随机数生成、调制理论</td><td>第1-3章</td></tr>
-            <tr><td>② 频谱分析</td><td>对比 Welch / AR / MUSIC 三种谱估计</td><td>功率谱密度、维纳-辛钦定理</td><td>第9、14、23-24章</td></tr>
-            <tr><td>③ 自适应滤波</td><td>LMS算法实现噪声抵消，提升SNR</td><td>自适应滤波、LMS收敛分析</td><td>第25章</td></tr>
-            <tr><td>④ 信号检测</td><td>匹配滤波器实现比特流检测</td><td>假设检验、NP准则、ROC曲线</td><td>第26章</td></tr>
-            <tr><td>⑤ 卡尔曼跟踪</td><td>跟踪时变信道增益或载波频偏</td><td>卡尔曼滤波、状态空间模型</td><td>第22章</td></tr>
-        </table>
-
-        <h2>分步实现</h2>
-
-        <h3>Step 1：生成BPSK调制信号 + AWGN噪声</h3>
-
-        <p>我们首先生成一段 BPSK（二进制相移键控）调制信号。BPSK 用两个相位（0 和 π）分别代表比特 1 和比特 0。信号经过 AWGN 信道后，接收端收到的信号是：r(t) = s(t) + w(t)。</p>
-
-        <pre><code>import numpy as np
-import matplotlib.pyplot as plt
-from scipy import signal as sp_signal
-
-# --- 参数配置 ---
-fs = 10000       # 采样率 (Hz)
-fc = 1000        # 载波频率 (Hz)
-Rb = 200         # 比特率 (bps)
-Ns = int(fs / Rb) # 每比特采样数
-N_bits = 200     # 发送比特数
-SNR_dB = 6       # 信噪比 (dB)
-
-# --- Step 1: 生成 BPSK 基带信号 ---
-bits = np.random.randint(0, 2, N_bits)
-symbols = 2 * bits - 1               # 0→-1, 1→+1
-baseband = np.repeat(symbols, Ns)     # 基带信号（矩形脉冲）
-
-t = np.arange(len(baseband)) / fs
-carrier = np.cos(2 * np.pi * fc * t)
-tx_signal = baseband * carrier        # BPSK 调制
-
-# 添加 AWGN 噪声
-E_b = np.sum(tx_signal**2) / N_bits
-N0 = E_b / (10**(SNR_dB/10))
-noise = np.sqrt(N0/2) * np.random.randn(len(tx_signal))
-rx_signal = tx_signal + noise</code></pre>
-
-        <h3>Step 2：功率谱估计对比</h3>
-
-        <p>使用三种方法对接收信号进行功率谱估计，对比其分辨率和噪声特性：</p>
-
-        <pre><code># --- Step 2: 功率谱估计 ---
-f_psd, Pxx_welch = sp_signal.welch(rx_signal, fs, nperseg=512)
-
-# AR 模型（Burg方法）
-f_ar, Pxx_ar = sp_signal.lombscargle(
-    # 注: 实际使用 spectrum 库的 pyburg 或 scipy.signal 的 lpc
-    # 此处为示意，推荐使用 spectrum.pyburg
-)
-
-# MUSIC 方法（推荐使用 spectrum.music）
-# 在低信噪比下 MUSIC 具有更高的频率分辨率
-
-# 可视化
-plt.figure(figsize=(10, 6))
-plt.semilogy(f_psd, Pxx_welch, label='Welch (周期图)')
-plt.semilogy(f_ar, Pxx_ar, label='AR Model (Burg)')
-plt.xlabel('频率 (Hz)')
-plt.ylabel('功率谱密度')
-plt.legend()
-plt.title('功率谱估计方法对比')
-plt.show()</code></pre>
-
-        <div class="highlight">
-            <strong>实验重点：</strong>对比三种方法在 SNR = 0 dB、6 dB、12 dB 下的表现。你会观察到：Welch方法在低SNR下最稳健但分辨率有限；AR模型分辨率高但模型阶数敏感；MUSIC方法对信噪比最敏感，但在高SNR下分辨率最优。这印证了我们在第23-24章讨论的"分辨率-稳健性"权衡。
-        </div>
-
-        <h3>Step 3：自适应噪声抵消</h3>
-
-        <p>使用LMS自适应滤波器从接收信号中消除噪声。我们假设有一个参考噪声输入（相关噪声），LMS滤波器自适应地估计噪声路径并抵消它：</p>
-
-        <pre><code># --- Step 3: LMS 自适应噪声抵消 ---
-M = 32           # 滤波器阶数
-mu = 0.01        # 步长
-w = np.zeros(M)  # 滤波器权重初始化
-
-# 假设参考噪声（与接收信号中的噪声相关）
-ref_noise = 0.5 * noise + 0.1 * np.random.randn(len(noise))
-
-y = np.zeros(len(rx_signal))
-e = np.zeros(len(rx_signal))
-
-for n in range(M, len(rx_signal)):
-    x_n = ref_noise[n-M:n][::-1]
-    y[n] = np.dot(w, x_n)           # 估计噪声
-    e[n] = rx_signal[n] - y[n]      # 误差 = 去噪后的信号
-    w += 2 * mu * e[n] * x_n        # LMS 权重更新
-
-# 计算 SNR 改善量
-SNR_before = 10 * np.log10(np.var(tx_signal) / np.var(noise))
-SNR_after  = 10 * np.log10(np.var(tx_signal) / np.var(e - tx_signal))
-print(f"SNR 改善: {SNR_before:.1f} dB → {SNR_after:.1f} dB")</code></pre>
-
-        <h3>Step 4：匹配滤波器检测</h3>
-
-        <p>使用匹配滤波器检测去噪后信号中的 BPSK 符号，并与发送比特对比计算误码率：</p>
-
-        <pre><code># --- Step 4: 匹配滤波器检测 ---
-# 基带脉冲形状（能量归一化）
-pulse = np.ones(Ns) / np.sqrt(Ns)
-matched_filter = pulse[::-1]
-
-# 匹配滤波
-detected = np.convolve(e * carrier, matched_filter, mode='same')
-
-# 在最佳采样点判决（每比特中间）
-sample_idx = np.arange(Ns//2, len(detected), Ns)
-decisions = np.sign(detected[sample_idx])
-detected_bits = (decisions + 1) // 2  # 映射回 0/1
-
-# 计算 BER
-ber = np.sum(detected_bits != bits) / N_bits
-print(f"误码率 (BER) = {ber:.4f}")</code></pre>
-
-        <h3>Step 5：卡尔曼滤波跟踪时变参数</h3>
-
-        <p>假设信道增益是时变的（例如移动通信中的衰落信道），我们使用卡尔曼滤波实时跟踪信道增益的变化：</p>
-
-        <pre><code># --- Step 5: 卡尔曼滤波跟踪时变信道增益 ---
-# 状态空间模型: 信道增益 h(t) 由一阶AR过程驱动
-# 状态方程: h[n] = a * h[n-1] + v[n],  v ~ N(0, Q)
-# 观测方程: y[n] = s_baseband[n] * h[n] + w[n], w ~ N(0, R)
-
-a = 0.99          # AR 系数（慢变化信道）
-Q = 0.01          # 过程噪声方差
-R = N0 / 2        # 观测噪声方差
-
-h_est = np.zeros(N_bits)  # 估计的信道增益
-h_err = np.zeros(N_bits)  # 估计误差方差
-
-# 初始化
-h_hat = 1.0
-P = 1.0
-
-for n in range(N_bits):
-    # 预测
-    h_pred = a * h_hat
-    P_pred = a**2 * P + Q
-
-    # 更新
-    K = P_pred * symbols[n] / (symbols[n]**2 * P_pred + R)
-    # 简化：假设已知发送符号（导频辅助）
-    y_obs = rx_signal[n*Ns + Ns//2] * np.cos(2*np.pi*fc*t[n*Ns + Ns//2])
-    h_hat = h_pred + K * (y_obs - symbols[n] * h_pred)
-    P = (1 - K * symbols[n]) * P_pred
-
-    h_est[n] = h_hat
-    h_err[n] = P
-
-# 绘制卡尔曼滤波的收敛过程
-plt.figure()
-plt.plot(h_est, label='估计信道增益')
-plt.fill_between(range(N_bits), h_est - 2*np.sqrt(h_err),
-                  h_est + 2*np.sqrt(h_err), alpha=0.3, label='±2σ 置信区间')
-plt.xlabel('符号序号')
-plt.ylabel('信道增益')
-plt.legend()
-plt.title('卡尔曼滤波跟踪信道增益')
-plt.show()</code></pre>
-
-        <h3>Step 6：性能评估</h3>
-
-        <p>最后，我们改变 SNR 运行多次仿真，绘制 BER vs Eb/N0 曲线，观察理论与仿真的吻合程度：</p>
-
-        <pre><code># --- Step 6: BER vs Eb/N0 曲线 ---
-SNR_range = np.arange(0, 14, 2)
-ber_sim = []
-
-for snr in SNR_range:
-    EbN0 = 10**(snr/10)
-    N0_sim = 1 / EbN0
-    noise_sim = np.sqrt(N0_sim/2) * np.random.randn(len(tx_signal))
-    rx_sim = tx_signal + noise_sim
-
-    # 简化的匹配滤波+BPSK判决（省略重复细节）
-    detected_sim = np.convolve(rx_sim * carrier, pulse[::-1], mode='same')
-    decisions_sim = np.sign(detected_sim[Ns//2::Ns])
-    ber_sim.append(np.sum(decisions_sim != symbols) / N_bits)
-
-# 理论 BPSK BER: 0.5 * erfc(sqrt(Eb/N0))
-ber_theory = 0.5 * np.special.erfc(np.sqrt(10**(SNR_range/10)))
-
-plt.figure()
-plt.semilogy(SNR_range, ber_sim, 'o-', label='仿真')
-plt.semilogy(SNR_range, ber_theory, 's--', label='理论')
-plt.xlabel('Eb/N0 (dB)')
-plt.ylabel('误码率 (BER)')
-plt.legend()
-plt.grid(True, alpha=0.3)
-plt.title('BPSK 误码率性能')
-plt.show()</code></pre>
-
-        <h2>验收标准与性能分析</h2>
-
-        <p>当你的系统完成上述所有模块后，可以按照以下标准来验收：</p>
-
-        <table>
-            <tr><th>阶段</th><th>验收指标</th><th>合格标准</th><th>优秀标准</th></tr>
-            <tr><td>信号生成</td><td>星座图清晰度</td><td>可区分两个簇</td><td>簇间距离 &gt; 2σ</td></tr>
-            <tr><td>频谱分析</td><td>载波频率估计误差</td><td>&lt; 5%</td><td>&lt; 1%</td></tr>
-            <tr><td>自适应滤波</td><td>SNR改善量</td><td>&gt; 3 dB</td><td>&gt; 6 dB</td></tr>
-            <tr><td>信号检测</td><td>BER @ 6 dB</td><td>&lt; 10⁻²</td><td>&lt; 10⁻³</td></tr>
-            <tr><td>卡尔曼跟踪</td><td>稳态估计误差</td><td>&lt; 初始误差50%</td><td>&lt; 初始误差20%</td></tr>
-            <tr><td>系统整体</td><td>BER vs 理论曲线差距</td><td>&lt; 3 dB</td><td>&lt; 1 dB</td></tr>
-        </table>
-
-        <div class="tip">
-            <strong>调试建议：</strong>如果仿真结果与理论曲线差异较大，按照以下优先级排查——(1) 检查能量归一化（E_b 计算是否正确？）；(2) 检查匹配滤波器的采样点是否对齐（符号定时误差是天敌）；(3) 检查 LMS 步长是否合适（太大不收敛、太小收敛慢）；(4) 检查卡尔曼滤波的 Q/R 比值是否反映真实噪声环境。
-        </div>
-
-        <h2>从项目到工程：一些额外的思考</h2>
-
-        <p>完成这个项目后，我想分享几点工程经验：</p>
-
-        <ul>
-            <li><strong>模块化第一</strong>：每个模块独立测试通过后再串联。如果整个系统出了问题，用"二分法"定位——逐一半屏蔽各模块，找到问题源头。</li>
-            <li><strong>可视化是调试利器</strong>：不要只盯着最终BER看——中间过程的星座图、误差曲线、功率谱、滤波器权重轨迹，每一个都是诊断系统健康的"生命体征"。</li>
-            <li><strong>理论是地图，仿真才是实地</strong>：理论公式给出了在理想假设下的性能界，但真实系统的性能往往受限于非理想因素（定时同步误差、载波频偏、滤波器非理想响应）。能把理论性能仿真到和公式一致，说明你理解了模型；能在实际硬件上接近理论性能，说明你理解了工程。</li>
-        </ul>
-
-        <h2>全书总结：从随机变量到随机信号处理工程师</h2>
-
-        <p>让我们最后一次回望这28章的旅程，看看我们走过了怎样的知识阶梯：</p>
-
-        <table>
-            <tr><th>阶段</th><th>章节</th><th>核心收获</th></tr>
-            <tr><td>概率论基础</td><td>第1-5章</td><td>随机变量、分布、数字特征——描述不确定性的语言</td></tr>
-            <tr><td>随机过程理论</td><td>第6-10章</td><td>相关函数、平稳性、功率谱密度——随机信号的时频描述</td></tr>
-            <tr><td>系统与变换</td><td>第11-17章</td><td>各态历经性、线性系统响应、窄带分析——信号通过系统</td></tr>
-            <tr><td>高级过程与估计</td><td>第18-20章</td><td>马尔可夫链、泊松过程、参数估计——从模型到推断</td></tr>
-            <tr><td>最优滤波</td><td>第21-22章</td><td>维纳滤波、卡尔曼滤波——从噪声中提取信号</td></tr>
-            <tr><td>谱估计与自适应</td><td>第23-25章</td><td>经典/现代谱估计、自适应滤波——数据驱动的信号分析</td></tr>
-            <tr><td>检测与前沿</td><td>第26-27章</td><td>假设检验、压缩感知、深度学习——决策与新视野</td></tr>
-            <tr><td>综合实践</td><td>第28章</td><td>端到端系统——把知识变成工程能力</td></tr>
-        </table>
-
-        <p>还记得我们在第1章开篇说过的话吗？"现实世界中的信号，无一例外地带有随机性。"从那时走到现在，你已经掌握了从概率论到前沿信号处理的完整工具箱。你学会了：不把随机性当作麻烦，而是把它当作一种可以用数学精确认知和处理的结构。</p>
-
-        <p>正如维纳所说："信息不是物质也不是能量，信息就是信息。"而随机信号分析，就是理解信息如何被噪声包裹、如何在不确定性中被提取、如何在随机性中传递的学问。这门课结束了，但你的探索才刚刚开始——下次当你看到雷达屏幕、听到收音机里的音乐、收到手机上的消息时，希望你想起这28章中讲过的每一个概念，因为那就是它们在工作。</p>
-
-        <p>感谢大家28章的陪伴。保持好奇，持续学习，我们下一门课再见。</p>
-
-        <div class="footer-nav">
-            <a href="27.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="javascript:void(0)">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
+<a class="skip-link" href="#article-main">跳到正文</a>
+<header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">项目要解决什么</a><a href="#model">端到端系统模型</a><a href="#link">检测与误码</a><a href="#spectrum">谱估计与均衡</a><a href="#tracking">状态跟踪</a><a href="#boundary">项目的边界与陷阱</a><a href="#practice">可复现实验</a><a href="#synthesis">全书回顾</a><a href="#references">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 统计推断与应用 / 第 28 章</div>
+<header class="article-header">
+<p class="chapter-kicker">CHAPTER 28 · 统计推断与应用</p>
+<h1>综合项目实战</h1>
+<p class="dek">前面 27 章各自解决一个子问题。本章把它们接成一条 BPSK 通信链路：估计、检测、自适应与跟踪在同一份数据上协同工作，并用可复现的数值实验核对结论。</p>
+<div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>画出一条端到端链路的信号流，并指出每个环节用到哪一章的工具</li><li>把 BPSK 误码率的理论值与种子固定的蒙特卡洛实验对照</li><li>说明多径为什么会破坏检测，自适应均衡如何补偿</li><li>区分链路中哪些量可以解析预测，哪些必须在线估计</li></ul></div>
+</header>
+<section id="opening"><h2>项目要解决什么</h2>
+<p>单独看，每一项工具都很清楚：匹配滤波器在 AWGN 下最优，周期图能显出谱形，LMS 能在线调系数，卡尔曼滤波能递推状态。但它们很少单独出场。一个真实的接收机要同时做四件事：<strong>估计</strong>信道与噪声强度，<strong>检测</strong>每个符号，<strong>自适应</strong>补偿失真，<strong>跟踪</strong>缓慢漂移的参数。</p>
+<p>本章不引入新定理，而是把全书工具接到一条 BPSK 链路上，并回答两个问题：每个环节用了哪一章的结论？哪些结论可以用数值实验核对？</p>
+</section>
+<section id="model"><h2>端到端系统模型</h2>
+<p>设发送比特经 BPSK 映射为 <code>bₖ∈{+1,−1}</code>，成形后送入信道。信道同时含多径与加性噪声：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="接收信号模型"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="接收信号等于发送信号卷积信道冲激响应再加噪声"><mi>r</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mo>(</mo><munder><mo>∑</mo><mi>k</mi></munder><msub><mi>b</mi><mi>k</mi></msub><mi>g</mi><mo>(</mo><mi>t</mi><mo>−</mo><mi>k</mi><mi>T</mi><mo>)</mo><mo>)</mo><mo>∗</mo><mi>h</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>+</mo><mi>n</mi><mo>(</mo><mi>t</mi><mo>)</mo></math><span class="eq-label">(28.1) 接收信号</span></div>
+<p>其中 <code>h(t)</code> 是多径冲激响应，<code>n(t)</code> 是加性噪声。接收端的处理链如下：</p>
+<figure><svg viewBox="0 0 1000 430" role="img" aria-labelledby="sys-t sys-d"><title id="sys-t">BPSK 链路的端到端信号流与辅助处理模块</title><desc id="sys-d">主链路为信源、BPSK 调制、含多径与噪声的信道、匹配滤波器、判决与误码统计；下方谱估计、自适应均衡与卡尔曼跟踪分别处理信道谱形、码间干扰和参数漂移。</desc><rect width="1000" height="430" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">一条 BPSK 链路上的全书工具</text><defs><marker id="sy-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#2f7d7b"/></marker><marker id="sy-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#7564ad"/></marker></defs><g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" text-anchor="middle"><rect x="36" y="72" width="130" height="60" rx="10" fill="#eef5f4" stroke="#2f7d7b"/><text x="101" y="108" fill="#164f59">信源 比特</text><rect x="196" y="72" width="130" height="60" rx="10" fill="#eef5f4" stroke="#2f7d7b"/><text x="261" y="108" fill="#164f59">BPSK 调制</text><rect x="356" y="72" width="130" height="60" rx="10" fill="#fbeae3" stroke="#ce704f"/><text x="421" y="100" fill="#a4482a">信道</text><text x="421" y="120" fill="#a4482a">h(t)+n(t)</text><rect x="516" y="72" width="130" height="60" rx="10" fill="#eef5f4" stroke="#2f7d7b"/><text x="581" y="108" fill="#164f59">匹配滤波器</text><rect x="676" y="72" width="130" height="60" rx="10" fill="#eef5f4" stroke="#2f7d7b"/><text x="741" y="108" fill="#164f59">判決 sign</text><rect x="836" y="72" width="130" height="60" rx="10" fill="#eef5f4" stroke="#2f7d7b"/><text x="901" y="108" fill="#164f59">BER 统计</text></g><g stroke="#2f7d7b" stroke-width="2.4" marker-end="url(#sy-a)"><line x1="166" y1="102" x2="190" y2="102"/><line x1="326" y1="102" x2="350" y2="102"/><line x1="486" y1="102" x2="510" y2="102"/><line x1="646" y1="102" x2="670" y2="102"/><line x1="806" y1="102" x2="830" y2="102"/></g><g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13" text-anchor="middle"><rect x="196" y="250" width="150" height="58" rx="10" fill="#f4f1fa" stroke="#7564ad"/><text x="271" y="285" fill="#4b3d78">谱估计 23/24</text><rect x="426" y="250" width="150" height="58" rx="10" fill="#f4f1fa" stroke="#7564ad"/><text x="501" y="285" fill="#4b3d78">自适应均衡 25</text><rect x="656" y="250" width="150" height="58" rx="10" fill="#f4f1fa" stroke="#7564ad"/><text x="731" y="285" fill="#4b3d78">卡尔曼跟踪 22</text></g><g stroke="#7564ad" stroke-width="2" stroke-dasharray="6 5" fill="none" marker-end="url(#sy-b)"><path d="M421 132 V244"/><path d="M501 244 V138"/><path d="M741 132 V244"/></g><circle cx="180" cy="132" r="3" fill="#ce704f"/><text x="188" y="150" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#ce704f">多径 → 码间干扰</text><text x="36" y="392" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">主链路（teal）对应第 12–13 章的 LTI 响应与第 26 章的匹配滤波检测；辅助模块（violet）分别对应第 22–25 章。</text><text x="36" y="412" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">流程为概念示意，不代表具体实现顺序。</text></svg><figcaption>图 28.1　检测、估计与自适应不是三个独立课题，而是在同一条链路上互相供给参数。</figcaption></figure>
+</section>
+<section id="link"><h2>检测与误码：理论与实验对齐</h2>
+<p>先看最理想的情形：信道只有加性噪声（<code>h(t)=δ(t)</code>）。匹配滤波器输出在每个符号时刻给出充分统计量，判決就是取符号：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="BPSK 在加性高斯白噪声下的误码率"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="误码率等于 Q 函数在根号二倍每比特信噪比处的值"><msub><mi>P</mi><mi>b</mi></msub><mo>=</mo><mi>Q</mi><mrow><mo>(</mo><msqrt><mrow><mn>2</mn><msub><mi>E</mi><mi>b</mi></msub><mo>/</mo><msub><mi>N</mi><mn>0</mn></msub></mrow></msqrt><mo>)</mo></mrow></math><span class="eq-label">(28.2) BPSK 误码率</span></div>
+<p>这个式子与第 26 章式 (26.5) 是同一个来源：两个等方差高斯分布、均值差为 <code>√(2Eb/N₀)</code> 个标准差。下面用固定种子（<code>seed=42</code>、每点 200000 比特）的蒙特卡洛实验逐点核对。</p>
+<figure><svg viewBox="0 0 1000 400" role="img" aria-labelledby="ber-t ber-d"><title id="ber-t">BPSK 误码率：理论曲线与固定种子仿真对比</title><desc id="ber-d">横轴为每比特信噪比（dB），纵轴为误码率（对数刻度）。青色实线为理论 Q 函数，珊瑚色散点为固定种子蒙特卡洛实验结果，两者在整个区间内吻合。</desc><rect width="1000" height="400" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">理论曲线与仿真散点重合</text><line x1="100" y1="330" x2="560" y2="330" stroke="#dce7e6"/><line x1="100" y1="70" x2="100" y2="330" stroke="#dce7e6"/><g stroke="#eef2f1"><line x1="100" y1="286.7" x2="560" y2="286.7"/><line x1="100" y1="243.3" x2="560" y2="243.3"/><line x1="100" y1="200" x2="560" y2="200"/><line x1="100" y1="156.7" x2="560" y2="156.7"/><line x1="100" y1="113.3" x2="560" y2="113.3"/></g><polyline points="100.0,117.9 146.0,124.2 192.0,131.8 238.0,141.1 284.0,152.5 330.0,166.4 376.0,183.6 422.0,204.9 468.0,231.2 514.0,263.8 560.0,304.5" fill="none" stroke="#2f7d7b" stroke-width="2.6"/><g fill="#ce704f"><circle cx="100" cy="117.7" r="4.5"/><circle cx="146" cy="124.1" r="4.5"/><circle cx="192" cy="131.7" r="4.5"/><circle cx="238" cy="141.2" r="4.5"/><circle cx="284" cy="151.8" r="4.5"/><circle cx="330" cy="166.4" r="4.5"/><circle cx="376" cy="183.9" r="4.5"/><circle cx="422" cy="208.3" r="4.5"/><circle cx="468" cy="225.4" r="4.5"/></g><g font-family="Arial,sans-serif" font-size="12" fill="#5d7078"><text x="100" y="348" text-anchor="middle">0</text><text x="284" y="348" text-anchor="middle">4</text><text x="468" y="348" text-anchor="middle">8</text><text x="560" y="348" text-anchor="end">10</text><text x="92" y="334" text-anchor="end">10⁰</text><text x="92" y="204" text-anchor="end">10⁻³</text><text x="92" y="74" text-anchor="end">10⁻⁶</text><text x="330" y="372" text-anchor="middle">Eb/N₀ (dB)</text><text x="60" y="200" text-anchor="middle" transform="rotate(-90 60 200)">误码率</text></g><g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5"><text x="410" y="120" fill="#2f7d7b">理论 Q(√(2Eb/N₀))</text><text x="410" y="300" fill="#ce704f">种子仿真散点</text></g><text x="100" y="392" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">仿真：seed=42，每点 200000 比特；高信噪比处误差棒明显变大（错误事件稀少）。</text></svg><figcaption>图 28.2　理论曲线与种子仿真相符，验证了第 26 章的检测结论；高信噪比端的微小偏离来自有限样本数，而非模型错误。</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th>Eb/N₀ (dB)</th><th>理论 Q(√(2Eb/N₀))</th><th>种子仿真（200k 比特）</th></tr></thead><tbody><tr><td>0</td><td>7.86×10⁻²</td><td>7.94×10⁻²</td></tr><tr><td>4</td><td>1.25×10⁻²</td><td>1.30×10⁻²</td></tr><tr><td>6</td><td>2.39×10⁻³</td><td>2.35×10⁻³</td></tr><tr><td>8</td><td>1.91×10⁻⁴</td><td>2.60×10⁻⁴（仅 52 个错误）</td></tr></tbody></table></div>
+<p>低信噪比处理论与仿真吻合得很好。到 8 dB，仿真值对应只有 52 个错误事件，其相对标准差约 <code>1/√52≈14%</code>，因此 <code>2.60×10⁻⁴</code> 与理论 <code>1.91×10⁻⁴</code> 的偏差处在蒙特卡洛涨落范围内，不是理论失配。要分辨 <code>10⁻⁶</code> 量级的误码率，需要的比特数远不止几十万——这是仿真评估误码率时最常见的低估。</p>
+</section>
+<section id="spectrum"><h2>谱估计与自适应均衡：看见并填平深坑</h2>
+<p>多径信道不再是 <code>δ(t)</code>。以两径模型为例，<code>h(t)=δ(t)+ρδ(t−Δ)</code>，其频响幅度平方为</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="两径信道的频响幅度平方"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="两径信道幅度平方等于一加反射系数平方再加两倍反射系数乘余弦"><msup><mrow><mo>|</mo><mi>H</mi><mo>(</mo><mi>f</mi><mo>)</mo><mo>|</mo></mrow><mn>2</mn></msup><mo>=</mo><mn>1</mn><mo>+</mo><msup><mi>ρ</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn><mi>ρ</mi><mi>cos</mi><mo>(</mo><mn>2</mn><mi>π</mi><mi>f</mi><mi>Δ</mi><mo>)</mo></math><span class="eq-label">(28.3) 两径频响</span></div>
+<p>当 <code>cos(2πfΔ)=−1</code> 时出现深坑；坑内信噪比很低，判决就会大批出错。这正是频率选择性衰落。接收端第一步是用第 23 章的周期图“看见”这条谱，再用第 25 章的自适应滤波器估计其逆响应，把整体幅度拉平。</p>
+<figure><svg viewBox="0 0 1000 400" role="img" aria-labelledby="eq-t eq-d"><title id="eq-t">多径信道频响的深坑与均衡后的平坦响应</title><desc id="eq-d">横轴为归一化频率，纵轴为幅度。珊瑚色曲线是两径信道频响，在 f=0.25 处有深坑；青色水平线是同一信道经过自适应均衡后近似平坦的幅度响应。</desc><rect width="1000" height="400" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">均衡器把频选信道拉平</text><line x1="100" y1="330" x2="560" y2="330" stroke="#dce7e6"/><line x1="100" y1="60" x2="100" y2="330" stroke="#dce7e6"/><polyline points="100.0,100.5 111.5,101.2 123.0,103.2 134.5,106.6 146.0,111.4 157.5,117.4 169.0,124.7 180.5,133.2 192.0,142.8 203.5,153.5 215.0,165.2 226.5,177.8 238.0,191.2 249.5,205.2 261.0,219.7 272.5,234.5 284.0,249.3 295.5,263.5 307.0,276.3 318.5,285.8 330.0,289.5 341.5,285.8 353.0,276.3 364.5,263.5 376.0,249.3 387.5,234.5 399.0,219.7 410.5,205.2 422.0,191.2 433.5,177.8 445.0,165.2 456.5,153.5 468.0,142.8 479.5,133.2 491.0,124.7 502.5,117.4 514.0,111.4 525.5,106.6 537.0,103.2 548.5,101.2 560.0,100.5" fill="none" stroke="#ce704f" stroke-width="2.6"/><line x1="100" y1="195" x2="560" y2="195" stroke="#2f7d7b" stroke-width="2.6"/><line x1="330" y1="60" x2="330" y2="330" stroke="#7564ad" stroke-width="1.4" stroke-dasharray="5 5"/><text x="338" y="290" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#7564ad">深坑 f=0.25：单个 FIR 逆滤波器在此需极大增益</text><g font-family="Arial,sans-serif" font-size="12" fill="#5d7078"><text x="100" y="348" text-anchor="middle">0</text><text x="330" y="348" text-anchor="middle">0.25</text><text x="560" y="348" text-anchor="end">0.5 f</text><text x="92" y="334" text-anchor="end">0</text><text x="92" y="199" text-anchor="end">1</text><text x="92" y="64" text-anchor="end">2</text><text x="330" y="372" text-anchor="middle">归一化频率</text><text x="60" y="200" text-anchor="middle" transform="rotate(-90 60 200)">|H(f)| 幅度</text></g><g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5"><text x="160" y="120" fill="#ce704f">两径信道 |H(f)|（ρ=0.7, Δ=2T）</text><text x="160" y="185" fill="#2f7d7b">均衡后 ≈ 平坦</text></g><text x="100" y="392" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">曲线由式 (28.3) 直接计算，非实测；深坑处所需逆增益很大，会将噪声一并放大。</text></svg><figcaption>图 28.3　均衡器能拉平幅度，但深坑代价是噪声放大；真正的零陷需要更复杂的结构。</figcaption></figure>
+<div class="warning"><p><strong>反例（不可逆信道）：</strong>若多径零点落在单位圆上或圆外（非最小相位），一个因果且稳定的 FIR 逆滤波器不存在。此时只能退而求其次：用 MMSE 准则接受残差干扰，或引入判决反馈均衡（DFE）与延迟，或改用最大似然序列检测。</p></div>
+</section>
+<section id="tracking"><h2>状态跟踪：把漂移的参数变成状态</h2>
+<p>信道增益、载波相位、定时偏移都不是常数。第 22 章的做法是把它写成状态空间模型，用卡尔曼滤波递推：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="状态方程与观测方程"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="状态按转移系数演化并受过程噪声驱动，观测等于状态加观测噪声"><msub><mi>x</mi><mi>k</mi></msub><mo>=</mo><mi>a</mi><msub><mi>x</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>w</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>,</mo><mspace width="1.2em"/><msub><mi>y</mi><mi>k</mi></msub><mo>=</mo><msub><mi>x</mi><mi>k</mi></msub><mo>+</mo><msub><mi>v</mi><mi>k</mi></msub></math><span class="eq-label">(28.4) 状态与观测</span></div>
+<p>预测步用 <code>a</code> 外推状态与协方差，修正步用导频或判决反馈得到的观测更新估计。过程噪声方差 <code>Q</code> 越大，滤波器越相信新观测、跟踪越快但也越抖；这与第 25 章遗忘因子 <code>λ</code> 的取舍完全同构。</p>
+<div class="note"><p>与自适应均衡的分工：均衡器关心“信道形状”，卡尔曼滤波器关心“随时间演化的参数”。两者常级联：先用卡尔曼稳定相位与增益，再让均衡器在已校正的基带上工作。</p></div>
+</section>
+<section id="boundary"><h2>项目的边界与陷阱</h2>
+<ul><li><strong>同步</strong>：匹配滤波器的最优性建立在精确的定时与载波相位上。定时偏差相当于降低有效信噪比；相位旋转会让判决轴偏移。</li><li><strong>噪声功率未知</strong>：门限若不随噪声自适应，虚警就会失控（回到第 26 章的 CFAR 问题）。</li><li><strong>非最小相位信道</strong>：因果且稳定的逆滤波器不存在（图 28.3），只能接受 MMSE 残差或改用 DFE / 序列检测。</li><li><strong>模型失配</strong>：卡尔曼滤波的过程噪声 <code>Q</code>、观测噪声 <code>R</code> 与实际不符时，估计会低估真实误差甚至发散。</li><li><strong>仿真统计</strong>：误码率越低，需要的比特数越多（见上表）；用 10 万个比特去估计 <code>10⁻⁶</code> 的误码率会得到“零错误”的假象。</li></ul>
+<div class="warning"><p>这些陷阱有同一个结构：每引入一条假设，就新增一个可能被违反的条件。工程可靠性来自对这些条件的检查，而不是来自算法名字。</p></div>
+</section>
+<section id="practice"><h2>可复现实验：理论与仿真对照</h2>
+<p>下面这段程序只用标准库，种子固定，输出与图 28.2、表 28.1 一致。它是全书多个结论的交叉验证：由观测模型到匹配滤波，再到高斯尾概率。</p>
+<pre class="code-block"><code>import math, random
+def Q(x):
+    return 0.5 * math.erfc(x / math.sqrt(2))     # 高斯右尾函数
+
+random.seed(42)
+N = 200000                                        # 每点比特数
+for db in range(0, 9):
+    ebno = 10 ** (db / 10)
+    sigma = math.sqrt(1 / (2 * ebno))            # Eb=1 时 N0=1/ebno
+    err = 0
+    for _ in range(N):
+        bit = 1 if random.random() &lt; 0.5 else -1
+        r = bit + random.gauss(0, sigma)         # BPSK + AWGN
+        if (r &gt; 0) != (bit &gt; 0):                 # 硬判決
+            err += 1
+    print(f"{db:&gt;2} dB  理论 {Q(math.sqrt(2*ebno)):.2e}  仿真 {err/N:.2e}  错误 {err}")
+#  0 dB  理论 7.86e-02  仿真 7.94e-02  错误 15876
+#  4 dB  理论 1.25e-02  仿真 1.30e-02  错误 2593
+#  6 dB  理论 2.39e-03  仿真 2.35e-03  错误 471
+#  8 dB  理论 1.91e-04  仿真 2.60e-04  错误 52
+</code></pre>
+<div class="example"><p><strong>独立练习：</strong>把每点比特数从 <code>200000</code> 提高到 <code>2000000</code>，观察 8 dB 处仿真值与理论值的接近程度是否变好；再固定每点比特数不变，把种子换成几个不同的值，估计仿真值的散布。这两个实验分别展示了“样本量”与“随机性”对结论可信度的影响。</p></div>
+</section>
+<section id="synthesis"><h2>全书回顾：从概率到工程</h2>
+<p>把 28 章压缩成一条链：<strong>概率模型</strong>（第 1–5 章）给出随机变量的分布与数字特征；<strong>随机过程</strong>（第 6–11 章）把分布拓到时间，得到相关函数、平稳性与谱；<strong>系统与模型</strong>（第 12–19 章）讨论信号通过线性系统与窄带、马尔可夫、泊松等结构；<strong>统计推断与应用</strong>（第 20–28 章）把它变成估计、滤波、检测与工程系统。本章的链路把这四层同时用上了。</p>
+<details><summary>自检：本项目里哪些量可以解析预测，哪些必须先估计？</summary><p>AWGN 下的误码率可以解析（<code>Q(√(2Eb/N₀))</code>）；多径信道形状、噪声功率、载波相位与增益漂移必须先估计或在线适应，它们的准确度直接决定实际性能。</p></details>
+<details><summary>自检：为什么均衡器不能把深坑完全填平？</summary><p>因为逆滤波在深坑处需要极大增益，会把该频段的噪声一同放大；且非最小相位信道的因果稳定逆根本不存在。工程上是在残差干扰与噪声放大之间取折中。</p></details>
+<details><summary>自检：一次“理论与仿真吻合”的结论需要哪些前提？</summary><p>需要：仿真确实遵守了模型的假设（理想同步、確知信号、高斯噪声）、样本量足以使估计的误差可接受、且报告了不确实度（误差棒或置信区间）。三者缺一，“吻合”都不够结实。</p></details>
+</section>
+<section id="references" class="references"><h2>延伸阅读与核查依据</h2><ol><li>J. G. Proakis, M. Salehi, <em>Digital Communications</em>, 5th ed., McGraw-Hill, 2008.——BPSK/QPSK 误码率、匹配滤波与多径均衡的标准教材。</li><li>S. M. Kay, <em>Fundamentals of Statistical Signal Processing, Vol. I: Estimation Theory</em>（Prentice Hall, 1993）与 <em>Vol. II: Detection Theory</em>（1998）。——估计、检测与匹配滤波的统一处理。</li><li>S. Haykin, <em>Adaptive Filter Theory</em>, 5th ed., Pearson, 2014.——自适应均衡、LMS/RLS 与信道跟踪。</li><li>H. L. Van Trees, <em>Detection, Estimation, and Modulation Theory, Part I</em>, Wiley, 1968.——检测与估计理论在通信与雷达中的奠基。</li></ol><p>本章的误码率理论值与公式均可在上述文献中找到对应；图 28.2 的仿真散点与表 28.1 由正文代码（种子固定）实际运行得到，图 28.3 的曲线由式 (28.3) 直接计算，均非实测信道数据。</p></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="27.html">← 第 27 章</a><a href="../index.html#content">全部章节</a><a href="../index.html">课程首页</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源代码</a></p></div></footer>
+<script defer src="../assets/js/site.js"></script>
 </body>
 </html>

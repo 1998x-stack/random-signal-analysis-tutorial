@@ -337,7 +337,7 @@
         "检测与卡尔曼跟踪"
       ],
       "file": "chapters/28.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "统计推断与应用"
     }
   ]
