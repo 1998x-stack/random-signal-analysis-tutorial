@@ -272,12 +272,12 @@
       "num": "23",
       "title": "经典功率谱估计",
       "topics": [
-        "周期图法",
-        "Bartlett与Welch法",
-        "MATLAB/Python实战"
+        "周期图与单边PSD约定",
+        "偏差、方差与不一致性",
+        "加窗泄漏与Bartlett/Welch折中"
       ],
       "file": "chapters/23.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "统计推断与应用"
     },
     {

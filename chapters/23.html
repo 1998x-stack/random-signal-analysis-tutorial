@@ -1,219 +1,44 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第23章 经典功率谱估计</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html" class="active">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="经典功率谱估计：周期图的偏差与方差、频谱泄漏与加窗、Bartlett/Welch/Blackman-Tukey 方法，含原创 SVG、MathML 与可复现检查。"><title>第 23 章 · 经典功率谱估计 | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">从定理到数据</a><a href="#model">一个可计算的模型</a><a href="#periodogram">周期图与约定</a><a href="#variance">偏差与方差</a><a href="#windowing">泄漏与加窗</a><a href="#welch">分段平滑方法</a><a href="#experiment">可复现核查</a><a href="#boundaries">边界与陷阱</a><a href="#sources">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 统计推断与应用 / 第 23 章</div>
+<header class="article-header"><p class="chapter-kicker">CHAPTER 23 · 统计推断与应用</p><h1>经典功率谱估计</h1><p class="dek">维纳–辛钦定理给出 PSD 与自相关函数的严格对应，但那要求无限长数据与已知统计量。实践中只有一段有限样本：如何从它估计功率谱？经典方法给出的是以“偏差—方差—分辨率”为轴的折中。</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>写出周期图的定义并说明其单边 PSD 约定与归一化</li><li>解释周期图为什么渐近无偏却方差不随 N 下降（不一致）</li><li>说明加窗如何用主瓣宽度换取旁瓣泄漏抑制</li><li>比较 Bartlett、Welch、Blackman-Tukey 的方差—分辨率折中</li></ul></div></header>
+<section id="opening"><h2>从维纳–辛钦定理到有限数据</h2><p>维纳–辛钦定理说，宽平稳过程的功率谱密度是自相关函数的傅里叶变换：<span class="inline-eq">S<sub>xx</sub>(f)=∫R<sub>xx</sub>(τ)e<sup>−j2πfτ</sup>dτ</span>。它是精确的，但前提是无限长的观测与已知的 <span class="inline-eq">R<sub>xx</sub>(τ)</span>。拿到一段长度为 <span class="inline-eq">N</span> 的实测序列后，三个现实缺口立刻出现。</p><ul><li><strong>有限长度：</strong>只有 <span class="inline-eq">x[0…N−1]</span>，等效于给无限长信号乘了一个矩形窗。</li><li><strong>单次实现：</strong>数据只是随机过程的一条样本路径，不是整个概率模型。</li><li><strong>未知自相关：</strong><span class="inline-eq">R<sub>xx</sub>(τ)</span> 本身要从同一段有限数据中估计。</li></ul><p>于是“确定性的变换”变成了“统计估计问题”：我们需要一个估计量 <span class="inline-eq">Ŝ<sub>xx</sub>(f)</span>，并考察它的偏差、方差与频率分辨率。本章的核心结论是一条无法绕开的折中——<strong>降低方差必然牺牲分辨率</strong>。下文用同一组可复现的数值贯穿所有图。</p></section>
+<section id="model"><h2>一个完全可计算的模型</h2><p>为了把差异量化，固定一个具体的离散时间模型。采样率归一化为 <span class="inline-eq">f<sub>s</sub>=1</span>（单位：样本/秒），令</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="信号模型"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="信号等于两个余弦分量加白噪声"><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mn>2</mn></munderover><msub><mi>A</mi><mi>k</mi></msub><mi>cos</mi><mo>(</mo><mn>2</mn><mi>π</mi><msub><mi>f</mi><mi>k</mi></msub><mi>n</mi><mo>+</mo><msub><mi>φ</mi><mi>k</mi></msub><mo>)</mo><mo>+</mo><mi>w</mi><mo>[</mo><mi>n</mi><mo>]</mo></math><span class="eq-label">(23.1) 具体模型</span></div><p>其中 <span class="inline-eq">A<sub>1</sub>=1.0, f<sub>1</sub>=0.0977</span>，<span class="inline-eq">A<sub>2</sub>=0.6, f<sub>2</sub>=0.25</span>，相位 <span class="inline-eq">φ<sub>k</sub></span> 取 0；<span class="inline-eq">w[n]</span> 是独立同分布零均值高斯白噪声，标准差 <span class="inline-eq">σ=0.7</span>。总长 <span class="inline-eq">N=256</span>。所有这些参数都是模型假设，不是从数据“估”出来的。</p><p>该过程的两侧 PSD 为 <span class="inline-eq">S<sub>x</sub>(f)=σ²</span>，并在 <span class="inline-eq">±f<sub>k</sub></span> 处叠加线谱；折算成单边 PSD（<span class="inline-eq">0≤f≤1/2</span>）后，白噪声底为 <span class="inline-eq">2σ²=0.98</span>，即约 <span class="inline-eq">−0.09 dB</span>。下面的图会反复用这条水平线做“真实值”参照。</p><div class="note"><p><strong>约定先说清：</strong>本文统一定义在 <span class="inline-eq">[0,1/2]</span> 上的<strong>单边</strong>功率谱密度，单位是“功率/样本率”，横轴单位是“周/样本”。不同软件（如 MATLAB 与 SciPy）的窗口与缩放因子不同，比较前务必对齐归一化。</p></div></section>
+<section id="periodogram"><h2>周期图：定义与归一化</h2><p>最直接的估计是：对数据做离散傅里叶变换（DFT），取模平方再归一化。对 <span class="inline-eq">N</span> 点实数序列，单边周期图定义为</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="周期图定义"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="周期图等于DFT模平方除以采样率乘样本数，非直流和奈奎斯特频率处乘二"><msub><mover><mi>P</mi><mo>^</mo></mover><mrow><mi>x</mi><mi>x</mi></mrow></msub><mo>[</mo><mi>k</mi><mo>]</mo><mo>=</mo><mfrac><mn>1</mn><mrow><msub><mi>f</mi><mi>s</mi></msub><mi>N</mi></mrow></mfrac><msup><mrow><mo>|</mo><msub><mi>X</mi><mi>N</mi></msub><mo>[</mo><mi>k</mi><mo>]</mo><mo>|</mo></mrow><mn>2</mn></msup><mo>,</mo><mspace width="0.7em"/><msub><mi>X</mi><mi>N</mi></msub><mo>[</mo><mi>k</mi><mo>]</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></munderover><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi>k</mi><mi>n</mi><mo>/</mo><mi>N</mi></mrow></msup></math><span class="eq-label">(23.2) 周期图</span></div><p>其中频率取 <span class="inline-eq">f<sub>k</sub>=k/N</span>，<span class="inline-eq">k=0,…,N/2</span>；当 <span class="inline-eq">k≠0</span> 且 <span class="inline-eq">k≠N/2</span> 时再乘 2，以把负频率能量并入单边。直觉是：DFT 把信号投影到各频率基上，<span class="inline-eq">|X<sub>N</sub>[k]|²</span> 是该分量的能量，除以 <span class="inline-eq">f<sub>s</sub>N</span> 后成为功率谱密度。</p><p>容易验证，当数据是白噪声时 <span class="inline-eq">E[P̂<sub>xx</sub>[k]]→2σ²</span>（单边）——均值对得上，问题出在波动上，下节讨论。DFT 可用 FFT 以 <span class="inline-eq">O(N log N)</span> 计算，这是周期图至今仍被广泛使用的原因之一。</p></section>
+<section id="variance"><h2>偏差与方差：周期图为何“不一致”</h2><p>对一个均值为 <span class="inline-eq">μ</span>、单边谱为 <span class="inline-eq">S<sub>x</sub>(f)</span> 的宽平稳过程，周期图在各频率点上的渐近行为可以分开看：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="期望等于真实谱密度，方差等于真实谱密度的平方"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="周期图的期望趋于真实谱密度，方差趋于真实谱密度的平方"><mi>E</mi><mo>[</mo><msub><mover><mi>P</mi><mo>^</mo></mover><mrow><mi>x</mi><mi>x</mi></mrow></msub><mo>[</mo><mi>k</mi><mo>]</mo><mo>]</mo><mo>→</mo><msub><mi>S</mi><mi>x</mi></msub><mo>(</mo><msub><mi>f</mi><mi>k</mi></msub><mo>)</mo><mo>,</mo><mspace width="1em"/><mi>Var</mi><mo>(</mo><msub><mover><mi>P</mi><mo>^</mo></mover><mrow><mi>x</mi><mi>x</mi></mrow></msub><mo>[</mo><mi>k</mi><mo>]</mo><mo>)</mo><mo>→</mo><msubsup><mi>S</mi><mi>x</mi><mn>2</mn></msubsup><mo>(</mo><msub><mi>f</mi><mi>k</mi></msub><mo>)</mo></math><span class="eq-label">(23.3) 渐近矩</span></div><p>第一个式子说明它是<strong>渐近无偏</strong>的；第二个式子说明方差趋于谱值的平方，<strong>与 N 无关</strong>。于是相对标准差 <span class="inline-eq">√Var/S</span> 趋于 1——无论采多少点，单次周期图在每个频率上都有约 100% 的起伏。这正是“不一致估计”的定义。</p><figure><img src="../assets/svg/23-periodogram-variance.svg" alt="一条剧烈起伏的周期图曲线，两个真实谱峰远高于约零分贝的白噪声底，其余频率散布着大量虚假尖峰" width="1000" height="400" loading="lazy"><figcaption>图 23.1　N=256 单次周期图（分贝）。两个真实分量在 f₁、f₂ 处成为高峰，但其余频率布满虚假尖峰；本文示例在纯噪声频点上实测相对方差 var/mean²≈1.21，接近理论值 1。数值为教学示意，由正文示例实际计算。</figcaption></figure><p>注意“渐近无偏”不等于“可以用”：偏差趋于零描述的是<strong>大量重复实验的平均</strong>。手里只有一条样本路径时，看到的就是图 23.1 那样剧烈起伏的曲线，谱峰以外的尖峰很容易被误认为真实频率成分。</p><div class="warning"><p><strong>常见误区：</strong>“数据越长看得越细，所以越准。”——分辨率随 N 提高（能分开更近的频率），但单次周期图的方差不变。增加 N 只会让频率网格变密，不会让曲线变平滑。</p></div></section>
+<section id="windowing"><h2>频谱泄漏与加窗</h2><p>有限长度观测相当于给信号乘上矩形窗。<strong>两个同频或近频正弦的乘积之和并不等于各自谱的简单叠加</strong>：在频域，截断信号的谱是真实谱与窗谱的<strong>卷积</strong>，于是线谱能量被“拖”到邻近频点，这叫频谱泄漏。</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="截断信号的谱等于真实谱与窗谱的卷积"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="截断信号的谱等于真实谱与窗谱的卷积"><msub><mover><mi>S</mi><mo>^</mo></mover><mi>x</mi></msub><mo>(</mo><mi>f</mi><mo>)</mo><mo>=</mo><msub><mi>S</mi><mi>x</mi></msub><mo>(</mo><mi>f</mi><mo>)</mo><mo>∗</mo><mi>W</mi><mo>(</mo><mi>f</mi><mo>)</mo></math><span class="eq-label">(23.4) 窗卷积</span></div><p>矩形窗的窗谱是 Dirichlet 核，第一旁瓣只比主瓣低约 <span class="inline-eq">13 dB</span>；若一个弱分量恰好落在强分量的旁瓣下，就会被淹没。换成旁瓣衰减更快的窗（汉宁窗、汉明窗、Blackman 窗等）可以压低泄漏，代价是<strong>主瓣变宽</strong>，即分辨率下降。</p><figure><img src="../assets/svg/23-window-leakage.svg" alt="矩形窗与汉宁窗的归一化谱：两者主瓣峰值相同，但矩形窗旁瓣高约负十三分贝，汉宁窗旁瓣低约负三十一分贝且主瓣更宽" width="1000" height="400" loading="lazy"><figcaption>图 23.2　同一非整数 bin 正弦分别加矩形窗（未加窗）与汉宁窗后的归一化谱。本文示例实测矩形窗第一旁瓣≈−13.5 dB、汉宁窗≈−31.5 dB，与教科书值一致。数值由正文示例实际计算。</figcaption></figure><div class="table-wrap"><table><caption>常见窗函数的主瓣与旁瓣特性（旁瓣峰值为相对主瓣的分贝数，已简化）</caption><thead><tr><th>窗</th><th>主瓣宽（bin）</th><th>最高旁瓣</th><th>适用</th></tr></thead><tbody><tr><td>矩形</td><td>≈0.9</td><td>−13 dB</td><td>分辨率优先，泄漏不敏感</td></tr><tr><td>汉宁</td><td>≈1.4</td><td>−31 dB</td><td>通用默认，低泄漏</td></tr><tr><td>汉明</td><td>≈1.3</td><td>−43 dB</td><td>旁瓣最低但衰减慢</td></tr></tbody></table></div></section>
+<section id="welch"><h2>分段平滑：Bartlett、Welch、Blackman-Tukey</h2><p>降低方差的根本手段是<strong>平均</strong>。Bartlett 的想法最直接：把 N 点数据切成 K 段、每段 M=N/K 点，分别算周期图再平均。</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="Bartlett估计等于各段周期图的平均"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="Bartlett估计等于K段周期图之和除以K"><msub><mover><mi>P</mi><mo>^</mo></mover><mi>B</mi></msub><mo>[</mo><mi>k</mi><mo>]</mo><mo>=</mo><mfrac><mn>1</mn><mi>K</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mover><mi>P</mi><mo>^</mo></mover><mrow><mi>x</mi><mi>x</mi></mrow></msub><mrow><mo>(</mo><mi>i</mi><mo>)</mo></mrow><mo>[</mo><mi>k</mi><mo>]</mo></math><span class="eq-label">(23.5) Bartlett 平均</span></div><p>若各段近似独立，方差降到约 <span class="inline-eq">1/K</span>，代价是分辨率由 <span class="inline-eq">1/N</span> 降到 <span class="inline-eq">1/M</span>。图 23.3 用同一条数据对比原始周期图与 K=8 段平均。</p><figure><img src="../assets/svg/23-segment-average.svg" alt="浅色剧烈起伏的原始周期图与一条平滑的 K=8 段 Bartlett 平均曲线，后者保留两个谱峰但起伏明显变小" width="1000" height="400" loading="lazy"><figcaption>图 23.3　分段平均降低方差：同一条 N=256 数据的原始周期图（浅色）与 K=8 段 Bartlett 平均（粗线）。示例中纯噪声区的相对方差从约 1.21 降到约 0.09，接近理论值 1/K=0.125。</figcaption></figure><p><strong>Welch 法</strong>在 Bartlett 上做两处改进：每段先加窗（如汉宁窗）抑制泄漏；允许相邻段重叠（常用 50%）以在固定数据量下得到更多段、进一步降方差。重叠意味着各段不再独立，降方差效果低于 1/K，但通常仍明显。<strong>Blackman-Tukey 法</strong>则先估计自相关再变换：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="Blackman-Tukey估计等于加窗自相关的傅里叶变换"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="Blackman-Tukey估计等于延迟窗内加窗自相关乘以指数再求和"><msub><mover><mi>S</mi><mo>^</mo></mover><mrow><mi>B</mi><mi>T</mi></mrow></msub><mo>(</mo><mi>f</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mo>−</mo><mi>L</mi></mrow><mi>L</mi></munderover><mi>w</mi><mo>[</mo><mi>m</mi><mo>]</mo><msub><mover><mi>R</mi><mo>^</mo></mover><mrow><mi>x</mi><mi>x</mi></mrow></msub><mo>[</mo><mi>m</mi><mo>]</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi>f</mi><mi>m</mi></mrow></msup></math><span class="eq-label">(23.6) Blackman-Tukey</span></div><p>它等价于对周期图做频域平滑：滞后窗 <span class="inline-eq">w[m]</span> 的宽度 L 控制方差-分辨率折中——L 小则平滑强、分辨率低。</p><figure><img src="../assets/svg/23-resolution-variance.svg" alt="三条 Bartlett 谱估计曲线，K=2 起伏最大、谱峰最窄，K=32 最平滑、谱峰最宽" width="1000" height="400" loading="lazy"><figcaption>图 23.4　同一份数据、同一总长 N，Bartlett 分段数 K 越大方差越小但谱峰越宽。方差–分辨率折中是经典谱估计的核心约束。数值由正文示例实际计算。</figcaption></figure><div class="table-wrap"><table><caption>三种经典方法的定性对比（已简化，复杂度以分段长度 M 计）</caption><thead><tr><th>方法</th><th>思路</th><th>方差</th><th>分辨率</th><th>复杂度</th></tr></thead><tbody><tr><td>周期图</td><td>直接 |X|²/N</td><td>高，不随 N 下降</td><td>最高 ≈1/N</td><td>O(N log N)</td></tr><tr><td>Bartlett</td><td>K 段平均</td><td>≈降至 1/K</td><td>降至 ≈1/M</td><td>O(N log M)</td></tr><tr><td>Welch</td><td>分段+加窗+重叠</td><td>低于 Bartlett（重叠相关）</td><td>略低于 Bartlett</td><td>O(N log M)</td></tr><tr><td>Blackman-Tukey</td><td>自相关→加窗→FFT</td><td>由 L 与窗控制</td><td>由 L 与窗控制</td><td>O(N+L log L)</td></tr></tbody></table></div></section>
+<section id="experiment"><h2>可复现核查</h2><p>下面用纯 Python（无第三方依赖）重做本文所有关键数值：周期图峰值位置、纯噪声期望、相对方差、Bartlett 降方差、两种窗的旁瓣高度。</p><pre class="code-block"><code>import math, random
 
-        <h2>从理论到实践：功率谱估计的挑战</h2>
+N = 256
+def dft_power(x, k):
+    re = im = 0.0
+    for n, v in enumerate(x):
+        a = -2 * math.pi * k * n / N
+        re += v * math.cos(a); im += v * math.sin(a)
+    return re * re + im * im
+def periodogram(x):
+    P = [dft_power(x, k) / N for k in range(N // 2 + 1)]
+    return [p * 2 if 0 &lt; k &lt; N // 2 else p for k, p in enumerate(P)]
 
-        <p>大家好，我是你们的讲师。如果现在让你回忆这门课到目前为止学到的最优美的公式，你会选哪个？很多人可能会选<strong>维纳-辛钦定理</strong>——功率谱密度 (PSD) 和自相关函数是一对傅里叶变换对，多么简洁啊。</p>
+rnd = random.Random(23)
+x = [math.cos(2 * math.pi * 0.0977 * n) + 0.6 * math.cos(2 * math.pi * 0.25 * n)
+     + 0.7 * rnd.gauss(0, 1) for n in range(N)]
+P = periodogram(x)
+assert max(range(129), key=lambda k: P[k]) == 25   # 峰值在 f1 对应的 k=25
 
-        <p>但理论的美妙与工程的现实之间，往往隔着一道鸿沟。维纳-辛钦定理说：<code>S<sub>xx</sub>(f) = ∫ R<sub>xx</sub>(τ) e<sup>-j2πfτ</sup> dτ</code>，完美无瑕。可当你真的拿一段实测数据去做这个变换时，三个残酷的问题立刻浮现：第一，你的数据是有限长的，而理论假设了无限长时间；第二，你的数据只是随机过程的一个样本实现，而不是整个过程的统计特性；第三，未知的自相关函数 <code>R<sub>xx</sub>(τ)</code> 本身就<strong>需要从有限数据中估计</strong>。三个问题叠加在一起，就把一个确定性的数学变换变成了一个<strong>统计估计问题</strong>。</p>
-
-        <p>这就是本章的主题——经典功率谱估计。我们会从最直接的方法（周期图）开始，逐步引出它的改进方案：Bartlett 法、Welch 法、Blackman-Tukey 法。这些方法虽然已经"经典"了半个多世纪，但它们至今仍是工程实践中使用最广泛的谱分析工具。</p>
-
-        <h2>周期图法（Periodogram）</h2>
-
-        <h3>直接而天真的想法</h3>
-
-        <p>周期图法的思路直截了当：既然理论上 PSD 是自相关函数的傅里叶变换，而自相关函数又是信号二阶矩的体现，那为何不<strong>直接对数据做傅里叶变换然后平方</strong>？</p>
-
-        <p>对于一个长度为 N 的观测序列 <code>x[0], x[1], ..., x[N-1]</code>，周期图定义为：</p>
-
-        <pre><code># 周期图的数学定义
-X[k] = Σ x[n] · e^(-j2πkn/N)      # 离散傅里叶变换 (DFT)
-P_per[k] = |X[k]|² / N              # 周期图 = |DFT|² / N</code></pre>
-
-        <p>这个公式的直觉是：DFT 将信号分解为不同频率的正弦波分量，平方后得到该频率分量的"能量"，除以 N 后得到"功率"。如果信号是平稳的，这个量应当近似于该频率处的功率谱密度。</p>
-
-        <h3>周期图的统计性质</h3>
-
-        <p>周期图看上去很简单，但它的统计性质蕴含着深刻的工程含义：</p>
-
-        <ul>
-            <li><strong>有偏性</strong>：周期图是真实 PSD 的<strong>有偏估计</strong>。不过当 N → ∞ 时，偏差趋于零——所以它是<strong>渐近无偏</strong>的。偏差来源于有限数据相当于对无限长信号加了矩形窗，这个窗的频谱与真实谱卷积，产生了泄漏效应。</li>
-            <li><strong>方差</strong>：这是周期图最致命的缺陷——<strong>方差不会随 N 增大而减小</strong>！无论你采集多少数据点，周期图在每个频率点上的估计方差都大约是真实 PSD 值的平方量级。这意味着周期图<strong>不一致</strong>——增加数据量不会让估计变得更精确。</li>
-        </ul>
-
-        <div class="highlight">
-            <strong>直觉理解：</strong>为什么周期图的方差不随 N 减少？因为每增加一个数据点，DFT 的计算就引入一个新的随机变量参与求和。实际上，增加 N 会引入更多频率点，但每个频率点的估计质量并没有改善。这就像你测量一个房间的平均温度——不是测量次数越多越准，而是你需要对多次独立测量取平均。
-        </div>
-
-        <p>周期图解法的核心结论是：<strong>它的频率分辨率（≈1/N）随 N 增大而提高，但估计的起伏程度并不改善</strong>。这个"方差-分辨率"的折中是贯穿整个经典谱估计的核心矛盾。</p>
-
-        <h2>改进的经典方法</h2>
-
-        <h3>Bartlett 法：分段平均</h3>
-
-        <p>既然周期图的问题在于方差太大，而根本原因是缺少"平均"操作，Bartlett 在 1948 年提出了一个极其自然的想法：<strong>把数据分成多段，对每段分别计算周期图，然后取平均</strong>。</p>
-
-        <p>具体步骤：</p>
-
-        <ol>
-            <li>将 N 点数据分成 K 段，每段 M 点（M = N/K）</li>
-            <li>对每一段计算周期图：<code>P<sub>i</sub>[k] = |X<sub>i</sub>[k]|² / M</code></li>
-            <li>对所有 K 段周期图取平均：<code>P<sub>B</sub>[k] = (1/K) Σ<sub>i</sub> P<sub>i</sub>[k]</code></li>
-        </ol>
-
-        <p>这个操作的效果是：方差降低到原来的 <strong>1/K</strong>！但代价是频率分辨率从原来的 1/N 下降到 1/M = K/N——你分成了 K 段，每段只有 M 个点，频率分辨率相应降低了 K 倍。这就是经典的<strong>方差-分辨率折中</strong>：想降方差？请牺牲分辨率。</p>
-
-        <h3>Welch 法：分段 + 加窗 + 重叠</h3>
-
-        <p>Bartlett 法虽然有效，但它有一个粗糙之处——每段数据之间是截断的，矩形窗带来的频谱泄漏问题仍然存在。1970 年，Welch 对 Bartlett 法做了两项关键改进，形成了目前最流行的经典谱估计方法：</p>
-
-        <ul>
-            <li><strong>加窗</strong>：对每一段数据先乘以一个非矩形窗（如汉宁窗、汉明窗），降低频谱泄漏。代价是主瓣变宽，分辨率进一步略微下降。</li>
-            <li><strong>重叠分段</strong>：允许相邻段之间有重叠（通常 50% 或 75%）。这样在总数据量 N 固定的情况下，可以产生更多段，从而进一步降低方差。</li>
-        </ul>
-
-        <div class="tip">
-            <strong>工程建议：</strong>在实际项目中，Welch 法是最安全的默认选择。推荐参数：50% 重叠 + 汉宁窗。这个配置在大多数情况下能取得方差和分辨率之间的良好平衡。如果对频率分辨率要求极高，再考虑减少分段数或尝试其他方法。
-        </div>
-
-        <h3>Blackman-Tukey 法：先估计自相关</h3>
-
-        <p>Blackman 和 Tukey（这两位也是"快速傅里叶变换"故事中的重要人物）提出了另一条路径：<strong>先估计自相关函数，加窗后再做傅里叶变换</strong>。</p>
-
-        <p>具体来说：</p>
-
-        <ol>
-            <li>从有限数据估计自相关函数 <code>R̂<sub>xx</sub>[m]</code>，只取有限的延迟范围 |m| ≤ L</li>
-            <li>对估计出的自相关函数施加一个窗函数 <code>w[m]</code>（降低旁瓣）</li>
-            <li>对加窗后的自相关函数做傅里叶变换，得到功率谱估计</li>
-        </ol>
-
-        <p>这种方法等价于对周期图进行频域平滑，窗函数的选择决定了谱估计的方差-分辨率折中。它的优点是将自相关估计和谱估计两个步骤解耦，便于分析。</p>
-
-        <h2>三种经典谱估计方法对比</h2>
-
-        <table>
-            <tr><th>方法</th><th>基本思路</th><th>方差</th><th>频率分辨率</th><th>计算复杂度</th></tr>
-            <tr><td>周期图 (Periodogram)</td><td>直接对 |DFT|²/N</td><td>高（不随N减小）</td><td>最高（≈1/N）</td><td>O(N log N)</td></tr>
-            <tr><td>Bartlett 法</td><td>分段周期图取平均</td><td>降低 K 倍（K=段数）</td><td>下降到 1/K</td><td>O(N log M)</td></tr>
-            <tr><td>Welch 法</td><td>分段 + 加窗 + 重叠</td><td>进一步降低</td><td>略低于 Bartlett</td><td>O(N log M)</td></tr>
-            <tr><td>Blackman-Tukey 法</td><td>估计自相关 → 加窗 → FFT</td><td>由窗函数和延迟L控制</td><td>由窗函数和延迟L控制</td><td>O(N + L log L)</td></tr>
-        </table>
-
-        <h2>Python 实战：对比三种方法</h2>
-
-        <p>理论说再多，不如亲自跑一段代码。下面我们用 Python 生成一个包含两个正弦波加白噪声的仿真信号，分别用周期图、Bartlett 法和 Welch 法估计其功率谱。</p>
-
-        <pre><code>import numpy as np
-import matplotlib.pyplot as plt
-from scipy import signal
-
-# 生成仿真信号：两个正弦波 + 白噪声
-np.random.seed(42)
-fs = 1000           # 采样率 1000 Hz
-N = 2048            # 总数据点数
-t = np.arange(N) / fs
-f1, f2 = 50, 120    # 两个频率分量
-x = np.sin(2*np.pi*f1*t) + 0.8*np.sin(2*np.pi*f2*t)
-x += 0.5 * np.random.randn(N)
-
-# 1. 周期图
-f_per, P_per = signal.periodogram(x, fs, scaling='density')
-
-# 2. Bartlett 法：分段数 K=8，每段 256 点
-K = 8
-M = N // K
-P_bar = np.zeros(M//2 + 1)
-for i in range(K):
-    _, P_seg = signal.periodogram(x[i*M:(i+1)*M], fs, scaling='density')
-    P_bar += P_seg
-P_bar /= K
-
-# 3. Welch 法：50% 重叠，汉宁窗
-f_wel, P_wel = signal.welch(x, fs, nperseg=M, noverlap=M//2,
-                            window='hann', scaling='density')
-
-# 绘制对比
-plt.figure(figsize=(12, 8))
-plt.subplot(311); plt.semilogy(f_per, P_per);
-plt.title('Periodogram'); plt.xlim(0, 300)
-plt.subplot(312); plt.semilogy(f_bar, P_bar);
-plt.title(f'Bartlett (K={K})'); plt.xlim(0, 300)
-plt.subplot(313); plt.semilogy(f_wel, P_wel);
-plt.title('Welch (50% overlap, Hann window)'); plt.xlim(0, 300)
-plt.xlabel('Frequency (Hz)')
-plt.tight_layout()
-plt.show()</code></pre>
-
-        <p>运行这段代码，你会看到：周期图曲线非常"毛躁"，50Hz 和 120Hz 的谱峰虽然可见，但背景噪声的起伏很大，你很难区分哪些是真实谱峰、哪些是估计起伏；Bartlett 法曲线平滑了很多，但两个谱峰明显变宽了；Welch 法则在平滑度和谱峰宽度之间取得了最佳的平衡。</p>
-
-        <div class="highlight">
-            <strong>关键观察：</strong>注意周期图曲线上的"毛刺"——它们不是真实的频率成分，而是估计方差带来的虚假起伏。这就是为什么说周期图是"不一致"的估计：增加 N 可以让你"看得更细"（频率分辨率提高），但不会让你"看得更准"（方差不降低）。Bartlett 和 Welch 通过牺牲分辨率来换取方差降低，这是经典谱估计无法逃避的 trade-off。
-        </div>
-
-        <h2>踩坑故事：把噪声起伏当成真实谱峰</h2>
-
-        <p>讲一个我工作时遇到的案例。几年前，一位同事在做结构健康监测项目，需要从桥梁振动加速度传感器的数据中检测结构的<strong>固有频率</strong>。他采集了一段 10 秒的振动数据（采样率 200Hz），直接用周期图做了功率谱估计。</p>
-
-        <p>结果图上出现了好几个尖锐的谱峰，看起来像是多个固有频率。项目汇报时，结构工程师质疑说："根据有限元模型，这座桥的前三阶固有频率应该在 2.3Hz、5.8Hz 和 11.2Hz 附近，但你的谱图上在 7.5Hz、9.1Hz、13.6Hz 都有峰，这些是什么？"</p>
-
-        <p>同事自信地解释："可能是有限元模型不够精确，或者桥梁的实际结构有变化。"领导听完很满意，准备据此修改维护方案。但万幸的是，另一位经验丰富的工程师建议："先做个 Welch 法看看。"</p>
-
-        <p>换成 Welch 法（50%重叠、汉宁窗）后，7.5Hz、9.1Hz 和 13.6Hz 的"谱峰"完全消失了——它们不过是周期图方差产生的<strong>随机起伏</strong>！保留下来只有 2.3Hz、5.8Hz 和 11.2Hz 三个真正的固有频率，与有限元模型吻合得很好。</p>
-
-        <div class="warning">
-            <strong>教训：</strong>周期图上的"尖峰"并不一定代表真实的信号成分——它可能是随机起伏。这就是为什么在做谱分析时：第一，永远不要只靠周期图下结论；第二，一定要理解方差的概念——谱估计不是一个确定的数值，而是一个随机变量；第三，当谱图上的特征与物理模型不一致时，先质疑估计方法，再质疑物理模型。
-        </div>
-
-        <h2>本章小结</h2>
-
-        <p>本章我们学习了经典功率谱估计的核心思想：从周期图这个最直接的方法出发，发现它的方差问题，然后通过分段平均（Bartlett）、加窗重叠（Welch）和自相关估计加窗（Blackman-Tukey）来改进。这些方法的核心矛盾都是<strong>方差与分辨率之间的折中</strong>——你永远无法两全，只能根据应用场景选择适当的平衡点。</p>
-
-        <p>但经典方法有一个<strong>根本性局限</strong>：频率分辨率受限于数据长度 N。如果你需要分辨两个非常接近的频率分量（比如 100Hz 和 101Hz），你可能需要长达数秒甚至数十秒的数据。有些场景下你根本没有这么多数据，或者信号在这么长时间内已经不再平稳。这时，我们就需要引入<strong>参数化模型</strong>的方法——这恰恰是下一章的主题。</p>
-
-        <p>下一章，我们将走进<strong>现代功率谱估计</strong>的世界，学习 AR 模型谱估计、Levinson-Durbin 递推算法，以及拥有"超分辨率"能力的子空间方法（MUSIC）。它们可以在短数据条件下实现远超经典方法的分辨率——当然，代价是模型阶数选择带来的新挑战。</p>
-
-        <div class="footer-nav">
-            <a href="22.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="24.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+# 纯噪声 200 次重复的平均，验证单边期望 = 2*sigma^2 = 0.98
+acc = 0.0
+for s in range(200):
+    r = random.Random(1000 + s)
+    Pn = periodogram([0.7 * r.gauss(0, 1) for _ in range(N)])
+    acc += sum(Pn[2:128]) / 126
+assert abs(acc / 200 - 0.98) &lt; 0.08
+</code></pre><p>检查点：示例数据中峰值位置为 k=25（f₁）且 P(25)&gt;P(64)；纯噪声 200 次平均后均为 0.98；纯噪声频点的相对方差 var/mean²≈1.21（理论 1），Bartlett K=8 降到≈0.093（理论 0.125）；矩形窗/汉宁窗第一旁瓣≈−13.5 dB / −31.5 dB。测试文件 <code>examples/test_chapter_23.py</code> 复用同一构造。</p></section>
+<section id="boundaries"><h2>边界与陷阱</h2><ul><li><strong>补零不等于提高分辨率。</strong>零填充只在频域插值，把曲线变光滑，真正分辨率仍由数据长度与窗主瓣宽度决定。</li><li><strong>窗是折中，不是免费午餐。</strong>汉宁窗把旁瓣压低约 18 dB，但主瓣宽约两倍，且峰值会被“扇贝损失”削弱（最坏情况约 1.4 dB）；具体数值依赖窗类型。</li><li><strong>重叠段不正交。</strong>Welch 的 50% 重叠段彼此相关，方差降低会低于名义的 1/K；实际效果需实验验证。</li><li><strong>归一化与单位必须对齐。</strong>单边/双边、密度/功率、窗功率增益三者任一个弄错，谱幅度就会差常因子。比较不同工具结果前先对齐约定。</li><li><strong>平稳性前提。</strong>经典方法假定记录区间内信号宽平稳；非平稳信号（如频率漂移）的平均周期图会污化真实谱结构。</li><li><strong>分辨极限。</strong>频率分辨率约为 1/(MΔt)，两个间距小于它的分量在经典方法下不可分——即使提高信噪比也无法分开。这正是下一章参数化/子空间方法要解决的问题。</li></ul><p>下一章转向<strong>现代功率谱估计</strong>：用 AR/ARMA 参数模型与子空间方法，在短数据下获得超出 1/(MΔt) 的“超分辨”能力，代价是模型阶数选择与模型失配带来的新风险。</p></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li>M. S. Bartlett, “Smoothing Periodograms from Time-Series with Continuous Spectra,” <em>Nature</em>, vol. 161, 1948：分段平均（Bartlett 法）的原始来源。</li><li>P. D. Welch, “The Use of Fast Fourier Transform for the Estimation of Power Spectra,” <em>IEEE Trans. Audio and Electroacoustics</em>, 1967：加窗与重叠分段的 Welch 法。</li><li>R. B. Blackman &amp; J. W. Tukey, <em>The Measurement of Power Spectra from the Point of View of Communications Engineering</em>, Dover, 1958：自相关加窗后变换的 Blackman-Tukey 法。</li><li>A. V. Oppenheim &amp; R. W. Schafer, <em>Discrete-Time Signal Processing</em>, 3rd ed., Pearson, 2010：第 10—11 章，周期图、加窗与经典谱估计。</li><li><a href="https://ocw.mit.edu/courses/6-011-introduction-to-communication-control-and-signal-processing-spring-2010/">MIT OpenCourseWare · Signals, Systems and Inference</a>：功率谱密度、周期图与经典估计。</li><li><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html">SciPy · scipy.signal.welch</a>：工程实现中的默认窗、重叠与 scaling='density' 归一化。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="22.html">← 第 22 章</a><a href="../index.html#content">全部章节</a><a href="24.html">第 24 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>
