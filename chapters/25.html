@@ -1,271 +1,109 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第25章 自适应滤波及应用</title>
-    <link rel="stylesheet" href="theme.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fffdf8">
+<meta name="description" content="当信号与噪声的统计特性未知或随时间变化时，滤波器如何在线调整自身系数？从 LMS 的随机梯度与步长条件，到 RLS 的递归最小二乘，并给出噪声抵消、信道均衡与回声消除的适用边界。">
+<title>第 25 章 · 自适应滤波及应用 | 随机信号分析</title>
+<link rel="stylesheet" href="../assets/css/site.css">
 </head>
 <body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html" class="active">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>当统计特性不再是常数</h2>
-
-        <p>大家好，我是你们的讲师。回顾第21章和第22章，我们学习了两种经典的最优滤波方法：维纳滤波和卡尔曼滤波。它们的共同点是：需要知道信号和噪声的统计特性（自相关函数、协方差矩阵等），或者至少知道系统模型。如果这些信息完全已知且<strong>不随时间变化</strong>，维纳滤波就已经是最优线性滤波器了——理论上没有更好的线性方法。</p>
-
-        <p>但现实世界很少给你这么好的条件。想象一下：你在一个嘈杂的咖啡馆里打电话，背景噪声不是平稳的——上一秒是咖啡机研磨声，下一秒是旁边桌的聊天声，再下一秒是门铃响。噪声的统计特性在秒级甚至毫秒级尺度上变化。你不可能提前知道这些噪声的自相关函数，更不可能用一个固定的滤波器来应对所有场景。</p>
-
-        <p>这就需要<strong>自适应滤波</strong>——一种能够<strong>在线调整自身系数</strong>的滤波器，它通过不断观察输入数据和误差信号来自动适应环境的统计变化。本章将介绍两种最经典的自适应算法：LMS（最小均方）和 RLS（递归最小二乘），然后展示它们在噪声抵消、信道均衡和回声消除中的精彩应用。</p>
-
-        <h2>LMS 算法：简单而实用</h2>
-
-        <h3>从维纳滤波到随机梯度下降</h3>
-
-        <p>维纳滤波器的解是维纳-霍夫方程：<code>R·w = p</code>，其中 R 是输入自相关矩阵，p 是输入与期望的互相关向量。这个解需要知道 R 和 p——而我们通常不知道。LMS 算法的天才之处在于：它用<strong>瞬时值代替统计期望</strong>，从而把求解方程组的问题变成了一个简单的递归更新。</p>
-
-        <p>具体来说，LMS 算法的迭代公式极其简洁：</p>
-
-        <pre><code># LMS 算法（每个时间步执行一次）
-y[n] = w[n]ᵀ · x[n]              # 滤波器输出
-e[n] = d[n] - y[n]                # 误差信号
-w[n+1] = w[n] + μ · e[n] · x[n]  # 系数更新</code></pre>
-
-        <p>其中：</p>
-        <ul>
-            <li><code>x[n] = [x[n], x[n-1], ..., x[n-N+1]]ᵀ</code> 是输入向量</li>
-            <li><code>w[n]</code> 是滤波器系数向量（长度为 N）</li>
-            <li><code>d[n]</code> 是期望响应（参考信号）</li>
-            <li><code>μ</code> 是步长因子（学习率）</li>
-            <li><code>e[n]</code> 是误差信号</li>
-        </ul>
-
-        <p>这个更新公式其实就是一个<strong>随机梯度下降</strong>（Stochastic Gradient Descent, SGD）——朝着降低瞬时误差平方的方向调整系数。它不需要计算任何统计量，每次只用当前一个样本的信息来更新，因此计算量只有 O(N)——跟滤波器的阶数成正比。</p>
-
-        <h3>步长 μ 的选择艺术</h3>
-
-        <p>LMS 算法中唯一需要你手工设定的参数就是步长 μ。这个参数的选择直接影响算法的性能：</p>
-
-        <ul>
-            <li><strong>收敛条件</strong>：<code>0 < μ < 2/λ_max</code>，其中 λ_max 是输入自相关矩阵的最大特征值。一个更保守的实用条件：<code>0 < μ < 2/(N · P_in)</code>，其中 P_in 是输入信号的平均功率。</li>
-            <li><strong>大步长（μ 较大）</strong>：收敛速度快，能快速跟踪环境变化，但稳态误差（失调）大，系数在最优值附近剧烈抖动。</li>
-            <li><strong>小步长（μ 较小）</strong>：稳态误差小，系数收敛后精度高，但收敛慢，对突发环境变化反应迟钝。</li>
-        </ul>
-
-        <div class="highlight">
-            <strong>步长选择的工程经验：</strong>在实际项目中，我通常先把 μ 设置得相对较大（比如 0.01），观察误差曲线的下降速度，等算法收敛后再逐步降低 μ 以获得更低的稳态误差。有些系统甚至采用"变步长"策略——收敛初期大步长加速，进入稳态后自动切换为小步长。这种变步长 LMS 在声学回声消除中非常常见。
-        </div>
-
-        <h2>RLS 算法：快速收敛的代价</h2>
-
-        <h3>递归最小二乘的基本原理</h3>
-
-        <p>LMS 算法的优点是简单、鲁棒，但它的收敛速度高度依赖于输入信号自相关矩阵的<strong>特征值散布</strong>（条件数）。如果输入信号是白噪声，特征值全相等，LMS 收敛很快；如果输入信号是高度有色（如语音信号），特征值散布很大，LMS 收敛极慢——可能到天荒地老。</p>
-
-        <p>RLS 算法（递归最小二乘）从另一个角度出发：它不是最小化瞬时误差平方的期望，而是最小化从开始到现在<strong>所有误差的加权平方和</strong>：</p>
-
-        <pre><code># RLS 的代价函数
-J[n] = Σ λ^(n-k) · e[k]²     (k = 1 to n)
-
-其中 λ 是遗忘因子（0 < λ ≤ 1）
-λ 越小 → 越关注近期数据（快跟踪）
-λ 越大 → 越利用历史数据（稳估计）</code></pre>
-
-        <p>RLS 的更新公式比 LMS 复杂得多，它需要维护一个逆相关矩阵 P[n] 并递归更新：</p>
-
-        <pre><code># RLS 算法（每个时间步执行一次）
-e[n] = d[n] - w[n-1]ᵀ · x[n]    # 先验误差
-k[n] = P[n-1]·x[n] / (λ + x[n]ᵀ·P[n-1]·x[n])  # 增益向量
-w[n] = w[n-1] + k[n] · e[n]     # 系数更新
-P[n] = (P[n-1] - k[n]·x[n]ᵀ·P[n-1]) / λ      # 逆相关矩阵更新</code></pre>
-
-        <p>RLS 的核心优势在于：它的收敛速度<strong>不受输入信号特征值散布的影响</strong>——对于高度有色的语音信号，RLS 可能在几十步内收敛，而 LMS 可能需要成千上万步。这个差距在声学回声消除等应用中至关重要。</p>
-
-        <h3>LMS 与 RLS 的取舍</h3>
-
-        <p>但是，RLS 的高性能是有代价的：<strong>计算量 O(N²)</strong>。对于 N=128 阶的滤波器（声学回声消除的典型值），RLS 每一步需要约 16000 次乘加运算，而 LMS 只需要 128 次。在嵌入式系统或实时应用中，这个差距非常致命。</p>
-
-        <div class="tip">
-            <strong>选择建议：</strong>在计算资源充足且收敛速度至关重要时，选 RLS。在实时嵌入式系统或计算资源受限时，选 LMS。如果既想要 RLS 的速度又想要 LMS 的计算量，可以考虑"中间路线"：仿射投影算法 (APA) 或共轭梯度法。另外，NLMS（归一化 LMS）通过将步长除以输入功率来缓解特征值散布问题，在工程中非常实用。
-        </div>
-
-        <h2>经典应用：自适应滤波的三大战场</h2>
-
-        <h3>自适应噪声抵消</h3>
-
-        <p>自适应噪声抵消（Adaptive Noise Cancellation, ANC）是自适应滤波最经典的应用之一。它的配置非常巧妙：</p>
-
-        <ul>
-            <li><strong>主输入</strong>：期望信号 s[n] + 噪声 v₀[n]（信号和噪声混在一起）</li>
-            <li><strong>参考输入</strong>：与 v₀[n] 相关、但与 s[n] 不相关的噪声 v₁[n]（通过另一个传感器采集）</li>
-            <li><strong>自适应滤波器</strong>：将参考输入滤波，试图"模拟"出 v₀[n] 的副本</li>
-            <li><strong>误差输出</strong>：主输入减去滤波后的参考输入 → s[n] + (v₀[n] - v̂₀[n])</li>
-        </ul>
-
-        <p>当自适应滤波器收敛时，v̂₀[n] ≈ v₀[n]，误差输出 ≈ s[n] ——噪声被抵消了！这个方案的一个著名应用是<strong>胎儿心电提取</strong>：母亲腹部电极采集的信号包含胎儿心电 + 母亲心电 + 噪声，而母亲胸部电极采集的信号主要包含母亲心电。以胸部信号为参考输入，自适应滤波可以从腹部信号中消去母亲心电分量，留下清晰的胎儿心电信号。</p>
-
-        <h3>自适应均衡</h3>
-
-        <p>在数字通信中，信号经过多径信道传输后会产生<strong>码间干扰</strong>（ISI）——当前符号受到前后符号的干扰。自适应均衡器的作用是对接收信号进行逆滤波，补偿信道效应，恢复原始发送符号。</p>
-
-        <p>典型的训练模式：发送端先发送一段<strong>已知的训练序列</strong>，接收端的均衡器以这个已知序列为期望响应进行自适应训练。训练完成后切换到决策导向模式——用检测器的输出作为"伪期望信号"继续跟踪信道的变化。这种训练+跟踪的两阶段策略就是大多数调制解调器和 WiFi 接收机的工作方式。</p>
-
-        <h3>回声消除</h3>
-
-        <p>如果你用过免提电话或视频会议，你一定遇到过回声——自己说话的声音从对方那边传回来，延迟后再次听到。这是因为扬声器放出的声音被麦克风再次拾取，形成了一个声学回路。</p>
-
-        <p>回声消除器的思路是：利用自适应滤波器估计<strong>回声路径的冲击响应</strong>（从扬声器到麦克风的声学传递函数），然后从麦克风信号中减去估计出的回声。由于回声路径会因房间内的人员走动、物体移动而改变，滤波器必须持续自适应——这正是 LMS/NLMS 算法大显身手的场景。</p>
-
-        <div class="highlight">
-            <strong>有趣的事实：</strong>典型的声学回声路径冲击响应可能有几百甚至上千毫秒长——这意味着自适应滤波器的阶数需要达到几千（采样率 16kHz 时，500ms 对应 8000 阶）。这么大的阶数，RLS 的 O(N²) 计算量完全不现实，因此声学回声消除几乎清一色使用 NLMS 算法及其变种。这告诉我们：在工程中，"最优"的算法不一定是"最好"的算法——<strong>计算可行性才是第一位的</strong>。
-        </div>
-
-        <h2>LMS vs RLS vs 维纳滤波</h2>
-
-        <table>
-            <tr><th>特性</th><th>维纳滤波</th><th>LMS 自适应</th><th>RLS 自适应</th></tr>
-            <tr><td>需要先验统计</td><td>是（R, p 已知）</td><td>否（在线学习）</td><td>否（在线学习）</td></tr>
-            <tr><td>收敛速度</td><td>瞬间（直接计算）</td><td>慢（受特征值散布影响）</td><td>快（不受特征值影响）</td></tr>
-            <tr><td>稳态误差</td><td>最小可能（维纳解）</td><td>较大（失调）</td><td>较小（接近维纳解）</td></tr>
-            <tr><td>跟踪时变环境</td><td>否（固定滤波器）</td><td>是（持续自适应）</td><td>是（遗忘因子控制）</td></tr>
-            <tr><td>计算量（每步）</td><td>O(N³) 离线</td><td>O(N)</td><td>O(N²)</td></tr>
-            <tr><td>内存需求</td><td>O(N²)</td><td>O(N)</td><td>O(N²)</td></tr>
-            <tr><td>典型应用</td><td>理论分析、离线处理</td><td>实时系统、嵌入式</td><td>信道均衡、系统辨识</td></tr>
-        </table>
-
-        <h2>Python 实战：LMS 自适应噪声抵消</h2>
-
-        <p>下面我们用 Python 实现一个完整的 LMS 自适应噪声抵消系统，模拟胎儿心电提取的简化版本。</p>
-
-        <pre><code>import numpy as np
-import matplotlib.pyplot as plt
-
-np.random.seed(42)
-fs = 500                     # 采样率 500 Hz
-T = 5                        # 时长 5 秒
-t = np.arange(0, T, 1/fs)
-N = len(t)
-
-# 1. 模拟信号源
-# "母亲心电"：用一个 1.2Hz 的窄带信号近似
-f_maternal = 1.2
-maternal_ecg = 0.5 * np.sin(2*np.pi*f_maternal*t)
-# "胎儿心电"：用 4Hz 的窄带信号近似
-f_fetal = 4.0
-fetal_ecg = 0.3 * np.sin(2*np.pi*f_fetal*t + 0.5)
-
-# 2. 模拟传感器采集
-# 腹部信号（主输入） = 胎儿心电 + 母亲心电 + 噪声
-noise_abd = 0.1 * np.random.randn(N)
-primary = fetal_ecg + maternal_ecg + noise_abd
-
-# 胸部信号（参考输入） = 母亲心电（经过一个未知通道）+ 噪声
-# 模拟通道：一个简单的 5 抽头 FIR 滤波器
-h = np.array([0.8, 0.3, -0.2, 0.1, -0.05])
-ref_signal = np.convolve(maternal_ecg, h, mode='same')
-ref_signal += 0.05 * np.random.randn(N)
-
-# 3. LMS 自适应滤波器
-M = 8                         # 滤波器阶数
-mu = 0.02                     # 步长
-w = np.zeros(M)               # 滤波器系数初始化
-x_buf = np.zeros(M)           # 输入缓冲区
-
-output = np.zeros(N)
-error = np.zeros(N)
-
-for n in range(N):
-    x_buf = np.roll(x_buf, 1)
-    x_buf[0] = ref_signal[n]
-    y = np.dot(w, x_buf)                    # 滤波输出
-    e = primary[n] - y                      # 误差 = 估计的胎儿心电
-    w = w + 2 * mu * e * x_buf              # LMS 更新
-    output[n] = y
-    error[n] = e
-
-# 4. 绘制结果
-plt.figure(figsize=(12, 10))
-plt.subplot(411); plt.plot(t, primary);
-plt.title('腹部信号（主输入：胎儿心电 + 母亲心电 + 噪声）')
-plt.subplot(412); plt.plot(t, ref_signal);
-plt.title('胸部信号（参考输入：母亲心电经信道）')
-plt.subplot(413); plt.plot(t, output);
-plt.title('自适应滤波器输出（估计的母亲心电）')
-plt.subplot(414); plt.plot(t, error, label='消噪后');
-plt.plot(t, fetal_ecg, '--', alpha=0.7, label='真实胎儿心电');
-plt.title('误差信号 = 估计的胎儿心电')
-plt.legend(); plt.xlabel('时间 (秒)')
-plt.tight_layout()
-plt.show()
-
-print(f"最终滤波器系数: {w}")</code></pre>
-
-        <p>运行这段代码，你会看到：自适应滤波器在初始阶段有一个"学习过程"（误差信号开始时较大），大约 1-2 秒后收敛，随后误差信号几乎完全跟踪上了真实的胎儿心电波形。这说明自适应滤波器成功地"学会"了母亲心电从胸部到腹部的传输路径，并从腹部信号中抵消了它。</p>
-
-        <h2>踩坑故事：输入功率波动导致的 LMS 发散</h2>
-
-        <p>我曾参与过一个<strong>助听器自适应反馈抑制</strong>系统——助听器的麦克风和扬声器靠得很近，扬声器放大的声音会被麦克风再次拾取，形成刺耳的啸叫（反馈）。自适应滤波器的作用是估计这个反馈路径并实时抵消。</p>
-
-        <p>系统在实验室里的安静环境下测试时，一切正常。但到了真实用户场景——佩戴者在嘈杂的餐厅里用餐——问题出现了：自适应滤波器突然<strong>发散</strong>，输出信号爆炸式增长，比原来的反馈啸叫还响，用户被吓了一大跳。</p>
-
-        <p>排查后发现，原因在于 LMS 的步长 μ 是在实验室里凭借<strong>安静环境下的输入功率</strong>设定的。到了餐厅环境，麦克风拾取的信号功率大了好几倍（因为周围人声、碗碟碰撞声等），而 LMS 的收敛条件 <code>μ < 2/(N · P_in)</code> 中的 P_in 变大后，原来设定的 μ 就不再满足收敛条件了。这导致了 LMS 系数的发散——系数越跳越大，滤波器输出也跟着爆炸。</p>
-
-        <div class="warning">
-            <strong>教训：</strong>标准 LMS 对输入信号的功率变化<strong>非常敏感</strong>。解决方案是使用<strong>归一化 LMS（NLMS）</strong>——将步长除以输入信号的瞬时功率（再加一个小常数防止除零）：
-            <pre><code># NLMS 更新公式
-w[n+1] = w[n] + μ · e[n] · x[n] / (||x[n]||² + ε)</code></pre>
-            NLMS 的步长自动适应输入功率变化，在实际工程中几乎总是优于标准 LMS。如果你在用自适应滤波，<strong>请默认选择 NLMS</strong>而不是 LMS——除非你有非常特殊的理由不这么做。从那以后，我在所有自适应滤波项目中都默认使用 NLMS，再也没有发生过类似发散事故。
-        </div>
-
-        <h2>本章小结</h2>
-
-        <p>本章我们学习了自适应滤波的核心思想：当信号统计特性未知或时变时，让滤波器<strong>在线学习</strong>最优系数。LMS 算法以 O(N) 的超低计算量实现了这个目标，但收敛速度受信号特征影响；RLS 算法牺牲计算量换来了更快的收敛速度。三种经典应用——噪声抵消、信道均衡、回声消除——展示了自适应滤波在通信、生物医学和消费电子中的广泛用途。</p>
-
-        <p>从第20章的估计理论到第21-22章的维纳/卡尔曼滤波，再到第23-24章的功率谱估计，最后到本章的自适应滤波——我们走过了"已知统计 → 未知统计"、"离线 → 在线"、"平稳 → 时变"的方法演进路径。这些工具构成了随机信号分析的完整工具箱。</p>
-
-        <p>下一章，我们将开启一个新的篇章——<strong>信号检测与假设检验</strong>。前面的章节假设我们要估计信号的参数或功率谱；而信号检测问的是另一个根本问题：<strong>给定观测数据，信号到底"有"还是"没有"？</strong>从雷达目标检测到数字通信中的比特判决，这将是另一片广阔的天地。</p>
-
-        <div class="footer-nav">
-            <a href="24.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="26.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
+<a class="skip-link" href="#article-main">跳到正文</a>
+<header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">统计未知时怎么办</a><a href="#model">噪声抵消模型</a><a href="#lms">LMS：随机梯度</a><a href="#rls">RLS：递归最小二乘</a><a href="#applications">三类典型应用</a><a href="#boundary">步长、发散与边界</a><a href="#practice">可复现验证</a><a href="#synthesis">本章总结</a><a href="#references">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 统计推断与应用 / 第 25 章</div>
+<header class="article-header">
+<p class="chapter-kicker">CHAPTER 25 · 统计推断与应用</p>
+<h1>自适应滤波及应用</h1>
+<p class="dek">第 21、22 章的最优滤波都需要事先知道统计特性或系统模型。如果这些量未知、甚至随时间漂移，滤波器就只能一边工作一边估计——这就是自适应滤波。</p>
+<div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>写出 LMS 的随机梯度更新，并说明步长必须满足的收敛条件</li><li>解释 RLS 为什么收敛更快，又付出了怎样的计算代价</li><li>判断自适应噪声抵消成立所需的相关性前提，并识别步长选错导致的发散</li></ul></div>
+</header>
+<section id="opening"><h2>当统计特性未知、甚至随时间变化时</h2>
+<p>第 21 章的维纳滤波解来自维纳-霍夫方程 <code>R w = p</code>：只要输入自相关矩阵 <code>R</code> 和互相关向量 <code>p</code> 已知，它就是均方误差意义下的最优线性解。第 22 章的卡尔曼滤波同样要求状态方程与噪声协方差已知。但它们都默认这些统计量<strong>事先可测且不随时间改变</strong>。</p>
+<p>真实场景很少满足这个前提：免持通话的回声路径随房间和人员走动而变，移动通信的多径信道在毫秒级抖动，车间背景噪声的功率随设备启停起落。此时固定滤波器从设计那一刻起就已经失配。</p>
+<p><strong>本章的核心问题</strong>：如果不显式估计 <code>R</code> 与 <code>p</code>，而是让滤波器每来一个样本就朝减小瞬时误差的方向挪动一小步，它能否自动逼近、并持续跟踪那个未知的最优解？</p>
+<div class="note"><p>本章只讨论<strong>线性自适应</strong>：滤波器的结构（FIR 抽头或 IIR 递归）固定，算法在线调整的只是系数向量。非线性自适应、基于神经网络的滤波不在讨论范围内。</p></div></section>
+<section id="model"><h2>一个最小模型：自适应噪声抵消</h2>
+<p>先固定一个完全指定的模型。设主输入为期望信号与噪声之和，另有一路参考输入：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="自适应噪声抵消的输入输出关系"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="主输入等于信号加噪声，输出等于主输入减去滤波器对参考输入的估计"><mi>d</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>=</mo><mi>s</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>+</mo><msub><mi>v</mi><mn>0</mn></msub><mo>[</mo><mi>n</mi><mo>]</mo><mo>,</mo><mspace width="1em"/><mi>e</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>=</mo><mi>d</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>−</mo><msup><mi>w</mi><mi>T</mi></msup><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo></math><span class="eq-label">(25.1) 噪声抵消的输入输出</span></div>
+<p>其中 <code>x[n]=[x[n],x[n−1],…,x[n−N+1]]ᵀ</code> 是由参考信号构成的 N 维向量，<code>w</code> 是待定系数。关键假设是：参考 <code>x[n]</code> 与噪声 <code>v₀[n]</code> <strong>相关</strong>，却与目标信号 <code>s[n]</code> <strong>不相关</strong>。</p>
+<figure><svg viewBox="0 0 1000 380" role="img" aria-labelledby="anc-t anc-d"><title id="anc-t">自适应噪声抵消：用参考通道估计噪声再相减</title><desc id="anc-d">主输入 d[n] 是信号 s[n] 与噪声 v0[n] 之和；参考通道 x[n] 与 v0[n] 相关而与 s[n] 无关。自适应滤波器 W(z) 以误差 e[n] 在线调整，使输出近似只剩下 s[n]。</desc><rect width="1000" height="380" rx="19" fill="#fffdf8"/><defs><marker id="anc-am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#2f7d7b"/></marker><marker id="anc-amc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#ce704f"/></marker></defs><text x="36" y="86" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#2f7d7b">信号源 s[n]</text><line x1="36" y1="103" x2="268" y2="103" stroke="#2f7d7b" stroke-width="2.4" marker-end="url(#anc-am)"/><text x="600" y="45" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#ce704f">噪声 v₀[n]（与 s[n] 无关）</text><line x1="660" y1="56" x2="660" y2="90" stroke="#ce704f" stroke-width="2.4" marker-end="url(#anc-amc)"/><line x1="660" y1="106" x2="300" y2="106" stroke="#ce704f" stroke-width="2.4" marker-end="url(#anc-amc)"/><circle cx="286" cy="106" r="16" fill="#eef5f4" stroke="#2f7d7b" stroke-width="2"/><text x="286" y="112" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" fill="#20343d">＋</text><text x="312" y="86" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#20343d">主输入 d[n]=s[n]+v₀[n]</text><line x1="302" y1="106" x2="560" y2="106" stroke="#2f7d7b" stroke-width="2.4" marker-end="url(#anc-am)"/><circle cx="590" cy="106" r="16" fill="#fbeae3" stroke="#ce704f" stroke-width="2"/><text x="590" y="112" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" fill="#20343d">−</text><line x1="606" y1="106" x2="884" y2="106" stroke="#2f7d7b" stroke-width="2.4" marker-end="url(#anc-am)"/><text x="892" y="99" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#2f7d7b">输出 e[n] ≈ s[n]</text><text x="36" y="262" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#ce704f">参考输入 x[n]（与 v₀[n] 相关）</text><line x1="36" y1="279" x2="170" y2="279" stroke="#ce704f" stroke-width="2.4" marker-end="url(#anc-amc)"/><rect x="172" y="244" width="164" height="70" rx="12" fill="#eef5f4" stroke="#2f7d7b" stroke-width="2"/><text x="254" y="276" text-anchor="middle" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="15" fill="#20343d">自适应滤波器</text><text x="254" y="298" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#5d7078">w[n]，阶数 N</text><line x1="336" y1="279" x2="560" y2="279" stroke="#2f7d7b" stroke-width="2.4" marker-end="url(#anc-am)"/><line x1="590" y1="279" x2="590" y2="124" stroke="#2f7d7b" stroke-width="2.4" marker-end="url(#anc-am)"/><text x="604" y="272" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#5d7078">估计的噪声 ŷ[n]</text><path d="M700 106 C 760 170, 460 360, 300 300" fill="none" stroke="#7564ad" stroke-width="2.2" stroke-dasharray="6 5" marker-end="url(#anc-am)"/><text x="470" y="338" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#7564ad">用 e[n] 更新系数：w ← w + μ·e·x</text><text x="36" y="364" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">前提：存在一路与噪声相关、与目标信号不相关的参考通道；若参考里混入 s[n]，相减会一并削弱信号。</text></svg><figcaption>图 25.1　误差 e[n] 既是输出、又是训练信号：算法不断调整 w，使 e[n] 的均方值最小。</figcaption></figure>
+<p>在平稳、联合二阶矩存在的假设下，均方误差是 <code>w</code> 的二次函数：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="均方误差是权向量的二次型"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="均方误差等于期望输出方差减二倍权向量与互相关向量的内积再加权向量二次型"><mi>J</mi><mo>(</mo><mi>w</mi><mo>)</mo><mo>=</mo><mi>E</mi><mo>[</mo><msup><mi>e</mi><mn>2</mn></msup><mo>[</mo><mi>n</mi><mo>]</mo><mo>]</mo><mo>=</mo><msubsup><mi>σ</mi><mi>d</mi><mn>2</mn></msubsup><mo>−</mo><mn>2</mn><msup><mi>w</mi><mi>T</mi></msup><mi>p</mi><mo>+</mo><msup><mi>w</mi><mi>T</mi></msup><mi>R</mi><mi>w</mi></math><span class="eq-label">(25.2) 二次代价面</span></div>
+<p>这里 <code>R=E[x xᵀ]</code> 对称半正定，<code>p=E[d x]</code>。对 <code>w</code> 求梯度并令其为零，得到的正是第 21 章的维纳解 <code>w*=R⁻¹p</code>，前提是 <code>R</code> 正定（可逆）。<strong>自适应滤波并不推翻这个解，它只是用数据在线逼近这个解。</strong></p>
+</section>
+<section id="lms"><h2>LMS：用瞬时值代替统计量</h2>
+<p>最速下降法沿负梯度方向迭代：<code>w[n+1]=w[n]−(μ/2)∇J(w[n])</code>，代入式 (25.2) 的梯度 <code>∇J=2(Rw−p)</code> 得 <code>w[n+1]=w[n]+μ(p−Rw[n])</code>。问题在于 <code>p</code> 和 <code>R</code> 仍然未知。</p>
+<p>LMS（最小均方）的关键一步是：用<strong>瞬时估计</strong> <code>e[n]x[n]</code> 代替期望 <code>p−Rw[n]</code>。在平稳假设下 <code>E[e[n]x[n]]=p−Rw[n]</code>，所以这个替换是<strong>无偏</strong>的；代价是每次只用了一个样本，迭代方向上叠加了噪声。于是得到只需当前样本的更新：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="LMS 系数更新公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="LMS 系数更新等于旧系数加步长乘误差乘参考向量"><mi>w</mi><mo>[</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo>]</mo><mo>=</mo><mi>w</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>+</mo><mi>μ</mi><mspace width="0.15em"/><mi>e</mi><mo>[</mo><mi>n</mi><mo>]</mo><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo></math><span class="eq-label">(25.3) LMS 更新</span></div>
+<p>运算量只有 <code>O(N)</code> —— 一次内积加一次向量更新，非常适合实时实现。但它对步长 <code>μ</code> 敏感。把式 (25.3) 在均值意义下分解到 <code>R</code> 的特征方向上，可得收敛条件：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="LMS 收敛的步长条件"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="步长大于零且小于二除以最大特征值"><mn>0</mn><mo>&lt;</mo><mi>μ</mi><mo>&lt;</mo><mfrac><mn>2</mn><msub><mi>λ</mi><mi>max</mi></msub></mfrac></math><span class="eq-label">(25.4) 收敛条件</span></div>
+<p>其中 <code>λmax</code> 是 <code>R</code> 的最大特征值。工程上常用一个更保守、无需做特征分解的上界 <code>0&lt;μ&lt;2/(N·P_in)</code>，<code>P_in=E[x²]</code> 是输入平均功率。注意：这个条件里出现的是<strong>输入功率</strong>，不是采样点数——当输入功率变大，原本安全的步长就可能越界。</p>
+<figure><svg viewBox="0 0 1000 400" role="img" aria-labelledby="lc-t lc-d"><title id="lc-t">步长与算法决定 LMS 的收敛速度与稳态失调</title><desc id="lc-d">三条归一化均方误差学习曲线：大步长收敛快但稳态失调高，小步长失调低却收敛慢，RLS 在同样误差水平下收敛最快。曲线为按一阶指数模型绘制的教学示意。</desc><rect width="1000" height="400" rx="19" fill="#fffdf8"/><line x1="90" y1="320" x2="880" y2="320" stroke="#dce7e6"/><line x1="90" y1="70" x2="90" y2="330" stroke="#dce7e6"/><g font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5d7078"><text x="90" y="340" text-anchor="middle">0</text><text x="485" y="340" text-anchor="middle">200</text><text x="880" y="340" text-anchor="end">400 次迭代 n</text><text x="14" y="195" text-anchor="middle" transform="rotate(-90 14 195)">均方误差 J（归一化）</text><text x="84" y="74" text-anchor="end">4.0</text><text x="84" y="324" text-anchor="end">0</text></g><polyline points="90.0,70.0 109.8,107.3 129.5,136.4 149.2,159.0 169.0,176.7 188.8,190.4 208.5,201.1 228.2,209.4 248.0,215.9 267.8,221.0 287.5,224.9 307.2,228.0 327.0,230.3 346.8,232.2 366.5,233.7 386.2,234.8 406.0,235.7 425.8,236.3 445.5,236.9 465.2,237.3 485.0,237.6 504.8,237.9 524.5,238.1 544.2,238.2 564.0,238.3 583.8,238.4 603.5,238.5 623.2,238.6 643.0,238.6 662.8,238.6 682.5,238.7 702.2,238.7 722.0,238.7 741.8,238.7 761.5,238.7 781.2,238.7 801.0,238.7 820.8,238.7 840.5,238.7 860.2,238.7 880.0,238.7" fill="none" stroke="#ce704f" stroke-width="2.4"/><polyline points="90.0,70.0 109.8,78.2 129.5,86.0 149.2,93.5 169.0,100.7 188.8,107.5 208.5,114.0 228.2,120.2 248.0,126.2 267.8,131.9 287.5,137.3 307.2,142.5 327.0,147.5 346.8,152.3 366.5,156.8 386.2,161.1 406.0,165.3 425.8,169.2 445.5,173.0 465.2,176.6 485.0,180.1 504.8,183.4 524.5,186.5 544.2,189.6 564.0,192.4 583.8,195.2 603.5,197.8 623.2,200.3 643.0,202.7 662.8,205.0 682.5,207.2 702.2,209.3 722.0,211.3 741.8,213.2 761.5,215.1 781.2,216.8 801.0,218.5 820.8,220.1 840.5,221.6 860.2,223.1 880.0,224.4" fill="none" stroke="#2f7d7b" stroke-width="2.4"/><polyline points="90.0,70.0 109.8,149.4 129.5,194.9 149.2,221.1 169.0,236.1 188.8,244.7 208.5,249.6 228.2,252.4 248.0,254.1 267.8,255.0 287.5,255.5 307.2,255.8 327.0,256.0 346.8,256.1 366.5,256.2 386.2,256.2 406.0,256.2 425.8,256.2 445.5,256.2 465.2,256.2 485.0,256.2 504.8,256.2 524.5,256.2 544.2,256.2 564.0,256.2 583.8,256.2 603.5,256.2 623.2,256.2 643.0,256.2 662.8,256.2 682.5,256.2 702.2,256.2 722.0,256.2 741.8,256.2 761.5,256.2 781.2,256.2 801.0,256.2 820.8,256.2 840.5,256.2 860.2,256.2 880.0,256.2" fill="none" stroke="#7564ad" stroke-width="2.4"/><line x1="330" y1="238.7" x2="880" y2="238.7" stroke="#ce704f" stroke-width="1.3" stroke-dasharray="5 5"/><line x1="330" y1="256.2" x2="880" y2="256.2" stroke="#7564ad" stroke-width="1.3" stroke-dasharray="5 5"/><text x="600" y="130" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#ce704f">大步长 μ：快但失调大（稳态 J ≈ 1.30）</text><text x="600" y="178" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#2f7d7b">小步长 μ：慢但失调小（稳态 J ≈ 1.05）</text><text x="600" y="214" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="13.5" fill="#7564ad">RLS：收敛最快、失调最小（稳态 J ≈ 1.02）</text><text x="90" y="378" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">教学示意：按 J(n)=J∞+(J₀−J∞)e^(−n/τ) 绘制，τ 随步长减小而增大；真实曲线随输入相关矩阵而非单一时间常数演化。</text></svg><figcaption>图 25.2　步长放大收敛速度也放大稳态失调；这是一条无法同时满足的取舍曲线。</figcaption></figure>
+<div class="warning"><p><strong>稳态失调</strong>是 LMS 绕不开的代价：由于瞬时梯度含噪，系数在最优值附近持续抖动，使收敛后的均方误差高于维纳解。前馈去耦近似给出额外均方误差比 <code>M ≈ (μ/2)·tr(R)</code>。要让失调变小就得减小 <code>μ</code>，但收敛也变慢——图中两条曲线的横向位置就是这个矛盾。</p></div>
+</section>
+<section id="rls"><h2>RLS：用逆相关矩阵换收敛速度</h2>
+<p>LMS 的收敛快慢取决于 <code>R</code> 的<strong>特征值散布</strong>（条件数）：输入接近白噪声时很快，输入高度有色时很慢。RLS（递归最小二乘）换了一个目标：最小化从开始到现在的<strong>指数加权残差平方和</strong>，而不是瞬时误差的期望。</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="RLS 的加权最小二乘代价函数"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="代价函数等于从一到n对遗忘因子幂乘误差平方求和"><msub><mi>J</mi><mi>n</mi></msub><mo>(</mo><mi>w</mi><mo>)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover><msup><mi>λ</mi><mrow><mi>n</mi><mo>−</mo><mi>k</mi></mrow></msup><msup><mi>e</mi><mn>2</mn></msup><mo>[</mo><mi>k</mi><mo>]</mo></math><span class="eq-label">(25.5) 遗忘因子 λ∈(0,1]</span></div>
+<p>令 <code>Φ[n]=Σ λ^{n−k}x[k]x[k]ᵀ</code>（加上小的正则项 <code>δI</code> 保证可逆），<code>z[n]=Σ λ^{n−k}d[k]x[k]</code>，则最优条件仍是线性方程组 <code>Φ[n]w=z[n]</code>。RLS 的高明处在于<strong>递推更新 <code>Φ⁻¹</code></strong>，而不每次重新求逆：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="RLS 的增益、系数与逆相关矩阵递推"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="增益向量等于逆相关矩阵乘参考向量再除以一加分母，系数加增益乘先验误差，逆矩阵按 Sherman-Morrison 公式更新"><mi>k</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>=</mo><mfrac><mrow><mi>P</mi><mo>[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>]</mo><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo></mrow><mrow><mi>λ</mi><mo>+</mo><msup><mi>x</mi><mi>T</mi></msup><mo>[</mo><mi>n</mi><mo>]</mo><mi>P</mi><mo>[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>]</mo><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo></mrow></mfrac></math><span class="eq-label">(25.6) 增益向量，P=Φ⁻¹</span></div>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="系数与逆相关矩阵的更新式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="系数加增益乘先验误差，逆矩阵减去增益乘行向量再除以遗忘因子"><mi>w</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>=</mo><mi>w</mi><mo>[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>]</mo><mo>+</mo><mi>k</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>(</mo><mi>d</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>−</mo><msup><mi>x</mi><mi>T</mi></msup><mo>[</mo><mi>n</mi><mo>]</mo><mi>w</mi><mo>[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>]</mo><mo>)</mo><mo>,</mo><mspace width="0.6em"/><mi>P</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>=</mo><mfrac><mrow><mi>P</mi><mo>[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>]</mo><mo>−</mo><mi>k</mi><mo>[</mo><mi>n</mi><mo>]</mo><msup><mi>x</mi><mi>T</mi></msup><mo>[</mo><mi>n</mi><mo>]</mo><mi>P</mi><mo>[</mo><mi>n</mi><mo>−</mo><mn>1</mn><mo>]</mo></mrow><mi>λ</mi></mfrac></math><span class="eq-label">(25.7) 系数与逆矩阵更新</span></div>
+<p>代价是每步 <code>O(N²)</code> 的矩阵运算。对 N=128 阶的滤波器，RLS 每步约需上万次乘加，而 LMS 只要百次级。但回报也明显：当 <code>λ=1</code> 且输入平稳时，RLS 在约 <code>2N</code> 步内逼近维纳解，收敛速度<strong>基本不受特征值散布影响</strong>。</p>
+</section>
+<section id="applications"><h2>三类典型应用与它们各自的前提</h2>
+<h3>1. 自适应噪声抵消</h3>
+<p>回到图 25.1 的结构。当滤波器收敛时 <code>ŷ[n]≈v₀[n]</code>，输出 <code>e[n]</code> 只剩目标信号。这类结构常用于从含噪声的多路传感器信号中提取相关分量。但注意它的成立前提：</p>
+<ul><li>参考通道必须与噪声相关，否则滤波器无从预测噪声；</li><li>参考通道必须与目标信号不相关，否则相减会连带削弱有用信号；</li><li>噪声源到两个传感器的通道差异要能被 N 阶 FIR 近似，否则抵消不充分。</li></ul>
+<h3>2. 自适应信道均衡</h3>
+<p>信号经多径信道后产生码间干扰。均衡器以接收信号为输入、以发送符号为期望响应，逆滤波补偿信道。常见做法分两段：先用一段接收端已知的<strong>训练序列</strong>驱动自适应（此时“期望响应”可靠），再切换到<strong>决策导向</strong>模式，用判决输出作为伪期望继续跟踪信道缓变。</p>
+<h3>3. 声学回声消除</h3>
+<p>免持设备的扬声器声音被麦克风再次拾取形成回声。回声消除器用自适应滤波器估计扬声器到麦克风的<strong>声学冲激响应</strong>，再从麦克风信号中减去估计的回声。声学路径的冲激响应可能长达数百毫秒，对应数千阶 FIR；此时 <code>O(N²)</code> 的 RLS 不现实，工程上几乎都使用 <strong>NLMS</strong>（见下节）。</p>
+<div class="note"><p>对比第 21 章的维纳滤波与第 22 章的卡尔曼滤波：维纳滤波需要离线已知的 <code>R</code> 与 <code>p</code>，卡尔曼滤波需要模型与协方差；自适应滤波不要求这些先验，代价是收敛需要时间、稳态存在失调，且跟踪速度与稳态精度相互制约。</p></div>
+</section>
+<section id="boundary"><h2>步长选错会发散，而不是变慢</h2>
+<p>式 (25.4) 不是“建议值”，而是<strong>稳定性边界</strong>。把 LMS 的均值迭代写作 <code>E[w[n+1]]=(I−μR)E[w[n]]+μp</code>，误差 <code>v[n]=E[w[n]]−w*</code> 满足 <code>v[n+1]=(I−μR)v[n]</code>。只有当 <code>I−μR</code> 的所有特征值落在 <code>(−1,1)</code> 内，误差才收敛；否则会指数放大。</p>
+<figure><svg viewBox="0 0 1000 400" role="img" aria-labelledby="ws-t ws-d"><title id="ws-t">LMS 在权空间沿椭圆等值线呈“之”字形收敛</title><desc id="ws-d">二次均方误差的等值线是以最优权 w* 为中心的椭圆。输入相关矩阵特征值散布越大，椭圆越扁，梯度下降在长轴上反复回摆，收敛越慢。</desc><rect width="1000" height="400" rx="19" fill="#fffdf8"/><text x="28" y="41" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="21" fill="#20343d" font-weight="700">特征值散布决定 LMS 的收敛路径</text><line x1="90" y1="330" x2="910" y2="330" stroke="#dce7e6"/><line x1="90" y1="330" x2="90" y2="70" stroke="#dce7e6"/><text x="906" y="352" text-anchor="end" font-family="Arial,sans-serif" font-size="13" fill="#5d7078">w₁</text><text x="84" y="76" text-anchor="end" font-family="Arial,sans-serif" font-size="13" fill="#5d7078">w₂</text><g transform="rotate(-28 500 200)" fill="none" stroke="#7564ad"><ellipse cx="500" cy="200" rx="330" ry="96" stroke-width="1.6" stroke-dasharray="7 6"/><ellipse cx="500" cy="200" rx="230" ry="66" stroke-width="1.8" stroke-dasharray="7 6"/><ellipse cx="500" cy="200" rx="140" ry="40" stroke-width="2" stroke-dasharray="7 6"/><ellipse cx="500" cy="200" rx="66" ry="19" stroke-width="2.2" stroke-dasharray="7 6"/></g><defs><marker id="wc-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#ce704f"/></marker></defs><circle cx="500" cy="200" r="6" fill="#2f7d7b"/><text x="512" y="196" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#2f7d7b">最优权 w*</text><polyline points="170,320 300,150 360,270 430,168 470,232 500,196 512,214 500,200" fill="none" stroke="#ce704f" stroke-width="2.6" marker-end="url(#wc-ar)"/><text x="150" y="70" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="14" fill="#ce704f">LMS 迭代路径：沿长轴来回摆动</text><text x="90" y="372" font-family="Arial,'Noto Sans CJK SC','Microsoft YaHei',sans-serif" font-size="12.5" fill="#5d7078">条件数 χ=λmax/λmin 越大，椭圆越扁、摆动越剧烈；RLS 用逆相关矩阵“预白化”，路径近似直指 w*。等值线为教学示意。</text></svg><figcaption>图 25.3　二次代价面的等值线是椭圆；条件数越大越扁，梯度下降在长轴上摆动越剧烈。图中等值线为教学示意。</figcaption></figure>
+<p><strong>反例（输入功率跳变导致发散）</strong>：设某时刻输入为白噪声，<code>R=0.04·I</code>（单特征值 0.04），选 <code>μ=30</code> 似乎仍在 <code>2/λmax=50</code> 以内。若随后输入功率上升为 <code>R=0.4·I</code>，则 <code>2/λmax=5</code>，同一个 <code>μ=30</code> 立即越界，<code>I−μR</code> 的特征值变为 <code>1−30×0.4=−11</code>，误差按约 11 倍逐代放大，系数迅速爆炸。这就是“实验室安静、现场嘈杂”时 LMS 失稳的机理。</p>
+<div class="warning"><p><strong>NLMS 修正</strong>：把步长除以输入瞬时功率，使实际步长随功率自动缩放：</p>
+<div class="eq" data-math-scroll role="region" tabindex="0" aria-label="NLMS 归一化更新公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="NLMS 更新等于旧系数加归一化步长乘误差乘参考向量"><mi>w</mi><mo>[</mo><mi>n</mi><mo>+</mo><mn>1</mn><mo>]</mo><mo>=</mo><mi>w</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>+</mo><mfrac><mi>μ</mi><mrow><msup><mrow><mo>∥</mo><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>∥</mo></mrow><mn>2</mn></msup><mo>+</mo><mi>ε</mi></mrow></mfrac><mi>e</mi><mo>[</mo><mi>n</mi><mo>]</mo><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo></math><span class="eq-label">(25.8) 归一化 LMS，ε&gt;0 防零除</span></div>
+<p>当 <code>0&lt;μ&lt;2</code> 时，NLMS 对输入功率的变化保持稳定。因此凡是输入功率可能大幅波动的场合（语音、回声消除），应优先使用 NLMS 而不是固定步长的 LMS。</p></div>
+<p><strong>RLS 的边界</strong>：<code>P=Φ⁻¹</code> 在 <code>Φ</code> 病态时会放大数值误差，需靠正则项 <code>δI</code> 或平方根实现稳定；遗忘因子 <code>λ&lt;1</code> 能跟踪时变系统，但等效记忆变短、估计方差上升。换句话说，<strong>“能跟踪”和“估计得准”也是一对取舍</strong>，只是它藏在 <code>λ</code> 里。</p>
+</section>
+<section id="practice"><h2>用一段确定性代码验证 LMS 确实收敛</h2>
+<p>下面的例子做系统辨识：让 LMS 去拟合一个未知的 3 抽头 FIR 系统 <code>h=[0.9,−0.4,0.2]</code>。随机数用固定种子，只用标准库，结果可复现。步长 <code>μ=0.05</code> 满足式 (25.4) 的保守上界 <code>2/(N·P_in)=2/(3×1/3)=2</code>。</p>
+<pre class="code-block"><code>import random
+random.seed(7)
+h = [0.9, -0.4, 0.2]          # 未知 FIR 系统
+w = [0.0, 0.0, 0.0]          # 待学习系数
+mu = 0.05                     # 步长（满足 0 &lt; mu &lt; 2/(N*P_in)）
+xs = [random.uniform(-1, 1) for _ in range(4000)]   # x ~ U(-1,1)
+
+for n in range(2, 4000):
+    x = [xs[n], xs[n-1], xs[n-2]]
+    y = sum(w[k]*x[k] for k in range(3))            # 滤波输出
+    d = sum(h[k]*x[k] for k in range(3))            # 期望响应
+    e = d - y                                        # 误差
+    for k in range(3):
+        w[k] += mu * e * x[k]                        # LMS 更新 (25.3)
+
+print([round(v, 3) for v in w])   # → [0.9, -0.4, 0.2]
+assert abs(w[0]-0.9) &lt; 0.05 and abs(w[1]+0.4) &lt; 0.05 and abs(w[2]-0.2) &lt; 0.05
+</code></pre>
+<div class="example"><p><strong>独立练习：</strong>把 <code>mu</code> 改为 <code>3.0</code>（超过上界 2），观察 <code>w</code> 是否迅速飞到极大的数；再把它改回 0.05，但把 <code>xs</code> 的幅度乘 10（模拟输入功率变大），此时原来的 <code>mu</code> 是否已经越界？最后用式 (25.8) 的 NLMS 重做一遍，验证它对输入幅度缩放不敏感。</p></div>
+</section>
+<section id="synthesis"><h2>把“自适应”接回整本书的脉络</h2>
+<p>从第 20 章的估计理论到第 21–22 章的维纳/卡尔曼滤波，再到本章，主线是同一个：从已知统计量出发求最优解，再把它放松成只需观测就能在线逼近的方法。LMS 用瞬时梯度替换期望，RLS 用逆相关矩阵替换特征值分解，两者都在回答一个问题——<strong>当先验知识不足时，哪些先验是必须的，哪些可以用数据换？</strong></p>
+<details><summary>自检：LMS 的收敛条件为什么与 λmax 而不是 N 有关？</summary><p>均值迭代是 <code>v[n+1]=(I−μR)v[n]</code>。把 <code>R</code> 对角化后，每个特征方向上的误差按 <code>1−μλᵢ</code> 缩放，稳定性要求所有 <code>|1−μλᵢ|&lt;1</code>，最紧的约束来自最大的 <code>λᵢ</code>。工程上界 <code>2/(N·P_in)</code> 只是用 <code>λmax≤tr(R)=N·P_in</code> 做的保守替换。</p></details>
+<details><summary>自检：参考通道里混入了目标信号会怎样？</summary><p>噪声抵消要求参考与 <code>s[n]</code> 不相关。若参考含 <code>s[n]</code> 分量，滤波器会学着去预测这一部分，相减时把真正的信号也一并减掉，输出产生失真。这是实际 ANC 设计中最常见的失败原因。</p></details>
+<details><summary>自检：RLS 收敛快，为何不总是用它？</summary><p>因为每步 <code>O(N²)</code>，且 <code>P</code> 的递推对数值精度敏感。长冲激响应（如回声消除）下计算量不可接受，因此工程上常用 NLMS 或块处理、子带方法在两者之间取折中。</p></details>
+</section>
+<section id="references" class="references"><h2>延伸阅读与核查依据</h2><ol><li>B. Widrow, M. E. Hoff, “Adaptive switching circuits,” <em>IRE WESCON Convention Record</em>, part 4, pp. 96–104, 1960.——LMS 规则的最早来源。</li><li>B. Widrow et al., “Adaptive noise cancelling: Principles and applications,” <em>Proceedings of the IEEE</em>, vol. 63, no. 12, pp. 1692–1716, 1975.——噪声抵消结构与相关性前提的经典论述。</li><li>S. Haykin, <em>Adaptive Filter Theory</em>, 5th ed., Pearson, 2014.——LMS 失调公式、特征值散布与 RLS 递推的标准推导。</li><li>A. H. Sayed, <em>Fundamentals of Adaptive Filtering</em>, Wiley, 2003.——归一化 LMS 与 RLS 数值稳定性的系统讨论。</li></ol><p>本章的公式与结论均可在上述文献中找到对应；图 25.2、图 25.3 中的数值为教学示意，已按图注说明的模型绘制，不代表任何实测结果。</p></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="24.html">← 第 24 章</a><a href="../index.html#content">全部章节</a><a href="26.html">第 26 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源代码</a></p></div></footer>
+<script defer src="../assets/js/site.js"></script>
 </body>
 </html>

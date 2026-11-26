@@ -301,7 +301,7 @@
         "噪声抵消与回声消除"
       ],
       "file": "chapters/25.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "统计推断与应用"
     },
     {
