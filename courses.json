@@ -284,12 +284,12 @@
       "num": "24",
       "title": "现代功率谱估计",
       "topics": [
-        "AR模型与Yule-Walker",
-        "Levinson-Durbin递推",
-        "MUSIC超分辨算法"
+        "AR模型与Yule-Walker方程",
+        "Levinson递推与Burg法",
+        "MUSIC子空间超分辨"
       ],
       "file": "chapters/24.html",
-      "stage": "legacy",
+      "stage": "refactored",
       "group": "统计推断与应用"
     },
     {

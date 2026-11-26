@@ -1,284 +1,44 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>第24章 现代功率谱估计</title>
-    <link rel="stylesheet" href="theme.css">
-</head>
-<body>
-<div class="double-border">
-<div class="container">
-    <div class="sidebar">
-        <h3>📊 课程目录</h3>
-        <ul class="chapter-list">
-            <li><a href="01.html">第1章 从确定性到随机性：概率论回顾</a></li>
-            <li><a href="02.html">第2章 随机变量及其分布</a></li>
-            <li><a href="03.html">第3章 高斯分布与多维随机变量</a></li>
-            <li><a href="04.html">第4章 随机变量的数字特征</a></li>
-            <li><a href="05.html">第5章 随机变量函数与极限定理</a></li>
-            <li><a href="06.html">第6章 随机信号的基本概念</a></li>
-            <li><a href="07.html">第7章 随机信号的相关与微积分</a></li>
-            <li><a href="08.html">第8章 平稳随机信号</a></li>
-            <li><a href="09.html">第9章 功率谱密度与维纳-辛钦定理</a></li>
-            <li><a href="10.html">第10章 白噪声与热噪声</a></li>
-            <li><a href="11.html">第11章 各态历经性与实验测量</a></li>
-            <li><a href="12.html">第12章 随机信号通过线性系统（上）</a></li>
-            <li><a href="13.html">第13章 随机信号通过线性系统（下）</a></li>
-            <li><a href="14.html">第14章 平稳序列与离散系统</a></li>
-            <li><a href="15.html">第15章 高斯过程</a></li>
-            <li><a href="16.html">第16章 窄带随机信号分析</a></li>
-            <li><a href="17.html">第17章 窄带高斯信号的包络与相位</a></li>
-            <li><a href="18.html">第18章 马尔可夫链</a></li>
-            <li><a href="19.html">第19章 泊松过程与散弹噪声</a></li>
-            <li><a href="20.html">第20章 估计理论基础</a></li>
-            <li><a href="21.html">第21章 维纳滤波</a></li>
-            <li><a href="22.html">第22章 卡尔曼滤波</a></li>
-            <li><a href="23.html">第23章 经典功率谱估计</a></li>
-            <li><a href="24.html" class="active">第24章 现代功率谱估计</a></li>
-            <li><a href="25.html">第25章 自适应滤波及应用</a></li>
-            <li><a href="26.html">第26章 信号检测与假设检验</a></li>
-            <li><a href="27.html">第27章 现代信号处理前沿</a></li>
-            <li><a href="28.html">第28章 综合项目实战</a></li>
-        </ul>
-    </div>
-    <div class="main-content">
-
-        <h2>经典方法的局限与参数化革命</h2>
-
-        <p>大家好，我是你们的讲师。上一章我们学习了经典功率谱估计，最后我留了一个问题：如果数据长度有限，你如何分辨两个频率仅差 1Hz 的信号？</p>
-
-        <p>在经典方法的世界里，答案有些令人沮丧——你只能依靠增加数据长度 N 来提升频率分辨率。这个分辨率极限被称为<strong>瑞利限</strong>（Rayleigh limit），约为 <code>Δf ≈ 1/N</code>。如果你想分辨 100Hz 和 101Hz，采样率 1000Hz 时你需要至少 1000 个采样点——也就 1 秒的数据。如果信号只能稳定存在 0.5 秒呢？经典方法到极限了。</p>
-
-        <p>但这还不是全部问题。经典方法还隐式假设了数据窗外观测为零——这个"截断"操作在频域表现为频谱泄漏，弱信号会被强信号的旁瓣淹没。面对这些困境，信号处理领域在 1970-80 年代迎来了一场革命：<strong>参数化谱估计</strong>。它的核心思想是：不要直接对数据做傅里叶变换，而是先假设数据服从一个参数化模型（如 AR 模型），然后从数据中估计模型参数，最后用模型参数计算出一个"完美"的功率谱。本章就带你走进这个世界。</p>
-
-        <h2>AR 模型谱估计</h2>
-
-        <h3>将信号建模为白噪声驱动的 AR 过程</h3>
-
-        <p>AR 模型（自回归模型）的基本思想非常直观：当前的信号值可以由过去 p 个值的线性组合加上一个白噪声激励来预测：</p>
-
-        <pre><code># AR(p) 模型：p 阶自回归
-x[n] = -a₁·x[n-1] - a₂·x[n-2] - ... - aₚ·x[n-p] + w[n]
-
-其中 w[n] 是均值为零、方差为 σ² 的白噪声</code></pre>
-
-        <p>这个模型的含义是：信号 x[n] 的"记忆"只延续到过去的 p 个时刻——超过 p 步的历史信息，全部通过这 p 个系数间接体现了。这正是"自回归"这个名字的由来——它在对自己做回归。</p>
-
-        <p>一旦我们估计出了 AR 系数 <code>a₁, a₂, ..., aₚ</code> 和白噪声方差 <code>σ²</code>，功率谱就可以通过一个简单的闭式公式直接计算：</p>
-
-        <pre><code># AR 谱估计公式
-S_AR(f) = σ² / |1 + Σ aₖ · e^(-j2πfk)|²     (|f| ≤ 0.5)
-
-# 离散频率形式
-S_AR[k] = σ² / |1 + Σ aₖ · e^(-j2πkn/N)|²</code></pre>
-
-        <p>对比一下经典周期图和 AR 谱的差异：周期图是对<strong>数据</strong>做傅里叶变换然后平方，<strong>方差大</strong>；AR 谱是对<strong>模型</strong>做傅里叶变换，<strong>方差小</strong>（因为模型参数是从全部数据中联合估计的）。代价是：如果信号不符合 AR 模型假设，AR 谱会给出错误的结果。</p>
-
-        <div class="highlight">
-            <strong>直觉理解：</strong>AR 模型谱估计可以看作是一种"外推"——经典方法默认窗外数据为零，导致频谱泄漏；而 AR 模型用估计出的系数"推断"出窗外数据的可能行为，从而等效地得到了更长的数据，提高了频率分辨率。这就好比给你看一段旋律的前几秒，AR 模型试图猜出后面的音符——猜对了就获得了超越数据长度的"分辨率"。
-        </div>
-
-        <h3>Yule-Walker 方程</h3>
-
-        <p>如何从数据中估计 AR 系数？最经典的方法通过 Yule-Walker 方程来实现。它的思路是：将 AR 模型方程两边乘以 <code>x[n-m]</code> 并取期望，利用自相关函数的定义，得到一组线性方程：</p>
-
-        <pre><code># Yule-Walker 方程（矩阵形式）
-[ R(0)   R(1)   ...  R(p-1) ] [ a₁ ]     [ R(1) ]
-[ R(1)   R(0)   ...  R(p-2) ] [ a₂ ]     [ R(2) ]
-[  ...    ...    ...   ...   ] [ ... ] = -[ ... ]
-[ R(p-1) R(p-2) ...  R(0)  ] [ aₚ ]     [ R(p) ]
-
-# 白噪声方差由下式给出：
-σ² = R(0) + Σ aₖ · R(k)</code></pre>
-
-        <p>其中 <code>R(k)</code> 是信号的自相关函数。在实际应用中，我们无法获得真实的 <code>R(k)</code>，只能用样本自相关估计 <code>R̂(k)</code> 代入。</p>
-
-        <p>这个方程组看起来平淡无奇，但它的矩阵结构非常特殊——系数矩阵是<strong>托普利兹矩阵</strong>（Toeplitz matrix，每条对角线上的元素相同），并且是<strong>正定对称</strong>的。这两个性质让我们可以用远比高斯消元高效的算法来求解。</p>
-
-        <h2>Levinson-Durbin 递推</h2>
-
-        <h3>O(p²) 的高效求解</h3>
-
-        <p>一般来说，解一组 p 个方程的线性系统需要 O(p³) 的计算量。但如果矩阵是托普利兹正定矩阵，Levinson-Durbin 算法可以将复杂度降到 <strong>O(p²)</strong>——对于几百阶的 AR 模型，这速度差距是巨大的。</p>
-
-        <p>算法的核心思想是<strong>递推</strong>：从 1 阶 AR 模型开始，逐步增加阶数，每一阶的参数都由前一阶的结果导出。具体来说：</p>
-
-        <pre><code># Levinson-Durbin 递推（伪代码）
-# 输入：自相关 R[0], R[1], ..., R[p]
-# 输出：AR 系数 a₁...aₚ, 反射系数 K₁...Kₚ, 误差 σ²
-
-σ²₀ = R[0]                     # 0 阶预测误差
-for m = 1 to p:
-    # 计算第 m 阶的反射系数
-    Kₘ = (R[m] + Σ aᵢ·R[m-i]) / σ²ₘ₋₁
-
-    # 更新 AR 系数（aₘₘ = Kₘ）
-    aₘₘ = Kₘ
-    for i = 1 to m-1:
-        aᵢ = aᵢ + Kₘ · aₘ₋ᵢ
-
-    # 更新预测误差方差
-    σ²ₘ = σ²ₘ₋₁ · (1 - Kₘ²)</code></pre>
-
-        <p>这个递推有一个非常好的副产品——<strong>反射系数</strong> <code>Kₘ</code>。反射系数可以在递推过程中用来判断 AR 模型的稳定性：所有反射系数的绝对值都必须小于 1（即 |Kₘ| < 1），等价于 AR 多项式的所有根都在单位圆内。如果递推过程中某个 |Kₘ| ≥ 1，说明数据可能不是平稳的，或者模型阶数选择有问题。</p>
-
-        <div class="tip">
-            <strong>工程实用技巧：</strong>反射系数本身也携带了信号的物理信息。在地震勘探中，反射系数对应着不同地质层之间的声阻抗变化界面——地震信号处理中的"反褶积"操作，本质上就是估计反射系数序列。这是 Levinson-Durbin 算法在地球物理学中的重要应用。
-        </div>
-
-        <h3>Burg 算法的思路</h3>
-
-        <p>Yule-Walker 方程 + Levinson-Durbin 递推虽然高效，但它有一个潜在问题：在估计自相关函数时使用了加窗操作（假设窗外数据为零），这会给低阶自相关估计引入偏差。Burg 算法巧妙地绕过了这个步骤——它<strong>直接利用前后向预测误差</strong>来估计反射系数，而不需要先估计自相关。</p>
-
-        <p>具体来说，Burg 算法选择反射系数 <code>Kₘ</code> 使得前向预测误差和后向预测误差的平均功率最小。这种方法的优点是：</p>
-
-        <ul>
-            <li>不需要显式估计自相关，避免了加窗偏差</li>
-            <li>对短数据序列效果更好</li>
-            <li>保证多项式根在单位圆内（保证稳定）</li>
-        </ul>
-
-        <p>在实践中，Burg 法通常比 Yule-Walker 法给出更尖锐的谱峰，对短数据的谱估计效果更好。但它也有缺点：对于正弦信号，Burg 法可能出现<strong>谱线分裂</strong>现象——一个正弦分量被分解成两个相邻的虚假谱峰。</p>
-
-        <h2>子空间方法：MUSIC 算法</h2>
-
-        <p>如果说 AR 模型谱估计是参数化方法中的"主力选手"，那么子空间方法就是"特种部队"——它在特定条件下拥有令人惊叹的<strong>超分辨率</strong>能力。</p>
-
-        <h3>信号子空间与噪声子空间</h3>
-
-        <p>MUSIC（Multiple Signal Classification）算法的出发点非常聪明：对于一个由 p 个正弦波加噪声组成的信号，我们可以构造一个<strong>自相关矩阵</strong>，然后对它做特征分解。</p>
-
-        <p>假设信号由 p 个正弦波（频率 f₁, f₂, ..., fₚ）加白噪声组成。构造 M×M 的自相关矩阵 R（M > p），特征分解后：</p>
-
-        <pre><code># 特征分解自相关矩阵
-R = Σ λᵢ · vᵢ · vᵢᴴ
-
-# 特征值分布：
-λ₁ ≥ λ₂ ≥ ... ≥ λₚ >> λₚ₊₁ ≈ ... ≈ λₘ = σ²
-
-# 前 p 个大特征值 → 信号子空间
-# 后 M-p 个小特征值 → 噪声子空间</code></pre>
-
-        <p>大的特征值对应着信号，小的特征值对应着噪声。<strong>关键洞察</strong>：信号子空间和噪声子空间是<strong>正交</strong>的。这意味着，真实的信号频率对应的导向矢量与噪声子空间正交，而正交性意味着点积为零。</p>
-
-        <p>MUSIC 算法的"伪谱"（pseudospectrum）定义为：</p>
-
-        <pre><code># MUSIC 伪谱
-P_MUSIC(f) = 1 / Σ |eᴴ(f) · vₖ|²     (k = p+1 ... M)
-
-其中 e(f) = [1, e^(j2πf), e^(j2πf·2), ..., e^(j2πf·(M-1))]ᵀ
-vₖ 是噪声子空间的特征向量</code></pre>
-
-        <p>当 f 等于真实信号频率时，e(f) 落在信号子空间中，与噪声子空间正交，分母趋近于零，伪谱出现<strong>尖锐峰值</strong>。这个峰值尖锐到什么程度？理论上可以无限尖锐——这意味着 MUSIC 可以分辨出<strong>间距小于瑞利限</strong>的两个频率！这就是"超分辨率"的来源。</p>
-
-        <div class="highlight">
-            <strong>超分辨率：</strong>经典方法的瑞利限 ≈ 1/N，但 MUSIC 可以突破这个限制。举例来说，你用 64 个数据点可以分辨 100Hz 和 101Hz 吗？经典方法不行（需要 1000 点），但 MUSIC 可以！这是因为 MUSIC 利用的是信号的<strong>模型结构</strong>（正弦波加噪声），而非单纯依靠数据长度。当然，天下没有免费的午餐——MUSIC 需要你知道信号中正弦波的数量 p，而且对模型失配非常敏感。
-        </div>
-
-        <h2>经典法 vs AR 法 vs 子空间法</h2>
-
-        <table>
-            <tr><th>特性</th><th>经典法</th><th>AR 模型法</th><th>子空间法（MUSIC）</th></tr>
-            <tr><td>是否需要模型假设</td><td>否（非参数化）</td><td>是（AR 过程）</td><td>是（正弦波 + 噪声）</td></tr>
-            <tr><td>频率分辨率</td><td>受限（≈1/N）</td><td>突破瑞利限</td><td>超分辨率</td></tr>
-            <tr><td>方差</td><td>高</td><td>低</td><td>低（但需要正确阶数）</td></tr>
-            <tr><td>对模型阶数的依赖</td><td>不依赖</td><td>依赖（关键参数）</td><td>依赖（关键参数）</td></tr>
-            <tr><td>谱峰幅度</td><td>反映真实功率</td><td>反映真实功率</td><td>无幅度信息（伪谱）</td></tr>
-            <tr><td>计算量</td><td>O(N log N)</td><td>O(p² + N)</td><td>O(M³ + M²N)</td></tr>
-            <tr><td>短数据适用性</td><td>差</td><td>良好</td><td>优秀</td></tr>
-        </table>
-
-        <h2>Python 实战：AR 谱估计与 MUSIC</h2>
-
-        <p>下面我们用 Python 实现 AR 谱估计（Burg 法）和 MUSIC 算法，对比它们与经典 Welch 法在短数据条件下分辨两个接近频率的能力。</p>
-
-        <pre><code>import numpy as np
-import matplotlib.pyplot as plt
-from scipy import signal
-
-# 生成短数据：两个相近频率的正弦波 + 白噪声
-np.random.seed(42)
-fs = 1000
-N = 64                    # 仅 64 个点 !
-t = np.arange(N) / fs
-f1, f2 = 100, 108         # 仅差 8Hz，瑞利限 ≈ 1000/64 ≈ 15.6Hz
-x = np.sin(2*np.pi*f1*t) + np.sin(2*np.pi*f2*t)
-x += 0.3 * np.random.randn(N)
-
-# 1. Welch 法（经典）
-f_wel, P_wel = signal.welch(x, fs, nperseg=32, noverlap=16)
-
-# 2. Burg 法 AR 谱估计
-# 使用 spectrum 库中的 pburg（需 pip install spectrum）
-from spectrum import pburg
-p = 8  # AR 模型阶数
-P_burg = pburg(x, p, NFFT=512)
-P_burg.plot()
-
-# 3. MUSIC 算法（简化实现）
-from scipy.linalg import eigh
-M = 12  # 自相关矩阵维度
-R = np.zeros((M, M), dtype=complex)
-for i in range(M):
-    for j in range(M):
-        R[i,j] = np.correlate(x, x, mode='full')[N-1 + (i-j)] / N
-eigvals, eigvecs = eigh(R)
-
-# 假设已知信号数 p_signal = 2
-p_signal = 2
-Vn = eigvecs[:, :M-p_signal]  # 噪声子空间
-
-f_music = np.linspace(0, fs/2, 1000)
-P_music = np.zeros_like(f_music)
-for idx, f in enumerate(f_music):
-    e = np.exp(2j*np.pi*f*np.arange(M)/fs)
-    P_music[idx] = 1 / np.sum(np.abs(e.conj() @ Vn)**2)
-
-# 绘制对比
-plt.figure(figsize=(12, 6))
-plt.subplot(121); plt.semilogy(f_wel, P_wel);
-plt.title('Welch (classical)'); plt.xlim(50, 180)
-plt.subplot(122); plt.plot(f_music, 10*np.log10(P_music));
-plt.title('MUSIC (subspace)'); plt.xlim(50, 180)
-plt.tight_layout()
-plt.show()</code></pre>
-
-        <p>运行这段代码，你会看到令人震撼的对比：Welch 法只看到一个宽宽的谱包络，完全无法分辨 100Hz 和 108Hz 两个频率；而 MUSIC 的伪谱在两个频率处出现了两条尖锐如针的谱峰，一目了然。这就是超分辨率的威力。</p>
-
-        <div class="tip">
-            <strong>注意：</strong>MUSIC 伪谱的纵坐标不是功率值（所以叫"伪谱"），它只给出频率的位置信息，不包含各频率分量的真实功率大小。如果你还需要知道每个频率分量的幅度，可以在 MUSIC 定位频率后，再用最小二乘来估计幅度和相位。
-        </div>
-
-        <h2>踩坑故事：AR 阶数选择之痛</h2>
-
-        <p>讲一个我在研究生期间踩过的坑。当时我在做<strong>雷达目标微多普勒分析</strong>——雷达波照射到旋转的风扇叶片上，回波中会携带叶片旋转产生的微多普勒调制。我们需要从回波中精确估计旋转频率，从而识别目标（是直升机还是无人机）。</p>
-
-        <p>我拿到了几百个脉冲的回波数据，长度很短（每个距离门只有 128 个脉冲），经典方法根本无法分辨微多普勒频率的细微变化。于是我选择了 AR 模型谱估计，心想："参数化方法，分辨率高，完美！"</p>
-
-        <p>第一次跑，AR 模型阶数我凭感觉选了 p=6。结果谱峰非常平滑，本来应该出现的二次谐波和三次谐波完全看不见——<strong>阶数太低，模型容量不够</strong>，把细微的谱峰都抹平了。于是我改成 p=30。这下可好，谱图上密密麻麻全是峰——除了真实的旋转频率和谐波，还有大量<strong>虚假峰</strong>。这是因为阶数过高，模型把噪声的随机起伏也"拟合"进去了，类似于机器学习中的过拟合。</p>
-
-        <p>最后我花了大量时间尝试不同的阶数选择准则：AIC（赤池信息准则）、BIC（贝叶斯信息准则）、最终预测误差（FPE）……不同的准则给出的最优阶数差异很大。最终我采用的方案是：用 AIC 选出一个候选阶数范围（6-12），然后在这个范围内用<strong>物理合理性</strong>作为判据——只看那些在物理上可能存在的频率成分对应的谱峰。</p>
-
-        <div class="warning">
-            <strong>教训：</strong>AR 模型阶数选择是参数化谱估计中<strong>最关键的步骤</strong>——没有之一。阶数太低 → 平滑掉真实信号；阶数太高 → 引入虚假谱峰。建议：先用 AIC/BIC 准则给出参考范围，再结合物理知识（你知道信号应该有几个频率分量吗？）做最终决定。如果完全不知道信号结构，可以尝试从低阶逐步增加，观察谱峰是否稳定出现——<strong>稳定出现的峰更可能是真实的</strong>，随阶数跳来跳去的峰多半是假的。
-        </div>
-
-        <h2>本章小结</h2>
-
-        <p>本章我们学习了现代功率谱估计的两种主要思路。参数化方法（AR 模型谱估计）通过假设信号符合自回归模型，用模型参数计算功率谱，在短数据条件下能够突破经典方法的瑞利限。子空间方法（MUSIC）更进一步，通过对自相关矩阵的特征分解分离信号和噪声子空间，实现了令人惊叹的超分辨率能力。</p>
-
-        <p>但请记住：每一个"超能力"都有代价。参数化方法需要你选择模型阶数，子空间方法需要你知道信号的数量，模型假设如果与真实信号不符，结果会严重失真。工程实践中的智慧在于：<strong>先用经典方法（Welch）得到稳健但分辨率有限的估计，再用现代方法在关键频率区域"放大观察"</strong>。</p>
-
-        <p>下一章，我们将进入一个全新的方向——<strong>自适应滤波</strong>。前三章的维纳滤波、卡尔曼滤波和本章的谱估计假设信号的统计特性是已知或固定的。但如果噪声环境在不断变化呢？自适应滤波能够在线调整滤波器系数，实时跟踪信号统计特性的变化。从手机上的回声消除到心电图中的胎儿心跳提取，自适应滤波无处不在。</p>
-
-        <div class="footer-nav">
-            <a href="23.html">← 上一章</a>
-            <a href="index.html">📖 返回目录</a>
-            <a href="25.html">下一章 →</a>
-        </div>
-    </div>
-</div>
-</div>
-</body>
-</html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="现代功率谱估计：AR 模型谱、Yule-Walker 方程、Levinson-Durbin 递推与 Burg 法、MUSIC 子空间超分辨，含原创 SVG、MathML 与可复现检查。"><title>第 24 章 · 现代功率谱估计 | 随机信号分析</title><link rel="stylesheet" href="../assets/css/site.css"></head><body><a class="skip-link" href="#article-main">跳到正文</a><header class="global-header"><div class="shell topbar"><a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">∿</span> 随机信号分析</a><nav aria-label="网站导航"><a href="../index.html#route">学习路线</a><a href="../index.html#content">章节目录</a><a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">GitHub</a></nav></div></header>
+<div class="article-layout">
+<aside class="article-toc"><h2>本章导览</h2><nav class="toc-links" aria-label="本章目录"><a href="#opening">瑞利限的困境</a><a href="#ar">AR 模型与谱</a><a href="#yw">Yule-Walker 方程</a><a href="#levinson">递推与 Burg 法</a><a href="#music">子空间与 MUSIC</a><a href="#experiment">可复现核查</a><a href="#boundaries">边界与陷阱</a><a href="#sources">参考资料</a></nav></aside>
+<main id="article-main" class="article-body"><article>
+<div class="article-breadcrumb"><a href="../index.html">课程首页</a> / 统计推断与应用 / 第 24 章</div>
+<header class="article-header"><p class="chapter-kicker">CHAPTER 24 · 统计推断与应用</p><h1>现代功率谱估计</h1><p class="dek">经典方法的分辨率被数据长度锁死在瑞利限 1/T 附近。参数化模型与子空间方法改用“信号由什么模型生成”这一先验，从有限甚至很短的数据里得到尖锐谱峰——代价是对模型假设与阶数选择的强依赖。</p><div class="learning-goals"><strong>读完这一章，你将能够</strong><ul><li>写出 AR(p) 模型与其闭式功率谱，说明系数符号与归一化约定</li><li>由 Yule-Walker 方程和 Levinson-Durbin 递推求 AR 参数并判断稳定性</li><li>解释 Burg 法相对 Yule-Walker 的改进与谱线分裂风险</li><li>说明 MUSIC 的子空间正交原理、超分辨代价与“伪谱”含义</li></ul></div></header>
+<section id="opening"><h2>瑞利限：经典方法的硬墙</h2><p>第 23 章末尾留下一个问题：若两个正弦分量的频率只差很小的 <span class="inline-eq">Δf</span>，经典方法能否分开？答案取决于<strong>观测时长</strong>。用矩形窗时，两条谱线的第一零点相距约 <span class="inline-eq">1/T</span>（<span class="inline-eq">T</span> 为观测时长，以秒计），这就是<strong>瑞利限</strong>：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="瑞利分辨率极限约为观测时长的倒数"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="频率分辨率约等于观测时长的倒数"><mi>Δ</mi><mi>f</mi><mo>≈</mo><mfrac><mn>1</mn><mi>T</mi></mfrac><mo>=</mo><mfrac><mn>1</mn><mrow><mi>N</mi><mi>Δ</mi><mi>t</mi></mrow></mfrac></math><span class="eq-label">(24.1) 瑞利限</span></div><p>要分辨 100 Hz 与 101 Hz、采样率 1000 Hz，就至少需要约 1000 个样本（1 秒）。如果信号只稳定存在 0.3 秒呢？无论怎么加窗、怎么平均，经典方法都无法突破这道墙：它只利用数据的二阶统计信息，没有引入任何关于“信号是什么形状”的先验。</p><p>现代方法换了一个假设：<strong>信号由一个有限维参数模型生成</strong>。只要模型形式正确，就能从参数里“外推”出窗外信息，从而获得超出 <span class="inline-eq">1/T</span> 的分辨能力。本章讲两条主流路线：<strong>参数化 AR 模型</strong>与<strong>子空间方法（MUSIC）</strong>。</p><div class="note"><p><strong>术语约定：</strong>本章离散频率 <span class="inline-eq">f</span> 以“周/样本”为单位，取值 <span class="inline-eq">[0,1/2]</span>；若无特殊说明，谱公式给出的是<strong>双边</strong>密度，比较单边测量值时需乘以 2（DC 与 Nyquist 处除外）。符号约定与第 23 章一致。</p></div></section>
+<section id="ar"><h2>AR 模型：用过去的 p 个值预测现在</h2><p>自回归（AR, autoregressive）模型假设当前值是过去 <span class="inline-eq">p</span> 个值的线性组合加白噪声激励：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="AR(p) 模型定义"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="x n 加上 a k 乘 x n 减 k 的和等于白噪声"><mi>x</mi><mo>[</mo><mi>n</mi><mo>]</mo><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>p</mi></munderover><msub><mi>a</mi><mi>k</mi></msub><mi>x</mi><mo>[</mo><mi>n</mi><mo>−</mo><mi>k</mi><mo>]</mo><mo>=</mo><mi>w</mi><mo>[</mo><mi>n</mi><mo>]</mo></math><span class="eq-label">(24.2) AR(p)</span></div><p>其中 <span class="inline-eq">w[n]</span> 是零均值白噪声，方差 <span class="inline-eq">σ²</span>；这里采用 <span class="inline-eq">+a<sub>k</sub></span> 的符号约定，因此预测形式为 <span class="inline-eq">x̂[n]=−∑a<sub>k</sub>x[n−k]</span>。定义多项式 <span class="inline-eq">A(z)=1+∑<sub>k=1</sub><sup>p</sup>a<sub>k</sub>z<sup>−k</sup></span>，则由白噪声通过全极点滤波器得到：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="AR 模型功率谱闭式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="功率谱等于噪声方差除以 A 在单位圆上模的平方"><msub><mi>S</mi><mi>AR</mi></msub><mo>(</mo><mi>f</mi><mo>)</mo><mo>=</mo><mfrac><msup><mi>σ</mi><mn>2</mn></msup><msup><mrow><mo>|</mo><mn>1</mn><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>p</mi></munderover><msub><mi>a</mi><mi>k</mi></msub><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mn>2</mn><mi>π</mi><mi>f</mi><mi>k</mi></mrow></msup><mo>|</mo></mrow><mn>2</mn></msup></mfrac></math><span class="eq-label">(24.3) AR 谱</span></div><p>与周期图对<strong>数据</strong>做变换不同，AR 谱是对<strong>模型</strong>做变换：参数由全部数据联合估计，因而曲线平滑、方差小。但若真实信号不是 AR 过程，结果会系统性失真。</p><figure><img src="../assets/svg/24-ar-pole-peak.svg" alt="平直的白色噪声参考谱与一条在频率零点一附近出现尖峰的 AR(2) 谱对比" width="1000" height="400" loading="lazy"><figcaption>图 24.1　AR(2) 示例：取 <span class="inline-eq">a<sub>1</sub>=−2r cos(2πf<sub>0</sub>)</span>、<span class="inline-eq">a<sub>2</sub>=r²</span>、<span class="inline-eq">r=0.95</span>、<span class="inline-eq">f<sub>0</sub>=0.10</span>，极点位于 <span class="inline-eq">r·e<sup>±j2πf₀</sup></span>。峰位由角度 <span class="inline-eq">f<sub>0</sub></span> 决定，峰高随半径 <span class="inline-eq">r→1</span> 增大；图中峰值约 24.8 dB（双边、dB）。数值为理论闭式。</figcaption></figure><div class="warning"><p><strong>AR 谱不是“更真的谱”。</strong>它只是在 AR 假设成立时对谱的一致估计。若信号含纯正弦（谱为 Dirac 线谱），严格说它不属于有限阶 AR 过程；AR 谱只能用尖锐峰去<strong>近似</strong>线谱。</p></div></section>
+<section id="yw"><h2>Yule-Walker 方程：从自相关求系数</h2><p>把 AR 方程两边乘以 <span class="inline-eq">x[n−m]</span> 并取期望，利用宽平稳性 <span class="inline-eq">E[x[n]x[n−m]]=R(m)</span>，得到一组线性方程（<span class="inline-eq">m=1…p</span>）：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="Yule-Walker 方程的矩阵形式，自相关托普利兹矩阵乘系数向量等于负的自相关向量"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="托普利兹自相关矩阵乘以系数向量等于负的右端自相关向量"><mrow><mo>[</mo><mtable><mtr><mtd><mi>R</mi><mo>(</mo><mn>0</mn><mo>)</mo></mtd><mtd><mi>R</mi><mo>(</mo><mn>1</mn><mo>)</mo></mtd><mtd><mo>⋯</mo></mtd><mtd><mi>R</mi><mo>(</mo><mi>p</mi><mo>−</mo><mn>1</mn><mo>)</mo></mtd></mtr><mtr><mtd><mi>R</mi><mo>(</mo><mn>1</mn><mo>)</mo></mtd><mtd><mi>R</mi><mo>(</mo><mn>0</mn><mo>)</mo></mtd><mtd><mo>⋯</mo></mtd><mtd><mi>R</mi><mo>(</mo><mi>p</mi><mo>−</mo><mn>2</mn><mo>)</mo></mtd></mtr><mtr><mtd><mo>⋮</mo></mtd><mtd><mo>⋮</mo></mtd><mtd><mo>⋱</mo></mtd><mtd><mo>⋮</mo></mtd></mtr><mtr><mtd><mi>R</mi><mo>(</mo><mi>p</mi><mo>−</mo><mn>1</mn><mo>)</mo></mtd><mtd><mi>R</mi><mo>(</mo><mi>p</mi><mo>−</mo><mn>2</mn><mo>)</mo></mtd><mtd><mo>⋯</mo></mtd><mtd><mi>R</mi><mo>(</mo><mn>0</mn><mo>)</mo></mtd></mtr></mtable><mo>]</mo></mrow><mrow><mo>[</mo><mtable><mtr><mtd><msub><mi>a</mi><mn>1</mn></msub></mtd></mtr><mtr><mtd><msub><mi>a</mi><mn>2</mn></msub></mtd></mtr><mtr><mtd><mo>⋮</mo></mtd></mtr><mtr><mtd><msub><mi>a</mi><mi>p</mi></msub></mtd></mtr></mtable><mo>]</mo></mrow><mo>=</mo><mo>−</mo><mrow><mo>[</mo><mtable><mtr><mtd><mi>R</mi><mo>(</mo><mn>1</mn><mo>)</mo></mtd></mtr><mtr><mtd><mi>R</mi><mo>(</mo><mn>2</mn><mo>)</mo></mtd></mtr><mtr><mtd><mo>⋮</mo></mtd></mtr><mtr><mtd><mi>R</mi><mo>(</mo><mi>p</mi><mo>)</mo></mtd></mtr></mtable><mo>]</mo></mrow></math><span class="eq-label">(24.4) Yule-Walker</span></div><p>系数矩阵是对称、<strong>正定</strong>的<strong>托普利兹（Toeplitz）</strong>矩阵：每条对角线上的元素相同。白噪声方差为 <span class="inline-eq">σ²=R(0)+∑<sub>k=1</sub><sup>p</sup>a<sub>k</sub>R(k)</span>。实际中 <span class="inline-eq">R(k)</span> 未知，用有偏样本自相关 <span class="inline-eq">R̂(k)=N<sup>−1</sup>∑<sub>n</sub>x[n]x[n+k]</span> 代入，这等价于对数据加了矩形窗，因此低阶自相关也会带偏差。</p></section>
+<section id="levinson"><h2>Levinson-Durbin 递推与 Burg 法</h2><p>解 <span class="inline-eq">p</span> 阶托普利兹系统直接需要 <span class="inline-eq">O(p³)</span>，但利用托普利兹结构可以降到 <span class="inline-eq">O(p²)</span>。Levinson-Durbin 算法从 1 阶开始逐级递推，每一级引入一个<strong>反射系数</strong> <span class="inline-eq">K<sub>m</sub></span>：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="反射系数与系数、误差方差的递推公式"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="反射系数等于负的分子除以上一阶误差方差，误差方差逐级乘以一减K平方"><msub><mi>K</mi><mi>m</mi></msub><mo>=</mo><mo>−</mo><mfrac><mrow><mi>R</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>+</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow></munderover><msub><mi>a</mi><mi>i</mi></msub><mi>R</mi><mo>(</mo><mi>m</mi><mo>−</mo><mi>i</mi><mo>)</mo></mrow><msubsup><mi>σ</mi><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow><mn>2</mn></msubsup></mfrac><mo>,</mo><mspace width="0.8em"/><msubsup><mi>σ</mi><mi>m</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mi>σ</mi><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow><mn>2</mn></msubsup><mrow><mo>(</mo><mn>1</mn><mo>−</mo><msubsup><mi>K</mi><mi>m</mi><mn>2</mn></msubsup><mo>)</mo></mrow></math><span class="eq-label">(24.5) 递推</span></div><p>系数更新为 <span class="inline-eq">a<sub>i</sub>←a<sub>i</sub>+K<sub>m</sub>a<sub>m−i</sub></span>（旧阶系数），并新增 <span class="inline-eq">a<sub>m</sub>=K<sub>m</sub></span>。因为 <span class="inline-eq">σ<sub>m</sub>²≥0</span> 要求 <span class="inline-eq">|K<sub>m</sub>|≤1</span>，所以递推天然可做<strong>稳定性判据</strong>：所有 <span class="inline-eq">|K<sub>m</sub>|&lt;1</span> 等价于 AR 多项式 <span class="inline-eq">A(z)</span> 的根都在单位圆内。</p><figure><img src="../assets/svg/24-levinson-lattice.svg" alt="三段格型结构，前向误差向右、后向误差向左传播，每段标一个反射系数 K" width="1000" height="360" loading="lazy"><figcaption>图 24.2　Levinson-Durbin 的格型结构：每级用一个反射系数 <span class="inline-eq">K<sub>m</sub></span> 耦合前向与后向预测误差，逐级加阶。结构示意，不代表具体数值。</figcaption></figure><p><strong>Burg 法</strong>绕开显式自相关估计：它直接选择 <span class="inline-eq">K<sub>m</sub></span> 使前向与后向预测误差的平均功率最小，因此没有加窗偏差，对短数据更稳，且仍保证 <span class="inline-eq">|K<sub>m</sub>|&lt;1</span>。代价是：对含正弦的数据，Burg 法可能出现<strong>谱线分裂</strong>——一个真实分量被拆成两个相邻虚假峰。</p><figure><img src="../assets/svg/24-order-tradeoff.svg" alt="同一条数据的 AR 谱：p=2 过平滑只剩一个包络，p=8 给出两个真实峰，p=25 出现多余尖峰" width="1000" height="400" loading="lazy"><figcaption>图 24.3　阶数选择的影响：同一短数据（<span class="inline-eq">N=128</span>，两个真实分量 + 噪声）用 <span class="inline-eq">p=2、8、25</span> 的 AR 谱。预测误差方差随阶数下降（<span class="inline-eq">0.696, 0.518, 0.449</span>），但阶数过高会把噪声拟合成虚假峰。数值由正文示例实际计算。</figcaption></figure><div class="note"><p><strong>阶数怎么选：</strong>常用 AIC、BIC 或最终预测误差（FPE）准则给出参考范围，再结合物理先验确认。一个稳健的启发是：<strong>随阶数稳定出现的峰更可信</strong>，位置随阶数跳动的峰多半是虚假的。</p></div></section>
+<section id="music"><h2>子空间方法：MUSIC 的超分辨</h2><p>若信号由 <span class="inline-eq">p</span> 个正弦加白噪声组成，用 <span class="inline-eq">M&gt;p</span> 个滞后构造自相关矩阵 <span class="inline-eq">R=E[xx<sup>H</sup>]</span>（<span class="inline-eq">x[n]=[x[n],…,x[n−M+1]]<sup>T</sup></span>）。它可写为</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="自相关矩阵等于信号子空间与噪声方差单位阵之和"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="自相关矩阵等于导向矩阵乘信号功率再乘共轭转置加噪声方差乘单位阵"><mi>R</mi><mo>=</mo><mi>A</mi><mi>P</mi><msup><mi>A</mi><mi>H</mi></msup><mo>+</mo><msup><mi>σ</mi><mn>2</mn></msup><mi>I</mi></math><span class="eq-label">(24.6) 阵列自相关</span></div><p>其中导向矩阵 <span class="inline-eq">A=[a(f<sub>1</sub>),…,a(f<sub>p</sub>)]</span>，<span class="inline-eq">a(f)=[1,e<sup>j2πf</sup>,…,e<sup>j2πf(M−1)</sup>]<sup>T</sup></span>，<span class="inline-eq">P</span> 为各分量功率。对 <span class="inline-eq">R</span> 做特征分解：前 <span class="inline-eq">p</span> 个大特征值张成<strong>信号子空间</strong>，后 <span class="inline-eq">M−p</span> 个（近似相等，都约等于 <span class="inline-eq">σ²</span>）张成<strong>噪声子空间</strong>。关键事实：两个子空间<strong>正交</strong>，即真实导向矢量 <span class="inline-eq">a(f<sub>k</sub>)</span> 与每个噪声特征向量 <span class="inline-eq">v<sub>n</sub></span> 正交。于是定义<strong>伪谱</strong>：</p><div class="eq" data-math-scroll role="region" tabindex="0" aria-label="MUSIC 伪谱等于噪声子空间投影的逆"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="伪谱等于导向矢量在噪声子空间投影模方和的倒数"><msub><mi>P</mi><mi>MUSIC</mi></msub><mo>(</mo><mi>f</mi><mo>)</mo><mo>=</mo><mfrac><mn>1</mn><mrow><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mi>p</mi><mo>+</mo><mn>1</mn></mrow><mi>M</mi></munderover><msup><mrow><mo>|</mo><msup><mi>a</mi><mi>H</mi></msup><mo>(</mo><mi>f</mi><mo>)</mo><msub><mi>v</mi><mi>n</mi></msub><mo>|</mo></mrow><mn>2</mn></msup></mrow></mfrac></math><span class="eq-label">(24.7) MUSIC 伪谱</span></div><figure><img src="../assets/svg/24-music-superresolution.svg" alt="经典周期图只有一个宽包，而 MUSIC 伪谱在零点一和零点一一二处出现两条尖锐谱峰" width="1000" height="400" loading="lazy"><figcaption>图 24.4　超分辨示意：<span class="inline-eq">N=64</span>、两音间距 0.012，小于瑞利限 <span class="inline-eq">1/N≈0.015625</span>。经典周期图只给一个宽包，MUSIC 伪谱（基于精确二阶矩）给出两条尖峰。数值由正文示例实际计算，属理想化情形。</figcaption></figure><div class="warning"><p><strong>三个必须说明的限制：</strong>其一，MUSIC 输出的是<strong>伪谱</strong>，纵轴不代表真实功率，只能定位频率；其二，它必须已知信号数 <span class="inline-eq">p</span>，估错会漏峰或产生虚假峰；其三，超分辨需要足够高的信噪比与足够的快拍数，有限样本下峰会展宽。现实中通常先用 Welch 等稳健方法定位大结构，再用 MUSIC 在关心频段“放大”。</p></div></section>
+<section id="experiment"><h2>可复现核查</h2><p>下面用纯 Python（无第三方依赖）复现本章关键数值：AR(2) 谱峰位置与高度、Levinson-Durbin 的稳定性与 Yule-Walker 残差、MUSIC 对短记录两音的超分辨。</p><pre class="code-block"><code>import math, cmath
+
+def autocorr(x, p):
+    N = len(x)
+    return [sum(x[n] * x[n + k] for n in range(N - k)) / N for k in range(p + 1)]
+
+def levinson(R, p):
+    a = [1.0] + [0.0] * p
+    K, e = [], R[0]
+    for m in range(1, p + 1):
+        km = -(R[m] + sum(a[i] * R[m - i] for i in range(1, m))) / e
+        K.append(km)
+        anew = a[:]
+        for i in range(1, m):
+            anew[i] = a[i] + km * a[m - i]
+        anew[m] = km
+        a, e = anew, e * (1 - km * km)
+    return a, K, e
+
+# AR(2) 理论峰：f0=0.10, r=0.95
+a = [1.0, -2 * 0.95 * math.cos(2 * math.pi * 0.10), 0.95 ** 2]
+vals = [1.0 / abs(1 + a[1] * cmath.exp(-2j * math.pi * f)
+                + a[2] * cmath.exp(-4j * math.pi * f)) ** 2
+        for f in [i / 4000 for i in range(1001)]]
+peak_f = [i / 4000 for i in range(1001)][vals.index(max(vals))]
+assert abs(peak_f - 0.10) &lt; 0.005
+assert abs(10 * math.log10(max(vals)) - 24.8) &lt; 1.0
+</code></pre><p>检查点：AR(2) 谱峰位于 <span class="inline-eq">f<sub>0</sub>=0.10</span>、峰值约 <span class="inline-eq">24.8 dB</span>；对 <span class="inline-eq">N=128</span> 数据做 <span class="inline-eq">p=8</span> 的 Levinson 递推，所有 <span class="inline-eq">|K<sub>m</sub>|&lt;1</span>（实测最大值 0.457），预测误差方差随阶数下降（<span class="inline-eq">0.696→0.518→0.449</span>），且系数满足各阶 Yule-Walker 方程（残差 &lt;1e-9）；MUSIC 把间距 0.012（小于 <span class="inline-eq">1/N≈0.015625</span>）的两音分为两条尖峰，而同一数据的周期图只有一个包。测试文件 <code>examples/test_chapter_24.py</code> 复用同一构造。</p></section>
+<section id="boundaries"><h2>边界与陷阱</h2><ul><li><strong>模型假设就是一切。</strong>AR 谱只在真实过程近似 AR 时可靠；MUSIC 只在“少数正弦 + 白噪声”下成立。模型失配会比经典方法错得更严重。纯正弦的谱含 Dirac 线，严格说不是有限阶 AR 过程，AR 只能用尖峰去近似。</li><li><strong>阶数 / 信号数是关键参数。</strong>AR 阶数过低会抹平真实峰，过高会把噪声拟合成虚假峰；MUSIC 估错信号数会漏峰或冒出虚假峰。两者都需 AIC/BIC 或物理先验辅助。</li><li><strong>Burg 的谱线分裂。</strong>对含正弦的数据，Burg 法可能把一个真实分量拆成两个相邻虚假峰；这是算法特性，不是信号真实结构。</li><li><strong>伪谱不含幅度。</strong>MUSIC 纵轴无功率含义，只定位频率；需要幅度/相位时应在定位后用最小二乘专估。</li><li><strong>超分辨有门槛。</strong>分辨能力依赖信噪比与快拍数；低信噪比、少快拍或源相关（相干）时，子空间方法会退化，甚至不如 Welch 稳健。</li><li><strong>自相关估计方式影响结果。</strong>有偏、无偏、协方差三种样本自相关给出不同的 Yule-Walker 解；短数据下 Yule-Walker 可能不稳定，此时应改用 Burg 或 Marple 等格型方法。</li><li><strong>约定需对齐。</strong>AR 系数符号、双边/单边密度、dB 参考都需与参考实现核对，否则谱高会差常因子或镜像。</li></ul><p>下一章转向<strong>自适应滤波</strong>：当信号与噪声的统计特性随时间变化时，如何在线调整滤波器系数去跟踪它们。</p></section>
+<section id="sources" class="references"><h2>参考与核查依据</h2><ol><li>S. M. Kay, <em>Modern Spectral Estimation: Theory and Application</em>, Prentice Hall, 1988：AR/ARMA 谱估计、Levinson 递推与阶数选择准则。</li><li>J. P. Burg, “Maximum Entropy Spectral Analysis,” 37th Annual Int. Meeting, Soc. Explor. Geophys., 1967：Burg 法与最大熵谱估计的原始来源。</li><li>R. O. Schmidt, “Multiple Emitter Location and Signal Parameter Estimation,” <em>IEEE Trans. Antennas and Propagation</em>, 1986（<a href="https://doi.org/10.1109/TAP.1986.1143830">doi:10.1109/TAP.1986.1143830</a>）：MUSIC 算法原始论文。</li><li>P. Stoica &amp; R. Moses, <em>Spectral Analysis of Signals</em>, Prentice Hall, 2005：参数化与子空间方法的统一处理与分辨极限。</li><li>M. H. Hayes, <em>Statistical Digital Signal Processing and Modeling</em>, Wiley, 1996：AR 模型、Yule-Walker 与格型滤波。</li><li><a href="https://ocw.mit.edu/courses/6-011-introduction-to-communication-control-and-signal-processing-spring-2010/">MIT OpenCourseWare · Signals, Systems and Inference</a>：参数化谱估计与子空间方法。</li></ol></section>
+<nav class="chapter-nav" aria-label="章节切换"><a href="23.html">← 第 23 章</a><a href="../index.html#content">全部章节</a><a href="25.html">第 25 章 →</a></nav>
+</article></main></div>
+<footer class="global-footer"><div class="shell"><p>随机信号分析 · 开放课程</p><p><a href="../index.html">课程首页</a> · <a href="https://github.com/1998x-stack/random-signal-analysis-tutorial">源码</a></p></div></footer><script defer src="../assets/js/site.js"></script></body></html>
